@@ -84,11 +84,10 @@ will result in the following sanitized output
 
 In general the TYPO3 core is released under the GNU General Public License version
 2 or any later version (`GPL-2.0-or-later`). In order to avoid licensing issues and
-incompatibilities this `PharStreamWrapper` is licenced under the MIT License. In case
-you duplicate or modify source code, credits are not required but really appreciated.
+incompatibilities this package is licenced under the MIT License. In case  you
+duplicate or modify source code, credits are not required but really appreciated.
 
 ## Security Contact
 
-In case of finding additional security issues in the TYPO3 project or in this
-`PharStreamWrapper` package in particular, please get in touch with the
-[TYPO3 Security Team](mailto:security@typo3.org).
+In case of finding additional security issues in the TYPO3 project or in this package  in particular,
+please get in touch with the [TYPO3 Security Team](mailto:security@typo3.org).
