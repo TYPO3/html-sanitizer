@@ -73,11 +73,9 @@ class Tag
 
     public function addAttrs(Attr ...$attrs): self
     {
-        $indexedAttrs = array_combine(
-            array_map([$this, 'getAttrName'], $attrs),
-            $attrs
-        );
-        // @todo PHPStan "demands" this check...
+        $names = array_map([$this, 'getAttrName'], $attrs);
+        $this->assertScalarUniqueness($names);
+        $indexedAttrs = array_combine($names, $attrs);
         if (!is_array($indexedAttrs)) {
             return $this;
         }
@@ -129,6 +127,24 @@ class Tag
     }
 
     /**
+     * @param string[] $names
+     * @throws LogicException
+     */
+    protected function assertScalarUniqueness(array $names): void
+    {
+        $ambiguousNames = array_diff_assoc($names, array_unique($names));
+        if ($ambiguousNames !== []) {
+            throw new LogicException(
+                sprintf(
+                    'Ambiguous attr names %s.',
+                    implode(', ', $ambiguousNames)
+                ),
+                1625590355
+            );
+        }
+    }
+
+    /**
      * @param array<string, Attr> $attrs
      * @throws LogicException
      */
@@ -156,7 +172,7 @@ class Tag
             throw new LogicException(
                 sprintf(
                     'Cannot redeclare attr names %s.',
-                    implode(', ', array_keys($existingAttrNames))
+                    implode(', ', $existingAttrNames)
                 ),
                 1625394715
             );

@@ -155,7 +155,6 @@ class CommonBuilder implements BuilderInterface
         $attrs = $this->createAttrs(
             'class',
             'id',
-            'title',
             'dir',
             'lang',
             'nonce',
