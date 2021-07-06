@@ -166,8 +166,6 @@ class CommonBuilder implements BuilderInterface
             'itemscope',
             'itemtype',
             'role',
-            // @todo `style` used in Introduction Package, inline CSS should be removed
-            'style',
             'tabindex',
             'title',
             'translate'
