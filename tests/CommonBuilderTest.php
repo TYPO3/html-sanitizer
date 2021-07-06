@@ -99,6 +99,16 @@ class CommonBuilderTest extends TestCase
                 '<p data-bool><span data-bool><strong data-bool>value</strong></span></p>',
                 '<p data-bool><span data-bool><strong data-bool>value</strong></span></p>'
             ],
+            '#900' => [
+                '<div id="main">' .
+                    '<a href="https://typo3.org/" data-type="url" wrong-attr="is-removed">TYPO3</a><br>' .
+                    '(the <script>alert(1)</script> tag shall be encoded to HTML entities)'.
+                '</div>',
+                '<div id="main">' .
+                    '<a href="https://typo3.org/" data-type="url">TYPO3</a><br>' .
+                    '(the &lt;script&gt;alert(1)&lt;/script&gt; tag shall be encoded to HTML entities)'.
+                '</div>',
+            ],
         ];
     }
 
