@@ -22,6 +22,11 @@ use LogicException;
 class Tag
 {
     /**
+     * not having any behavioral capabilities
+     */
+    public const BLUNT = 0;
+
+    /**
      * whether to purge this tag in case it does not have any attributes
      */
     public const PURGE_WITHOUT_ATTRS = 1;
@@ -51,10 +56,12 @@ class Tag
      */
     protected $attrs = [];
 
-    public function __construct(string $name, int $flags = 0)
+    public function __construct(string $name, int $flags = null)
     {
         $this->name = $name;
-        $this->flags = $flags;
+        // using `null` as default - potentially allows switching
+        // the real default value from `BLUNT` to e.g. `ALLOW_CHILDREN`
+        $this->flags = $flags ?? self::BLUNT;
 
         if ($this->shallPurgeWithoutChildren() && !$this->shallAllowChildren()) {
             throw new LogicException(
