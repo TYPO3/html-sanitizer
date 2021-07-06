@@ -82,12 +82,10 @@ class Behavior
 
     public function withTags(Tag ...$tags): self
     {
+        $names = array_map([$this, 'getTagName'], $tags);
+        $this->assertScalarUniqueness($names);
         // uses tag name as array index, e.g. `['strong' => new Tag('strong')]`
-        $indexedTags = array_combine(
-            array_map([$this, 'getTagName'], $tags),
-            $tags
-        );
-        // @todo PHPStan "demands" this check...
+        $indexedTags = array_combine($names, $tags);
         if (!is_array($indexedTags)) {
             return $this;
         }
@@ -165,6 +163,24 @@ class Behavior
     public function shallAllowCustomElements(): bool
     {
         return ($this->flags & self::ALLOW_CUSTOM_ELEMENTS) === self::ALLOW_CUSTOM_ELEMENTS;
+    }
+
+    /**
+     * @param string[] $names
+     * @throws LogicException
+     */
+    protected function assertScalarUniqueness(array $names): void
+    {
+        $ambiguousNames = array_diff_assoc($names, array_unique($names));
+        if ($ambiguousNames !== []) {
+            throw new LogicException(
+                sprintf(
+                    'Ambiguous tag names %s.',
+                    implode(', ', $ambiguousNames)
+                ),
+                1625591503
+            );
+        }
     }
 
     /**
