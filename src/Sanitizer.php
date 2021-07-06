@@ -100,8 +100,10 @@ class Sanitizer
             }
         }
 
-        foreach ($node->childNodes as $childNode) {
-            $this->traverse($childNode);
+        if ($node->hasChildNodes()) {
+            foreach ($node->childNodes as $childNode) {
+                $this->traverse($childNode);
+            }
         }
 
         foreach ($this->visitors as $visitor) {
