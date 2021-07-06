@@ -80,20 +80,20 @@ class CommonBuilderTest extends TestCase
                 '',
             ],
             '#050' => [
-                '<a href="https://typo3.org/" role="button"></a>',
-                '<a href="https://typo3.org/" role="button"></a>',
+                '<a href="https://typo3.org/" role="button">value</a>',
+                '<a href="https://typo3.org/" role="button">value</a>',
             ],
             '#051' => [
-                '<a href="ssh://example.org/" role="button"></a>',
-                '<a role="button"></a>',
+                '<a href="ssh://example.org/" role="button">value</a>',
+                '<a role="button">value</a>',
             ],
             '#052' => [
-                '<a href="javascript:alert(1)" role="button"></a>',
-                '<a role="button"></a>',
+                '<a href="javascript:alert(1)" role="button">value</a>',
+                '<a role="button">value</a>',
             ],
             '#053' => [
-                '<a href="data:text/html;..." role="button"></a>',
-                '<a role="button"></a>',
+                '<a href="data:text/html;..." role="button">value</a>',
+                '<a role="button">value</a>',
             ],
             '#090' => [
                 '<p data-bool><span data-bool><strong data-bool>value</strong></span></p>',
