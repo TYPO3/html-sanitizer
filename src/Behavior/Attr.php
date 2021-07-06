@@ -107,6 +107,8 @@ class Attr
                 return $matchFirstValue;
             }
         }
-        return false;
+        // + matchFirstValue: false --> return true (since no other match failed before)
+        // + matchFirstValue: true --> return false (since no other match succeeded before)
+        return !$matchFirstValue;
     }
 }

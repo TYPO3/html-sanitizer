@@ -66,7 +66,7 @@ will result in the following sanitized output
 
 ```html
 <div id="main">
-    <a data-type="url">TYPO3</a><br>
+    <a href="https://typo3.org/" data-type="url">TYPO3</a><br>
     (the &lt;span&gt;SPAN, SPAN, SPAN&lt;/span&gt; tag shall be encoded to HTML entities)
 </div>
 ```
