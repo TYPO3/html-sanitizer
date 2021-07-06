@@ -9,6 +9,11 @@
 			"email": "oliver@typo3.org"
 		}
 	],
+	"extra": {
+		"branch-alias": {
+			"dev-main": "2.x-dev"
+		}
+	},
 	"require": {
 		"ext-dom": "*",
 		"masterminds/html5": "^2.7",
