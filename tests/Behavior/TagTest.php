@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -21,7 +19,10 @@ use TYPO3\HtmlSanitizer\Behavior\Tag;
 
 class TagTest extends TestCase
 {
-    public function ambiguityIsDetectedDataProvider(): array
+    /**
+     * @return mixed[]
+     */
+    public function ambiguityIsDetectedDataProvider()
     {
         return [
             [ ['same'], ['same'], 1625394715 ],
@@ -38,9 +39,11 @@ class TagTest extends TestCase
      * @param int $code
      * @test
      * @dataProvider ambiguityIsDetectedDataProvider
+     * @return void
      */
-    public function ambiguityIsDetected(array $originalNames, array $additionalNames, int $code = 0): void
+    public function ambiguityIsDetected(array $originalNames, array $additionalNames, $code = 0)
     {
+        $code = (int) $code;
         $this->expectException(LogicException::class);
         $this->expectExceptionCode($code);
         $tag = new Tag('tag');
@@ -54,12 +57,13 @@ class TagTest extends TestCase
 
     /**
      * @param string ...$names
-     * @return Attr[]
+     * @return mixed[]
      */
-    private function createAttrs(string ...$names): array
+    private function createAttrs(...$names)
     {
         return array_map(
-            function (string $name) {
+            function ($name) {
+                $name = (string) $name;
                 return new Attr($name);
             },
             $names

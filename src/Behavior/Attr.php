@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -23,14 +21,14 @@ class Attr
      * whether given name shall be considered as prefix, e.g.
      * `data-` or `aria-` for multiple similar and safe attribute names
      */
-    public const NAME_PREFIX = 1;
+    const NAME_PREFIX = 1;
 
     /**
      * whether the first match in `$values` shall be considered
      * as indicator the attribute value is valid in general - if
      * this flag is not given, all declared `$values` must match
      */
-    public const MATCH_FIRST_VALUE = 2;
+    const MATCH_FIRST_VALUE = 2;
 
     /**
      * either specific attribute name (`class`) or a prefix
@@ -49,50 +47,78 @@ class Attr
      */
     protected $values = [];
 
-    public function __construct(string $name, int $flags = 0)
+    /**
+     * @param string $name
+     * @param int $flags
+     */
+    public function __construct($name, $flags = 0)
     {
+        $name = (string) $name;
+        $flags = (int) $flags;
         $this->name = $name;
         $this->flags = $flags;
     }
 
-    public function addValues(AttrValueInterface ...$assertions): self
+    /**
+     * @return $this
+     */
+    public function addValues(AttrValueInterface ...$assertions)
     {
         $this->values = array_merge($this->values, $assertions);
         return $this;
     }
 
-    public function getName(): string
+    /**
+     * @return string
+     */
+    public function getName()
     {
         return $this->name;
     }
 
     /**
-     * @return AttrValueInterface[]
+     * @return mixed[]
      */
-    public function getValues(): array
+    public function getValues()
     {
         return $this->values;
     }
 
-    public function isPrefix(): bool
+    /**
+     * @return bool
+     */
+    public function isPrefix()
     {
         return ($this->flags & self::NAME_PREFIX) === self::NAME_PREFIX;
     }
 
-    public function shallMatchFirstValue(): bool
+    /**
+     * @return bool
+     */
+    public function shallMatchFirstValue()
     {
         return ($this->flags & self::MATCH_FIRST_VALUE) === self::MATCH_FIRST_VALUE;
     }
 
-    public function matchesName(string $name): bool
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function matchesName($name)
     {
+        $name = (string) $name;
         $name = strtolower($name);
         return $name === $this->name
             || $this->isPrefix() && strpos($name, $this->name) === 0;
     }
 
-    public function matchesValue(string $value): bool
+    /**
+     * @param string $value
+     * @return bool
+     */
+    public function matchesValue($value)
     {
+        $value = (string) $value;
         // no declared assertions means `true` as well
         if ($this->values === []) {
             return true;

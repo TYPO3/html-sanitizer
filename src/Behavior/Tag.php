@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -24,22 +22,22 @@ class Tag
     /**
      * not having any behavioral capabilities
      */
-    public const BLUNT = 0;
+    const BLUNT = 0;
 
     /**
      * whether to purge this tag in case it does not have any attributes
      */
-    public const PURGE_WITHOUT_ATTRS = 1;
+    const PURGE_WITHOUT_ATTRS = 1;
 
     /**
      * whether to purge this tag in case it does not have children
      */
-    public const PURGE_WITHOUT_CHILDREN = 2;
+    const PURGE_WITHOUT_CHILDREN = 2;
 
     /**
      * whether this tag allows to have children
      */
-    public const ALLOW_CHILDREN = 8;
+    const ALLOW_CHILDREN = 8;
 
     /**
      * @var string
@@ -56,12 +54,18 @@ class Tag
      */
     protected $attrs = [];
 
-    public function __construct(string $name, int $flags = null)
+    /**
+     * @param string $name
+     * @param int $flags
+     */
+    public function __construct($name, $flags = null)
     {
+        $name = (string) $name;
+        $flags = (int) $flags;
         $this->name = $name;
         // using `null` as default - potentially allows switching
         // the real default value from `BLUNT` to e.g. `ALLOW_CHILDREN`
-        $this->flags = $flags ?? self::BLUNT;
+        $this->flags = isset($flags) ? $flags : self::BLUNT;
 
         if ($this->shallPurgeWithoutChildren() && !$this->shallAllowChildren()) {
             throw new LogicException(
@@ -71,7 +75,10 @@ class Tag
         }
     }
 
-    public function addAttrs(Attr ...$attrs): self
+    /**
+     * @return $this
+     */
+    public function addAttrs(Attr ...$attrs)
     {
         $names = array_map([$this, 'getAttrName'], $attrs);
         $this->assertScalarUniqueness($names);
@@ -85,35 +92,52 @@ class Tag
     }
 
     /**
-     * @return Attr[]
+     * @return mixed[]
      */
-    public function getAttrs(): array
+    public function getAttrs()
     {
         return $this->attrs;
     }
 
-    public function getName(): string
+    /**
+     * @return string
+     */
+    public function getName()
     {
         return $this->name;
     }
 
-    public function shallPurgeWithoutAttrs(): bool
+    /**
+     * @return bool
+     */
+    public function shallPurgeWithoutAttrs()
     {
         return ($this->flags & self::PURGE_WITHOUT_ATTRS) === self::PURGE_WITHOUT_ATTRS;
     }
 
-    public function shallPurgeWithoutChildren(): bool
+    /**
+     * @return bool
+     */
+    public function shallPurgeWithoutChildren()
     {
         return ($this->flags & self::PURGE_WITHOUT_CHILDREN) === self::PURGE_WITHOUT_CHILDREN;
     }
 
-    public function shallAllowChildren(): bool
+    /**
+     * @return bool
+     */
+    public function shallAllowChildren()
     {
         return ($this->flags & self::ALLOW_CHILDREN) === self::ALLOW_CHILDREN;
     }
 
-    public function getAttr(string $name): ?Attr
+    /**
+     * @return \TYPO3\HtmlSanitizer\Behavior\Attr|null
+     * @param string $name
+     */
+    public function getAttr($name)
     {
+        $name = (string) $name;
         $name = strtolower($name);
         if (isset($this->attrs[$name])) {
             return $this->attrs[$name];
@@ -129,8 +153,9 @@ class Tag
     /**
      * @param string[] $names
      * @throws LogicException
+     * @return void
      */
-    protected function assertScalarUniqueness(array $names): void
+    protected function assertScalarUniqueness(array $names)
     {
         $ambiguousNames = array_diff_assoc($names, array_unique($names));
         if ($ambiguousNames !== []) {
@@ -147,8 +172,9 @@ class Tag
     /**
      * @param array<string, Attr> $attrs
      * @throws LogicException
+     * @return void
      */
-    protected function assertAttrUniqueness(array $attrs): void
+    protected function assertAttrUniqueness(array $attrs)
     {
         $existingAttrNames = [];
         $currentAttrNames = array_keys($this->attrs);
@@ -179,7 +205,10 @@ class Tag
         }
     }
 
-    protected function getAttrName(Attr $attr): string
+    /**
+     * @return string
+     */
+    protected function getAttrName(Attr $attr)
     {
         return strtolower($attr->getName());
     }

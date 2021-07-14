@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -20,5 +18,9 @@ namespace TYPO3\HtmlSanitizer\Behavior;
  */
 interface AttrValueInterface
 {
-    public function matches(string $value): bool;
+    /**
+     * @param string $value
+     * @return bool
+     */
+    public function matches($value);
 }

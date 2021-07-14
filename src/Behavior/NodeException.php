@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -19,7 +17,10 @@ use RuntimeException;
 
 class NodeException extends RuntimeException
 {
-    public static function create(): self
+    /**
+     * @return $this
+     */
+    public static function create()
     {
         return new self('<node>', 1624911897);
     }
@@ -29,13 +30,20 @@ class NodeException extends RuntimeException
      */
     protected $node;
 
-    public function withNode(?DOMNode $node): self
+    /**
+     * @param \DOMNode|null $node
+     * @return $this
+     */
+    public function withNode($node)
     {
         $this->node = $node;
         return $this;
     }
 
-    public function getNode(): ?DOMNode
+    /**
+     * @return \DOMNode|null
+     */
+    public function getNode()
     {
         return $this->node;
     }

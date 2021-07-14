@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -61,8 +59,13 @@ class Sanitizer
         $this->parser = $this->createParser();
     }
 
-    public function sanitize(string $html): string
+    /**
+     * @param string $html
+     * @return string
+     */
+    public function sanitize($html)
     {
+        $html = (string) $html;
         $this->root = $this->parse($html);
         $this->context = new Context($this->parser);
         $this->beforeTraverse();
@@ -73,24 +76,38 @@ class Sanitizer
         return $this->serialize($this->root);
     }
 
-    protected function parse(string $html): DOMDocumentFragment
+    /**
+     * @param string $html
+     * @return \DOMDocumentFragment
+     */
+    protected function parse($html)
     {
+        $html = (string) $html;
         return $this->parser->parseFragment($html);
     }
 
-    protected function serialize(DOMNode $document): string
+    /**
+     * @return string
+     */
+    protected function serialize(DOMNode $document)
     {
         return $this->parser->saveHTML($document);
     }
 
-    protected function beforeTraverse(): void
+    /**
+     * @return void
+     */
+    protected function beforeTraverse()
     {
         foreach ($this->visitors as $visitor) {
             $visitor->beforeTraverse($this->context);
         }
     }
 
-    protected function traverse(DOMNode $node): void
+    /**
+     * @return void
+     */
+    protected function traverse(DOMNode $node)
     {
         foreach ($this->visitors as $visitor) {
             $result = $visitor->enterNode($node);
@@ -115,14 +132,21 @@ class Sanitizer
         }
     }
 
-    protected function afterTraverse(): void
+    /**
+     * @return void
+     */
+    protected function afterTraverse()
     {
         foreach ($this->visitors as $visitor) {
             $visitor->afterTraverse($this->context);
         }
     }
 
-    protected function replaceNode(DOMNode $source, ?DOMNode $target): ?DOMNode
+    /**
+     * @param \DOMNode|null $target
+     * @return \DOMNode|null
+     */
+    protected function replaceNode(DOMNode $source, $target)
     {
         if ($target === null) {
             $source->parentNode->removeChild($source);
@@ -135,7 +159,10 @@ class Sanitizer
         return $target;
     }
 
-    protected function createParser(): HTML5
+    /**
+     * @return \Masterminds\HTML5
+     */
+    protected function createParser()
     {
         // set parser & applies work-around
         // https://github.com/Masterminds/html5-php/issues/181#issuecomment-643767471

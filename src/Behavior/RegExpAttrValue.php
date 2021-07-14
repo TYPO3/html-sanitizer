@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -23,13 +21,22 @@ class RegExpAttrValue implements AttrValueInterface
      */
     protected $pattern;
 
-    public function __construct(string $pattern)
+    /**
+     * @param string $pattern
+     */
+    public function __construct($pattern)
     {
+        $pattern = (string) $pattern;
         $this->pattern = $pattern;
     }
 
-    public function matches(string $value): bool
+    /**
+     * @param string $value
+     * @return bool
+     */
+    public function matches($value)
     {
+        $value = (string) $value;
         $matches = preg_match($this->pattern, $value) > 0;
         $regExpError = preg_last_error();
         if ($regExpError === PREG_NO_ERROR) {

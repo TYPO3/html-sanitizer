@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -19,7 +17,10 @@ use TYPO3\HtmlSanitizer\Builder\CommonBuilder;
 
 class CommonBuilderTest extends TestCase
 {
-    public function isSanitizedDataProvider(): array
+    /**
+     * @return mixed[]
+     */
+    public function isSanitizedDataProvider()
     {
         return [
             '#010' => [
@@ -117,9 +118,12 @@ class CommonBuilderTest extends TestCase
      * @param string $expectation
      * @test
      * @dataProvider isSanitizedDataProvider
+     * @return void
      */
-    public function isSanitized(string $payload, string $expectation): void
+    public function isSanitized($payload, $expectation)
     {
+        $payload = (string) $payload;
+        $expectation = (string) $expectation;
         $builder = new CommonBuilder();
         $sanitizer = $builder->build();
         self::assertSame($expectation, $sanitizer->sanitize($payload));

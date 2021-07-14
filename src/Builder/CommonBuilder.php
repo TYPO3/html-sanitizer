@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -65,14 +63,20 @@ class CommonBuilder implements BuilderInterface
             ->addValues($isHttpOrLocalUri, $isMailtoUri);
     }
 
-    public function build(): Sanitizer
+    /**
+     * @return \TYPO3\HtmlSanitizer\Sanitizer
+     */
+    public function build()
     {
         $behavior = $this->createBehavior();
         $visitor = new CommonVisitor($behavior);
         return new Sanitizer($visitor);
     }
 
-    protected function createBehavior(): Behavior
+    /**
+     * @return \TYPO3\HtmlSanitizer\Behavior
+     */
+    protected function createBehavior()
     {
         return (new Behavior())
             ->withFlags(Behavior::ENCODE_INVALID_TAG + Behavior::REMOVE_UNEXPECTED_CHILDREN)
@@ -81,7 +85,10 @@ class CommonBuilder implements BuilderInterface
             ->withTags(...array_values($this->createMediaTags()));
     }
 
-    protected function createBasicTags(): array
+    /**
+     * @return mixed[]
+     */
+    protected function createBasicTags()
     {
         $names = [
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#content_sectioning
@@ -124,7 +131,10 @@ class CommonBuilder implements BuilderInterface
         return $tags;
     }
 
-    protected function createMediaTags(): array
+    /**
+     * @return mixed[]
+     */
+    protected function createMediaTags()
     {
         $tags = [];
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#image_and_multimedia
@@ -147,9 +157,9 @@ class CommonBuilder implements BuilderInterface
     }
 
     /**
-     * @return Behavior\Attr[]
+     * @return mixed[]
      */
-    protected function createGlobalAttrs(): array
+    protected function createGlobalAttrs()
     {
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes
         $attrs = $this->createAttrs(
@@ -176,12 +186,13 @@ class CommonBuilder implements BuilderInterface
 
     /**
      * @param string ...$names
-     * @return Behavior\Attr[]
+     * @return mixed[]
      */
-    protected function createAttrs(string ...$names): array
+    protected function createAttrs(...$names)
     {
         return array_map(
-            function (string $name) {
+            function ($name) {
+                $name = (string) $name;
                 return new Behavior\Attr($name);
             },
             $names

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -26,23 +24,23 @@ class Behavior
     /**
      * in case an unexpected tag was found, encode the whole tag as HTML
      */
-    public const ENCODE_INVALID_TAG = 1;
+    const ENCODE_INVALID_TAG = 1;
 
     /**
      * in case an unexpected attribute was found, encode the whole tag as HTML
      */
-    public const ENCODE_INVALID_ATTR = 2;
+    const ENCODE_INVALID_ATTR = 2;
 
     /**
      * remove children at tags that did not expect children
      */
-    public const REMOVE_UNEXPECTED_CHILDREN = 4;
+    const REMOVE_UNEXPECTED_CHILDREN = 4;
 
     /**
      * https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name
      * custom elements must contain a hyphen (`-`), start with ASCII lower alpha
      */
-    public const ALLOW_CUSTOM_ELEMENTS = 8;
+    const ALLOW_CUSTOM_ELEMENTS = 8;
 
     /**
      * @var int
@@ -60,8 +58,13 @@ class Behavior
      */
     protected $tags = [];
 
-    public function withFlags(int $flags): self
+    /**
+     * @param int $flags
+     * @return $this
+     */
+    public function withFlags($flags)
     {
+        $flags = (int) $flags;
         if ($flags === $this->flags) {
             return $this;
         }
@@ -70,8 +73,13 @@ class Behavior
         return $target;
     }
 
-    public function withName(string $name): self
+    /**
+     * @param string $name
+     * @return $this
+     */
+    public function withName($name)
     {
+        $name = (string) $name;
         if ($name === $this->name) {
             return $this;
         }
@@ -80,7 +88,10 @@ class Behavior
         return $target;
     }
 
-    public function withTags(Tag ...$tags): self
+    /**
+     * @return $this
+     */
+    public function withTags(Tag ...$tags)
     {
         $names = array_map([$this, 'getTagName'], $tags);
         $this->assertScalarUniqueness($names);
@@ -95,7 +106,10 @@ class Behavior
         return $target;
     }
 
-    public function withoutTags(Tag ...$tags): self
+    /**
+     * @return $this
+     */
+    public function withoutTags(Tag ...$tags)
     {
         $filteredTags = array_filter(
             $this->tags,
@@ -114,7 +128,7 @@ class Behavior
     /**
      * @return int
      */
-    public function getFlags(): int
+    public function getFlags()
     {
         return $this->flags;
     }
@@ -122,15 +136,15 @@ class Behavior
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
 
     /**
-     * @return Tag[]
+     * @return mixed[]
      */
-    public function getTags(): array
+    public function getTags()
     {
         return $this->tags;
     }
@@ -139,28 +153,41 @@ class Behavior
      * @param string $name
      * @return Tag|null
      */
-    public function getTag(string $name): ?Tag
+    public function getTag($name)
     {
+        $name = (string) $name;
         $name = strtolower($name);
-        return $this->tags[$name] ?? null;
+        return isset($this->tags[$name]) ? $this->tags[$name] : null;
     }
 
-    public function shallEncodeInvalidTag(): bool
+    /**
+     * @return bool
+     */
+    public function shallEncodeInvalidTag()
     {
         return ($this->flags & self::ENCODE_INVALID_TAG) === self::ENCODE_INVALID_TAG;
     }
 
-    public function shallEncodeInvalidAttr(): bool
+    /**
+     * @return bool
+     */
+    public function shallEncodeInvalidAttr()
     {
         return ($this->flags & self::ENCODE_INVALID_ATTR) === self::ENCODE_INVALID_ATTR;
     }
 
-    public function shallRemoveUnexpectedChildren(): bool
+    /**
+     * @return bool
+     */
+    public function shallRemoveUnexpectedChildren()
     {
         return ($this->flags & self::REMOVE_UNEXPECTED_CHILDREN) === self::REMOVE_UNEXPECTED_CHILDREN;
     }
 
-    public function shallAllowCustomElements(): bool
+    /**
+     * @return bool
+     */
+    public function shallAllowCustomElements()
     {
         return ($this->flags & self::ALLOW_CUSTOM_ELEMENTS) === self::ALLOW_CUSTOM_ELEMENTS;
     }
@@ -168,8 +195,9 @@ class Behavior
     /**
      * @param string[] $names
      * @throws LogicException
+     * @return void
      */
-    protected function assertScalarUniqueness(array $names): void
+    protected function assertScalarUniqueness(array $names)
     {
         $ambiguousNames = array_diff_assoc($names, array_unique($names));
         if ($ambiguousNames !== []) {
@@ -185,8 +213,9 @@ class Behavior
 
     /**
      * @param array<string, Tag> $tags
+     * @return void
      */
-    protected function assertTagUniqueness(array $tags): void
+    protected function assertTagUniqueness(array $tags)
     {
         $existingTagNames = array_intersect_key($this->tags, $tags);
         if ($existingTagNames !== []) {
@@ -200,7 +229,10 @@ class Behavior
         }
     }
 
-    protected function getTagName(Tag $tag): string
+    /**
+     * @return string
+     */
+    protected function getTagName(Tag $tag)
     {
         return strtolower($tag->getName());
     }
