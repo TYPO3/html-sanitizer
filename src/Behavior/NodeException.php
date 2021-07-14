@@ -34,7 +34,7 @@ class NodeException extends RuntimeException
      * @param \DOMNode|null $node
      * @return $this
      */
-    public function withNode($node)
+    public function withNode(DOMNode $node = null)
     {
         $this->node = $node;
         return $this;

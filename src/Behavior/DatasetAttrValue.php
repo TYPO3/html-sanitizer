@@ -19,12 +19,9 @@ class DatasetAttrValue implements AttrValueInterface
      */
     protected $dataset;
 
-    /**
-     * @param string ...$dataset
-     */
-    public function __construct(...$dataset)
+    public function __construct()
     {
-        $this->dataset = $dataset;
+        $this->dataset = func_get_args();
     }
 
     /**

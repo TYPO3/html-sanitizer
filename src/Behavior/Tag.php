@@ -78,8 +78,9 @@ class Tag
     /**
      * @return $this
      */
-    public function addAttrs(Attr ...$attrs)
+    public function addAttrs()
     {
+        $attrs = func_get_args();
         $names = array_map([$this, 'getAttrName'], $attrs);
         $this->assertScalarUniqueness($names);
         $indexedAttrs = array_combine($names, $attrs);
@@ -92,7 +93,7 @@ class Tag
     }
 
     /**
-     * @return mixed[]
+     * @return Attr[]
      */
     public function getAttrs()
     {

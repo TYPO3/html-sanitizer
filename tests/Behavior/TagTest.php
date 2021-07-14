@@ -48,25 +48,26 @@ class TagTest extends TestCase
         $this->expectExceptionCode($code);
         $tag = new Tag('tag');
         if (!empty($originalNames)) {
-            $tag->addAttrs(...$this->createAttrs(...$originalNames));
+            $createdAttributes = call_user_func_array([$this, 'createAttrs'], $originalNames);
+            $tag = call_user_func_array([$tag, 'addAttrs'], $createdAttributes);
         }
         if (!empty($additionalNames)) {
-            $tag->addAttrs(...$this->createAttrs(...$additionalNames));
+            $createdAdditionalAttributes = call_user_func_array([$this, 'createAttrs'], $additionalNames);
+            $tag = call_user_func_array([$tag, 'addAttrs'], $createdAdditionalAttributes);
         }
     }
 
     /**
-     * @param string ...$names
      * @return mixed[]
      */
-    private function createAttrs(...$names)
+    private function createAttrs()
     {
         return array_map(
             function ($name) {
                 $name = (string) $name;
                 return new Attr($name);
             },
-            $names
+            func_get_args()
         );
     }
 }

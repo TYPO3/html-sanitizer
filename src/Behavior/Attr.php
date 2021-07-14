@@ -62,9 +62,9 @@ class Attr
     /**
      * @return $this
      */
-    public function addValues(AttrValueInterface ...$assertions)
+    public function addValues()
     {
-        $this->values = array_merge($this->values, $assertions);
+        $this->values = array_merge($this->values, func_get_args());
         return $this;
     }
 
@@ -77,7 +77,7 @@ class Attr
     }
 
     /**
-     * @return mixed[]
+     * @return AttrValueInterface[]
      */
     public function getValues()
     {

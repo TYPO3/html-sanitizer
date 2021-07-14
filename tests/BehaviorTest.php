@@ -48,25 +48,26 @@ class BehaviorTest extends TestCase
         $this->expectExceptionCode($code);
         $behavior = new Behavior();
         if (!empty($originalNames)) {
-            $behavior = $behavior->withTags(...$this->createTags(...$originalNames));
+            $createdTags = call_user_func_array([$this, 'createTags'], $originalNames);
+            $behavior = call_user_func_array([$behavior, 'withTags'], $createdTags);
         }
         if (!empty($additionalNames)) {
-            $behavior = $behavior->withTags(...$this->createTags(...$additionalNames));
+            $createdAdditionalTags = call_user_func_array([$this, 'createTags'], $additionalNames);
+            $behavior = call_user_func_array([$behavior, 'withTags'], $createdAdditionalTags);
         }
     }
 
     /**
-     * @param string ...$names
      * @return mixed[]
      */
-    private function createTags(...$names)
+    private function createTags()
     {
         return array_map(
             function ($name) {
                 $name = (string) $name;
                 return new Tag($name);
             },
-            $names
+            func_get_args()
         );
     }
 }

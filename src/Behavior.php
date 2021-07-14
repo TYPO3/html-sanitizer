@@ -91,8 +91,9 @@ class Behavior
     /**
      * @return $this
      */
-    public function withTags(Tag ...$tags)
+    public function withTags()
     {
+        $tags = func_get_args();
         $names = array_map([$this, 'getTagName'], $tags);
         $this->assertScalarUniqueness($names);
         // uses tag name as array index, e.g. `['strong' => new Tag('strong')]`
@@ -109,8 +110,9 @@ class Behavior
     /**
      * @return $this
      */
-    public function withoutTags(Tag ...$tags)
+    public function withoutTags()
     {
+        $tags = func_get_args();
         $filteredTags = array_filter(
             $this->tags,
             function (Tag $tag) use ($tags) {
@@ -142,7 +144,7 @@ class Behavior
     }
 
     /**
-     * @return mixed[]
+     * @return Tag[]
      */
     public function getTags()
     {
