@@ -25,12 +25,12 @@ interface VisitorInterface
     /**
      * @return \DOMNode|null
      */
-    public function enterNode(DOMNode $node);
+    public function enterNode(DOMNode $node = null);
 
     /**
      * @return \DOMNode|null
      */
-    public function leaveNode(DOMNode $node);
+    public function leaveNode(DOMNode $node = null);
 
     public function afterTraverse(Context $context);
 }

@@ -30,7 +30,7 @@ abstract class AbstractVisitor implements VisitorInterface
     /**
      * @return \DOMNode|null
      */
-    public function enterNode(DOMNode $node)
+    public function enterNode(DOMNode $node = null)
     {
         return $node;
     }
@@ -38,7 +38,7 @@ abstract class AbstractVisitor implements VisitorInterface
     /**
      * @return \DOMNode|null
      */
-    public function leaveNode(DOMNode $node)
+    public function leaveNode(DOMNode $node = null)
     {
         return $node;
     }

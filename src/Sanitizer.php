@@ -146,7 +146,7 @@ class Sanitizer
      * @param \DOMNode|null $target
      * @return \DOMNode|null
      */
-    protected function replaceNode(DOMNode $source, $target)
+    protected function replaceNode(DOMNode $source, DOMNode $target = null)
     {
         if ($target === null) {
             $source->parentNode->removeChild($source);

@@ -89,7 +89,7 @@ class CommonBuilder implements BuilderInterface
     }
 
     /**
-     * @return mixed[]
+     * @return Behavior\Tag[]
      */
     protected function createBasicTags()
     {
@@ -127,11 +127,11 @@ class CommonBuilder implements BuilderInterface
         $tags['a']->addAttrs($this->hrefAttr);
         $tags['a'] = call_user_func_array([$tags['a'], 'addAttrs'], $this->createAttrs('hreflang', 'rel', 'referrerpolicy', 'target', 'type'));
 
-        $brBehavior = new Behavior\Tag('br');
-        $tags['br'] = call_user_func_array([$brBehavior, 'addAttrs'], $this->globalAttrs);
+        $tags['br'] = new Behavior\Tag('br');
+        $tags['br'] = call_user_func_array([$tags['br'], 'addAttrs'], $this->globalAttrs);
 
-        $hrBehavior = new Behavior\Tag('hr');
-        $tags['hr'] = call_user_func_array([$hrBehavior, 'addAttrs'], $this->globalAttrs);
+        $tags['hr'] = new Behavior\Tag('hr');
+        $tags['hr'] = call_user_func_array([$tags['hr'], 'addAttrs'], $this->globalAttrs);
 
         $tags['label'] = call_user_func_array([$tags['label'], 'addAttrs'], $this->createAttrs('for'));
         $tags['td'] = call_user_func_array([$tags['td'], 'addAttrs'], $this->createAttrs('colspan', 'rowspan', 'scope'));
@@ -146,19 +146,23 @@ class CommonBuilder implements BuilderInterface
     {
         $tags = [];
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#image_and_multimedia
-        $tags['audio'] = (new Behavior\Tag('audio', Behavior\Tag::ALLOW_CHILDREN))->addAttrs($this->srcAttr);
+        $tags['audio'] = (new Behavior\Tag('audio', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs($this->srcAttr);
         $tags['audio'] = call_user_func_array([$tags['audio'], 'addAttrs'], $this->globalAttrs);
         $tags['audio'] = call_user_func_array([$tags['audio'], 'addAttrs'], $this->createAttrs('autoplay', 'controls', 'loop', 'muted', 'preload'));
 
-        $tags['video'] = (new Behavior\Tag('video', Behavior\Tag::ALLOW_CHILDREN))->addAttrs($this->srcAttr);
+        $tags['video'] = (new Behavior\Tag('video', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs($this->srcAttr);
         $tags['video'] = call_user_func_array([$tags['video'], 'addAttrs'], $this->globalAttrs);
         $tags['video'] = call_user_func_array([$tags['video'], 'addAttrs'], $this->createAttrs('autoplay', 'controls', 'height', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'width'));
 
-        $tags['img'] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs($this->srcAttr, $this->srcsetAttr);
+        $tags['img'] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))
+            ->addAttrs($this->srcAttr, $this->srcsetAttr);
         $tags['img'] = call_user_func_array([$tags['img'], 'addAttrs'], $this->globalAttrs);
         $tags['img'] = call_user_func_array([$tags['img'], 'addAttrs'], $this->createAttrs('alt', 'decoding', 'height', 'sizes', 'width'));
 
-        $tags['track'] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs($this->srcAttr);
+        $tags['track'] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))
+            ->addAttrs($this->srcAttr);
         $tags['track'] = call_user_func_array([$tags['track'], 'addAttrs'], $this->globalAttrs);
         $tags['img'] = call_user_func_array([$tags['img'], 'addAttrs'], $this->createAttrs('default', 'kind', 'label', 'srcLang'));
 

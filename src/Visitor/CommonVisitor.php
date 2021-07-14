@@ -57,7 +57,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
     /**
      * @return \DOMNode|null
      */
-    public function enterNode(DOMNode $node)
+    public function enterNode(DOMNode $node = null)
     {
         if (!$node instanceof DOMElement) {
             return $node;
@@ -93,7 +93,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
     /**
      * @return \DOMNode|null
      */
-    public function leaveNode(DOMNode $node)
+    public function leaveNode(DOMNode $node = null)
     {
         if (!$node instanceof DOMElement) {
             return $node;
@@ -118,7 +118,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
      * @param \DOMElement|null $node
      * @return \DOMElement|null
      */
-    protected function processAttributes($node, Behavior\Tag $tag)
+    protected function processAttributes(DOMElement $node = null, Behavior\Tag $tag)
     {
         if ($node === null) {
             return null;
@@ -141,7 +141,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
      * @param \DOMElement|null $node
      * @return \DOMElement|null
      */
-    protected function processChildren($node, Behavior\Tag $tag)
+    protected function processChildren(DOMElement $node = null, Behavior\Tag $tag)
     {
         if ($node === null) {
             return null;
