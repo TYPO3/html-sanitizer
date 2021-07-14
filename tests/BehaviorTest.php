@@ -44,17 +44,23 @@ class BehaviorTest extends TestCase
     public function ambiguityIsDetected(array $originalNames, array $additionalNames, $code = 0)
     {
         $code = (int) $code;
-        $this->expectException(LogicException::class);
-        $this->expectExceptionCode($code);
-        $behavior = new Behavior();
-        if (!empty($originalNames)) {
-            $createdTags = call_user_func_array([$this, 'createTags'], $originalNames);
-            $behavior = call_user_func_array([$behavior, 'withTags'], $createdTags);
+        try {
+            $behavior = new Behavior();
+            if (!empty($originalNames)) {
+                $createdTags = call_user_func_array([$this, 'createTags'], $originalNames);
+                $behavior = call_user_func_array([$behavior, 'withTags'], $createdTags);
+            }
+            if (!empty($additionalNames)) {
+                $createdAdditionalTags = call_user_func_array([$this, 'createTags'], $additionalNames);
+                $behavior = call_user_func_array([$behavior, 'withTags'], $createdAdditionalTags);
+            }
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(LogicException::class, $e);
+            $this->assertSame($code, $e->getCode());
+            return;
         }
-        if (!empty($additionalNames)) {
-            $createdAdditionalTags = call_user_func_array([$this, 'createTags'], $additionalNames);
-            $behavior = call_user_func_array([$behavior, 'withTags'], $createdAdditionalTags);
-        }
+
+        $this->fail(sprintf('Expected to throw %s with code %d', LogicException::class, $code));
     }
 
     /**
