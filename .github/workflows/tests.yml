@@ -17,12 +17,20 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: nanasess/setup-php@master
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          tools: composer:v2
 
       - name: Validate composer.json and composer.lock
         run: composer validate
+
+      - name: Lint PHP
+        uses: overtrue/phplint@7.4
+        with:
+          path: .
+          options: --exclude=vendor
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
