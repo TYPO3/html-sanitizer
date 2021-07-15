@@ -35,6 +35,20 @@ class CommonBuilderTest extends TestCase
                 '&lt;script&gt;alert(1)&lt;/script&gt;',
                 '&lt;script&gt;alert(1)&lt;/script&gt;',
             ],
+            '#013' => [
+                '<unknown unknown="unknown">value</unknown>' .
+                    '<unknown unknown="unknown">value</unknown>',
+                '&lt;unknown unknown="unknown"&gt;value&lt;/unknown&gt;' .
+                    '&lt;unknown unknown="unknown"&gt;value&lt;/unknown&gt;'
+            ],
+            '#014' => [
+                '<unknown>value</unknown><unknown>value</unknown>' .
+                    '<div unknown="unknown">value</div>' .
+                    '<unknown>value</unknown><unknown>value</unknown>',
+                '&lt;unknown&gt;value&lt;/unknown&gt;&lt;unknown&gt;value&lt;/unknown&gt;' .
+                    '<div>value</div>' .
+                    '&lt;unknown&gt;value&lt;/unknown&gt;&lt;unknown&gt;value&lt;/unknown&gt;'
+            ],
             // @todo bug in https://github.com/Masterminds/html5-php/issues
             // '#013' => [
             //    '<strong>Given that x < y and y > z...</strong>',
