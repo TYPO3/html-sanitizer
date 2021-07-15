@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -29,8 +27,13 @@ class ClosureAttrValue implements AttrValueInterface
         $this->closure = $closure;
     }
 
-    public function matches(string $value): bool
+    /**
+     * @param string $value
+     * @return bool
+     */
+    public function matches($value)
     {
+        $value = (string) $value;
         $result = call_user_func($this->closure, $value);
         if (!is_bool($result)) {
             throw new LogicException('Closure must return boolean value', 1624908450);

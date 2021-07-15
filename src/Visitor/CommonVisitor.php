@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -48,12 +46,18 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         $this->behavior = $behavior;
     }
 
-    public function beforeTraverse(Context $context): void
+    /**
+     * @return void
+     */
+    public function beforeTraverse(Context $context)
     {
         $this->context = $context;
     }
 
-    public function enterNode(DOMNode $node): ?DOMNode
+    /**
+     * @return \DOMNode|null
+     */
+    public function enterNode(DOMNode $node = null)
     {
         if (!$node instanceof DOMElement) {
             return $node;
@@ -86,7 +90,10 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         return $node;
     }
 
-    public function leaveNode(DOMNode $node): ?DOMNode
+    /**
+     * @return \DOMNode|null
+     */
+    public function leaveNode(DOMNode $node = null)
     {
         if (!$node instanceof DOMElement) {
             return $node;
@@ -107,7 +114,11 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         return $node;
     }
 
-    protected function processAttributes(?DOMElement $node, Behavior\Tag $tag): ?DOMElement
+    /**
+     * @param \DOMElement|null $node
+     * @return \DOMElement|null
+     */
+    protected function processAttributes(DOMElement $node = null, Behavior\Tag $tag)
     {
         if ($node === null) {
             return null;
@@ -126,7 +137,11 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         return $node;
     }
 
-    protected function processChildren(?DOMElement $node, Behavior\Tag $tag): ?DOMElement
+    /**
+     * @param \DOMElement|null $node
+     * @return \DOMElement|null
+     */
+    protected function processChildren(DOMElement $node = null, Behavior\Tag $tag)
     {
         if ($node === null) {
             return null;
@@ -155,8 +170,9 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
      * @param Behavior\Tag $tag
      * @param DOMAttr $attribute
      * @throws Behavior\NodeException
+     * @return void
      */
-    protected function processAttribute(DOMElement $node, Behavior\Tag $tag, DOMAttr $attribute): void
+    protected function processAttribute(DOMElement $node, Behavior\Tag $tag, DOMAttr $attribute)
     {
         $name = strtolower($attribute->name);
         $attr = $tag->getAttr($name);
@@ -174,9 +190,11 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
      * @param DOMNode $node
      * @param string $name
      * @throws Behavior\NodeException
+     * @return void
      */
-    protected function handleInvalidAttr(DOMNode $node, string $name): void
+    protected function handleInvalidAttr(DOMNode $node, $name)
     {
+        $name = (string) $name;
         if ($this->behavior->shallEncodeInvalidAttr()) {
             throw Behavior\NodeException::create()->withNode($this->convertToText($node));
         }
@@ -193,7 +211,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
      * @param DOMNode $node
      * @return DOMText
      */
-    protected function convertToText(DOMNode $node): DOMText
+    protected function convertToText(DOMNode $node)
     {
         $text = new DOMText();
         $text->nodeValue = $this->context->parser->saveHTML($node);
@@ -207,7 +225,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
      * @param DOMNode $node
      * @return bool
      */
-    protected function isCustomElement(DOMNode $node): bool
+    protected function isCustomElement(DOMNode $node)
     {
         return $node instanceof DOMElement
             && preg_match('#^[a-z][a-z0-9]*-.+#', $node->nodeName) > 0;

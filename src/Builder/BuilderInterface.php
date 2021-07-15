@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -18,5 +16,8 @@ use TYPO3\HtmlSanitizer\Sanitizer;
 
 interface BuilderInterface
 {
-    public function build(): Sanitizer;
+    /**
+     * @return \TYPO3\HtmlSanitizer\Sanitizer
+     */
+    public function build();
 }

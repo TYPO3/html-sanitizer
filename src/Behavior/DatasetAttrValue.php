@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -21,13 +19,18 @@ class DatasetAttrValue implements AttrValueInterface
      */
     protected $dataset;
 
-    public function __construct(string ...$dataset)
+    public function __construct()
     {
-        $this->dataset = $dataset;
+        $this->dataset = func_get_args();
     }
 
-    public function matches(string $value): bool
+    /**
+     * @param string $value
+     * @return bool
+     */
+    public function matches($value)
     {
+        $value = (string) $value;
         return in_array($value, $this->dataset, true);
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -22,21 +20,33 @@ use TYPO3\HtmlSanitizer\Context;
  */
 abstract class AbstractVisitor implements VisitorInterface
 {
-    public function beforeTraverse(Context $context): void
+    /**
+     * @return void
+     */
+    public function beforeTraverse(Context $context)
     {
     }
 
-    public function enterNode(DOMNode $node): ?DOMNode
+    /**
+     * @return \DOMNode|null
+     */
+    public function enterNode(DOMNode $node = null)
     {
         return $node;
     }
 
-    public function leaveNode(DOMNode $node): ?DOMNode
+    /**
+     * @return \DOMNode|null
+     */
+    public function leaveNode(DOMNode $node = null)
     {
         return $node;
     }
 
-    public function afterTraverse(Context $context): void
+    /**
+     * @return void
+     */
+    public function afterTraverse(Context $context)
     {
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -65,23 +63,32 @@ class CommonBuilder implements BuilderInterface
             ->addValues($isHttpOrLocalUri, $isMailtoUri);
     }
 
-    public function build(): Sanitizer
+    /**
+     * @return \TYPO3\HtmlSanitizer\Sanitizer
+     */
+    public function build()
     {
         $behavior = $this->createBehavior();
-        $visitor = new CommonVisitor($behavior);
-        return new Sanitizer($visitor);
+        $visitors = [new CommonVisitor($behavior)];
+        return new Sanitizer($visitors);
     }
 
-    protected function createBehavior(): Behavior
+    /**
+     * @return \TYPO3\HtmlSanitizer\Behavior
+     */
+    protected function createBehavior()
     {
         return (new Behavior())
             ->withFlags(Behavior::ENCODE_INVALID_TAG + Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('common')
-            ->withTags(...array_values($this->createBasicTags()))
-            ->withTags(...array_values($this->createMediaTags()));
+            ->withTags(array_values($this->createBasicTags()))
+            ->withTags(array_values($this->createMediaTags()));
     }
 
-    protected function createBasicTags(): array
+    /**
+     * @return Behavior\Tag[]
+     */
+    protected function createBasicTags()
     {
         $names = [
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#content_sectioning
@@ -107,49 +114,64 @@ class CommonBuilder implements BuilderInterface
             'acronym', 'big', 'nobr', 'tt',
         ];
 
+        /** @var Behavior\Tag[] $tags */
         $tags = [];
         foreach ($names as $name) {
             $tags[$name] = (new Behavior\Tag($name, Behavior\Tag::ALLOW_CHILDREN))
-                ->addAttrs(...$this->globalAttrs);
+                ->addAttrs($this->globalAttrs);
         }
-        $tags['a']->addAttrs(
-            $this->hrefAttr,
-            ...$this->createAttrs('hreflang', 'rel', 'referrerpolicy', 'target', 'type')
-        );
-        $tags['br'] = (new Behavior\Tag('br'))->addAttrs(...$this->globalAttrs);
-        $tags['hr'] = (new Behavior\Tag('hr'))->addAttrs(...$this->globalAttrs);
-        $tags['label']->addAttrs(...$this->createAttrs('for'));
-        $tags['td']->addAttrs(...$this->createAttrs('colspan', 'rowspan', 'scope'));
-        $tags['th']->addAttrs(...$this->createAttrs('colspan', 'rowspan', 'scope'));
+
+        $tags['a']->addAttrs(array_merge(
+            [$this->hrefAttr],
+            $this->createAttrs('hreflang', 'rel', 'referrerpolicy', 'target', 'type')
+        ));
+        $tags['br'] = (new Behavior\Tag('br'))->addAttrs($this->globalAttrs);
+        $tags['hr'] = (new Behavior\Tag('hr'))->addAttrs($this->globalAttrs);
+        $tags['label']->addAttrs($this->createAttrs('for'));
+        $tags['td']->addAttrs($this->createAttrs('colspan', 'rowspan', 'scope'));
+        $tags['th']->addAttrs($this->createAttrs('colspan', 'rowspan', 'scope'));
         return $tags;
     }
 
-    protected function createMediaTags(): array
+    /**
+     * @return Behavior\Tag[]
+     */
+    protected function createMediaTags()
     {
         $tags = [];
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#image_and_multimedia
-        $tags[] = (new Behavior\Tag('audio', Behavior\Tag::ALLOW_CHILDREN))
-            ->addAttrs($this->srcAttr, ...$this->globalAttrs)
-            ->addAttrs(...$this->createAttrs('autoplay', 'controls', 'loop', 'muted', 'preload'));
-        $tags[] = (new Behavior\Tag('video', Behavior\Tag::ALLOW_CHILDREN))
-            ->addAttrs($this->srcAttr, ...$this->globalAttrs)
-            ->addAttrs(...$this->createAttrs('autoplay', 'controls', 'height', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'width'));
-        $tags[] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))
-            ->addAttrs($this->srcAttr, $this->srcsetAttr, ...$this->globalAttrs)
-            ->addAttrs(...$this->createAttrs('alt', 'decoding', 'height', 'sizes', 'width'));
-        $tags[] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))
-            ->addAttrs($this->srcAttr, ...$this->globalAttrs)
-            ->addAttrs(...$this->createAttrs('default', 'kind', 'label', 'srcLang'));
+        $tags[] = (new Behavior\Tag('audio', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(array_merge(
+            [$this->srcAttr],
+            $this->globalAttrs,
+            $this->createAttrs('autoplay', 'controls', 'loop', 'muted', 'preload')
+        ));
+        $tags[] = (new Behavior\Tag('video', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(array_merge(
+            [$this->srcAttr],
+            $this->globalAttrs,
+            $this->createAttrs('autoplay', 'controls', 'height', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'width')
+        ));
+        $tags[] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs(array_merge(
+            [$this->srcAttr],
+            $this->globalAttrs,
+            $this->createAttrs('alt', 'decoding', 'height', 'sizes', 'width')
+        ));
+        $tags[] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs(array_merge(
+            [$this->srcAttr],
+            $this->globalAttrs,
+            $this->createAttrs('default', 'kind', 'label', 'srcLang')
+        ));
+
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#embedded_content
-        $tags[] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(...$this->globalAttrs);
-        $tags[] = (new Behavior\Tag('source'))->addAttrs(...$this->globalAttrs);
+        $tags[] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN))->addAttrs($this->globalAttrs);
+        $tags[] = (new Behavior\Tag('source', Behavior\Tag::ALLOW_CHILDREN))->addAttrs($this->globalAttrs);
+
         return $tags;
     }
 
     /**
      * @return Behavior\Attr[]
      */
-    protected function createGlobalAttrs(): array
+    protected function createGlobalAttrs()
     {
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes
         $attrs = $this->createAttrs(
@@ -175,16 +197,16 @@ class CommonBuilder implements BuilderInterface
     }
 
     /**
-     * @param string ...$names
      * @return Behavior\Attr[]
      */
-    protected function createAttrs(string ...$names): array
+    protected function createAttrs()
     {
         return array_map(
-            function (string $name) {
+            function ($name) {
+                $name = (string) $name;
                 return new Behavior\Attr($name);
             },
-            $names
+            func_get_args()
         );
     }
 }

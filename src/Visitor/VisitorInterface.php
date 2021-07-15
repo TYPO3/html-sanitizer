@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -24,9 +22,15 @@ interface VisitorInterface
 {
     public function beforeTraverse(Context $context);
 
-    public function enterNode(DOMNode $node): ?DOMNode;
+    /**
+     * @return \DOMNode|null
+     */
+    public function enterNode(DOMNode $node = null);
 
-    public function leaveNode(DOMNode $node): ?DOMNode;
+    /**
+     * @return \DOMNode|null
+     */
+    public function leaveNode(DOMNode $node = null);
 
     public function afterTraverse(Context $context);
 }

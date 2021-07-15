@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -21,7 +19,10 @@ use TYPO3\HtmlSanitizer\Behavior\Tag;
 
 class BehaviorTest extends TestCase
 {
-    public function ambiguityIsDetectedDataProvider(): array
+    /**
+     * @return mixed[]
+     */
+    public function ambiguityIsDetectedDataProvider()
     {
         return [
             [ ['same'], ['same'], 1625391217 ],
@@ -38,28 +39,37 @@ class BehaviorTest extends TestCase
      * @param int $code
      * @test
      * @dataProvider ambiguityIsDetectedDataProvider
+     * @return void
      */
-    public function ambiguityIsDetected(array $originalNames, array $additionalNames, int $code = 0): void
+    public function ambiguityIsDetected(array $originalNames, array $additionalNames, $code = 0)
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionCode($code);
-        $behavior = new Behavior();
-        if (!empty($originalNames)) {
-            $behavior = $behavior->withTags(...$this->createTags(...$originalNames));
+        $code = (int) $code;
+        try {
+            $behavior = new Behavior();
+            if (!empty($originalNames)) {
+                $behavior = $behavior->withTags($this->createTags($originalNames));
+            }
+            if (!empty($additionalNames)) {
+                $behavior = $behavior->withTags($this->createTags($additionalNames));
+            }
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(LogicException::class, $e);
+            $this->assertSame($code, $e->getCode());
+            return;
         }
-        if (!empty($additionalNames)) {
-            $behavior = $behavior->withTags(...$this->createTags(...$additionalNames));
-        }
+
+        $this->fail(sprintf('Expected to throw %s with code %d', LogicException::class, $code));
     }
 
     /**
-     * @param string ...$names
-     * @return Tag[]
+     * @param string[] $names
+     * @return mixed[]
      */
-    private function createTags(string ...$names): array
+    private function createTags(array $names)
     {
         return array_map(
-            function (string $name) {
+            function ($name) {
+                $name = (string) $name;
                 return new Tag($name);
             },
             $names

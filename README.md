@@ -41,16 +41,16 @@ $hrefAttr = (new Behavior\Attr('href'))
 // (invoking `withFlags()` or `withTags()` returns new instance)
 $behavior = (new Behavior())
     ->withFlags(Behavior::ENCODE_INVALID_TAG)
-    ->withTags(
+    ->withTags([
         (new Behavior\Tag('div', Behavior\Tag::ALLOW_CHILDREN))
-            ->addAttrs(...$commonAttrs),
+            ->addAttrs($commonAttrs),
         (new Behavior\Tag('a', Behavior\Tag::ALLOW_CHILDREN))
-            ->addAttrs($hrefAttr, ...$commonAttrs),
-        (new Behavior\Tag('br')),
-    );
+            ->addAttrs($hrefAttr, $commonAttrs),
+        (new Behavior\Tag('br'))
+    ]);
 
 $visitors = [new CommonVisitor($behavior)];
-$sanitizer = new Sanitizer(...$visitors);
+$sanitizer = new Sanitizer($visitors);
 
 $html = <<< EOH
 <div id="main">
