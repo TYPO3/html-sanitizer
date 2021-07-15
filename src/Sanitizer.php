@@ -66,9 +66,7 @@ class Sanitizer
         $this->root = $this->parse($html);
         $this->context = new Context($this->parser);
         $this->beforeTraverse();
-        foreach ($this->root->childNodes as $childNode) {
-            $this->traverse($childNode);
-        }
+        $this->traverseNodeList($this->root->childNodes);
         $this->afterTraverse();
         return $this->serialize($this->root);
     }
@@ -101,9 +99,7 @@ class Sanitizer
         }
 
         if ($node->hasChildNodes()) {
-            foreach ($node->childNodes as $childNode) {
-                $this->traverse($childNode);
-            }
+            $this->traverseNodeList($node->childNodes);
         }
 
         foreach ($this->visitors as $visitor) {
@@ -112,6 +108,21 @@ class Sanitizer
             if ($node === null) {
                 return;
             }
+        }
+    }
+
+    /**
+     * Traverses node-list (child-nodes) in reverse(!) order to allow
+     * directly removing child nodes, keeping node-list indexes.
+     *
+     * @param \DOMNodeList $nodeList
+     */
+    protected function traverseNodeList(\DOMNodeList $nodeList): void
+    {
+        for ($i = $nodeList->length - 1; $i >= 0; $i--) {
+            /** @var DOMNode $item */
+            $item = $nodeList->item($i);
+            $this->traverse($item);
         }
     }
 
