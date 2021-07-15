@@ -48,12 +48,10 @@ class TagTest extends TestCase
         try {
             $tag = new Tag('tag');
             if (!empty($originalNames)) {
-                $createdAttributes = call_user_func_array([$this, 'createAttrs'], $originalNames);
-                $tag = call_user_func_array([$tag, 'addAttrs'], $createdAttributes);
+                $tag->addAttrs($this->createAttrs($originalNames));
             }
             if (!empty($additionalNames)) {
-                $createdAdditionalAttributes = call_user_func_array([$this, 'createAttrs'], $additionalNames);
-                $tag = call_user_func_array([$tag, 'addAttrs'], $createdAdditionalAttributes);
+                $tag->addAttrs($this->createAttrs($additionalNames));
             }
         } catch (\Exception $e) {
             $this->assertInstanceOf(LogicException::class, $e);
@@ -65,16 +63,17 @@ class TagTest extends TestCase
     }
 
     /**
+     * @param string[] $names
      * @return mixed[]
      */
-    private function createAttrs()
+    private function createAttrs(array $names)
     {
         return array_map(
             function ($name) {
                 $name = (string) $name;
                 return new Attr($name);
             },
-            func_get_args()
+            $names
         );
     }
 }

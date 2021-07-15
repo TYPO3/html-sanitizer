@@ -47,12 +47,10 @@ class BehaviorTest extends TestCase
         try {
             $behavior = new Behavior();
             if (!empty($originalNames)) {
-                $createdTags = call_user_func_array([$this, 'createTags'], $originalNames);
-                $behavior = call_user_func_array([$behavior, 'withTags'], $createdTags);
+                $behavior = $behavior->withTags($this->createTags($originalNames));
             }
             if (!empty($additionalNames)) {
-                $createdAdditionalTags = call_user_func_array([$this, 'createTags'], $additionalNames);
-                $behavior = call_user_func_array([$behavior, 'withTags'], $createdAdditionalTags);
+                $behavior = $behavior->withTags($this->createTags($additionalNames));
             }
         } catch (\Exception $e) {
             $this->assertInstanceOf(LogicException::class, $e);
@@ -64,16 +62,17 @@ class BehaviorTest extends TestCase
     }
 
     /**
+     * @param string[] $names
      * @return mixed[]
      */
-    private function createTags()
+    private function createTags(array $names)
     {
         return array_map(
             function ($name) {
                 $name = (string) $name;
                 return new Tag($name);
             },
-            func_get_args()
+            $names
         );
     }
 }

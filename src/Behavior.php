@@ -89,11 +89,11 @@ class Behavior
     }
 
     /**
+     * @param Tag[] $tags
      * @return $this
      */
-    public function withTags()
+    public function withTags(array $tags)
     {
-        $tags = func_get_args();
         $names = array_map([$this, 'getTagName'], $tags);
         $this->assertScalarUniqueness($names);
         // uses tag name as array index, e.g. `['strong' => new Tag('strong')]`
@@ -108,11 +108,11 @@ class Behavior
     }
 
     /**
+     * @param Tag[] $tags
      * @return $this
      */
-    public function withoutTags()
+    public function withoutTags(array $tags)
     {
-        $tags = func_get_args();
         $filteredTags = array_filter(
             $this->tags,
             function (Tag $tag) use ($tags) {

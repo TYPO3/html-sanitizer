@@ -78,14 +78,11 @@ class CommonBuilder implements BuilderInterface
      */
     protected function createBehavior()
     {
-        $behavior = (new Behavior())
+        return (new Behavior())
             ->withFlags(Behavior::ENCODE_INVALID_TAG + Behavior::REMOVE_UNEXPECTED_CHILDREN)
-            ->withName('common');
-
-        $behavior = call_user_func_array([$behavior, 'withTags'], array_values($this->createBasicTags()));
-        $behavior = call_user_func_array([$behavior, 'withTags'], array_values($this->createMediaTags()));
-
-        return $behavior;
+            ->withName('common')
+            ->withTags(array_values($this->createBasicTags()))
+            ->withTags(array_values($this->createMediaTags()));
     }
 
     /**
@@ -117,62 +114,58 @@ class CommonBuilder implements BuilderInterface
             'acronym', 'big', 'nobr', 'tt',
         ];
 
+        /** @var Behavior\Tag[] $tags */
         $tags = [];
         foreach ($names as $name) {
-            $behavior = new Behavior\Tag($name, Behavior\Tag::ALLOW_CHILDREN);
-            $behavior = call_user_func_array([$behavior, 'addAttrs'], $this->globalAttrs);
-            $tags[$name] = $behavior;
+            $tags[$name] = (new Behavior\Tag($name, Behavior\Tag::ALLOW_CHILDREN))
+                ->addAttrs($this->globalAttrs);
         }
 
-        $tags['a']->addAttrs($this->hrefAttr);
-        $tags['a'] = call_user_func_array([$tags['a'], 'addAttrs'], $this->createAttrs('hreflang', 'rel', 'referrerpolicy', 'target', 'type'));
-
-        $tags['br'] = new Behavior\Tag('br');
-        $tags['br'] = call_user_func_array([$tags['br'], 'addAttrs'], $this->globalAttrs);
-
-        $tags['hr'] = new Behavior\Tag('hr');
-        $tags['hr'] = call_user_func_array([$tags['hr'], 'addAttrs'], $this->globalAttrs);
-
-        $tags['label'] = call_user_func_array([$tags['label'], 'addAttrs'], $this->createAttrs('for'));
-        $tags['td'] = call_user_func_array([$tags['td'], 'addAttrs'], $this->createAttrs('colspan', 'rowspan', 'scope'));
-        $tags['th'] = call_user_func_array([$tags['th'], 'addAttrs'], $this->createAttrs('colspan', 'rowspan', 'scope'));
+        $tags['a']->addAttrs(array_merge(
+            [$this->hrefAttr],
+            $this->createAttrs('hreflang', 'rel', 'referrerpolicy', 'target', 'type')
+        ));
+        $tags['br'] = (new Behavior\Tag('br'))->addAttrs($this->globalAttrs);
+        $tags['hr'] = (new Behavior\Tag('hr'))->addAttrs($this->globalAttrs);
+        $tags['label']->addAttrs($this->createAttrs('for'));
+        $tags['td']->addAttrs($this->createAttrs('colspan', 'rowspan', 'scope'));
+        $tags['th']->addAttrs($this->createAttrs('colspan', 'rowspan', 'scope'));
         return $tags;
     }
 
     /**
-     * @return Behavior\Attr[]
+     * @return Behavior\Tag[]
      */
     protected function createMediaTags()
     {
         $tags = [];
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#image_and_multimedia
-        $tags['audio'] = (new Behavior\Tag('audio', Behavior\Tag::ALLOW_CHILDREN))
-            ->addAttrs($this->srcAttr);
-        $tags['audio'] = call_user_func_array([$tags['audio'], 'addAttrs'], $this->globalAttrs);
-        $tags['audio'] = call_user_func_array([$tags['audio'], 'addAttrs'], $this->createAttrs('autoplay', 'controls', 'loop', 'muted', 'preload'));
-
-        $tags['video'] = (new Behavior\Tag('video', Behavior\Tag::ALLOW_CHILDREN))
-            ->addAttrs($this->srcAttr);
-        $tags['video'] = call_user_func_array([$tags['video'], 'addAttrs'], $this->globalAttrs);
-        $tags['video'] = call_user_func_array([$tags['video'], 'addAttrs'], $this->createAttrs('autoplay', 'controls', 'height', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'width'));
-
-        $tags['img'] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))
-            ->addAttrs($this->srcAttr, $this->srcsetAttr);
-        $tags['img'] = call_user_func_array([$tags['img'], 'addAttrs'], $this->globalAttrs);
-        $tags['img'] = call_user_func_array([$tags['img'], 'addAttrs'], $this->createAttrs('alt', 'decoding', 'height', 'sizes', 'width'));
-
-        $tags['track'] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))
-            ->addAttrs($this->srcAttr);
-        $tags['track'] = call_user_func_array([$tags['track'], 'addAttrs'], $this->globalAttrs);
-        $tags['img'] = call_user_func_array([$tags['img'], 'addAttrs'], $this->createAttrs('default', 'kind', 'label', 'srcLang'));
+        $tags[] = (new Behavior\Tag('audio', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(array_merge(
+            [$this->srcAttr],
+            $this->globalAttrs,
+            $this->createAttrs('autoplay', 'controls', 'loop', 'muted', 'preload')
+        ));
+        $tags[] = (new Behavior\Tag('video', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(array_merge(
+            [$this->srcAttr],
+            $this->globalAttrs,
+            $this->createAttrs('autoplay', 'controls', 'height', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'width')
+        ));
+        $tags[] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs(array_merge(
+            [$this->srcAttr],
+            $this->globalAttrs,
+            $this->createAttrs('alt', 'decoding', 'height', 'sizes', 'width')
+        ));
+        $tags[] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs(array_merge(
+            [$this->srcAttr],
+            $this->globalAttrs,
+            $this->createAttrs('default', 'kind', 'label', 'srcLang')
+        ));
 
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#embedded_content
-        $tags['picture'] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN));
-        $tags['picture'] = call_user_func_array([$tags['picture'], 'addAttrs'], $this->globalAttrs);
+        $tags[] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN))->addAttrs($this->globalAttrs);
+        $tags[] = (new Behavior\Tag('source', Behavior\Tag::ALLOW_CHILDREN))->addAttrs($this->globalAttrs);
 
-        $tags['source'] = (new Behavior\Tag('source', Behavior\Tag::ALLOW_CHILDREN));
-        $tags['source'] = call_user_func_array([$tags['source'], 'addAttrs'], $this->globalAttrs);
-        return array_values($tags);
+        return $tags;
     }
 
     /**

@@ -76,11 +76,11 @@ class Tag
     }
 
     /**
+     * @param Attr[] $attrs
      * @return $this
      */
-    public function addAttrs()
+    public function addAttrs(array $attrs)
     {
-        $attrs = func_get_args();
         $names = array_map([$this, 'getAttrName'], $attrs);
         $this->assertScalarUniqueness($names);
         $indexedAttrs = array_combine($names, $attrs);
