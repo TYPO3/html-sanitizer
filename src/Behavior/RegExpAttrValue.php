@@ -43,7 +43,7 @@ class RegExpAttrValue implements AttrValueInterface
             return $matches;
         }
         throw new LogicException(
-            sprintf('RegExp error %d: %s', $regExpError, preg_last_error_msg()),
+            sprintf('RegExp error %d', $regExpError),
             1624915659
         );
     }
