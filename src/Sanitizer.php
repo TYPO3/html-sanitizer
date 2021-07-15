@@ -16,6 +16,7 @@ namespace TYPO3\HtmlSanitizer;
 
 use DOMDocumentFragment;
 use DOMNode;
+use DOMNodeList;
 use Masterminds\HTML5;
 use TYPO3\HtmlSanitizer\Visitor\VisitorInterface;
 
@@ -115,9 +116,9 @@ class Sanitizer
      * Traverses node-list (child-nodes) in reverse(!) order to allow
      * directly removing child nodes, keeping node-list indexes.
      *
-     * @param \DOMNodeList $nodeList
+     * @param DOMNodeList $nodeList
      */
-    protected function traverseNodeList(\DOMNodeList $nodeList): void
+    protected function traverseNodeList(DOMNodeList $nodeList): void
     {
         for ($i = $nodeList->length - 1; $i >= 0; $i--) {
             /** @var DOMNode $item */

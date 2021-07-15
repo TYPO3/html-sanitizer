@@ -48,7 +48,7 @@ class BehaviorTest extends TestCase
             $behavior = $behavior->withTags(...$this->createTags(...$originalNames));
         }
         if (!empty($additionalNames)) {
-            $behavior = $behavior->withTags(...$this->createTags(...$additionalNames));
+            $behavior->withTags(...$this->createTags(...$additionalNames));
         }
     }
 
