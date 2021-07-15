@@ -46,7 +46,7 @@ $behavior = (new Behavior())
             ->addAttrs(...$commonAttrs),
         (new Behavior\Tag('a', Behavior\Tag::ALLOW_CHILDREN))
             ->addAttrs($hrefAttr, ...$commonAttrs),
-        (new Behavior\Tag('br')),
+        (new Behavior\Tag('br'))
     );
 
 $visitors = [new CommonVisitor($behavior)];
