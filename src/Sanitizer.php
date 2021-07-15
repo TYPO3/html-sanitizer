@@ -53,9 +53,12 @@ class Sanitizer
      */
     protected $context;
 
-    public function __construct()
+    /**
+     * @param VisitorInterface[] $visitors
+     */
+    public function __construct(array $visitors = [])
     {
-        $this->visitors = func_get_args();
+        $this->visitors = $visitors;
         $this->parser = $this->createParser();
     }
 
