@@ -110,6 +110,10 @@ class CommonBuilderTest extends TestCase
                 '<a href="data:text/html;..." role="button">value</a>',
                 '<a role="button">value</a>',
             ],
+            '#054' => [
+                '<a href="#anchor">anchor</a><a name="anchor">content</a>',
+                '<a href="#anchor">anchor</a><a name="anchor">content</a>',
+            ],
             '#090' => [
                 '<p data-bool><span data-bool><strong data-bool>value</strong></span></p>',
                 '<p data-bool><span data-bool><strong data-bool>value</strong></span></p>'

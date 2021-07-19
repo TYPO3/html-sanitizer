@@ -123,7 +123,12 @@ class CommonBuilder implements BuilderInterface
 
         $tags['a']->addAttrs(array_merge(
             [$this->hrefAttr],
-            $this->createAttrs('hreflang', 'rel', 'referrerpolicy', 'target', 'type')
+            $this->createAttrs(
+                // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
+                'download', 'hreflang', 'ping', 'rel', 'referrerpolicy', 'target', 'type',
+                // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#deprecated_attributes
+                'charset', 'name', 'rev'
+            )
         ));
         $tags['br'] = (new Behavior\Tag('br'))->addAttrs($this->globalAttrs);
         $tags['hr'] = (new Behavior\Tag('hr'))->addAttrs($this->globalAttrs);
