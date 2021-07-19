@@ -116,7 +116,7 @@ class CommonBuilder implements BuilderInterface
             $this->hrefAttr,
             ...$this->createAttrs(
                 // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
-                'download', 'hreflang', 'media', 'ping', 'rel', 'referrerpolicy', 'target', 'type',
+                'download', 'hreflang', 'ping', 'rel', 'referrerpolicy', 'target', 'type',
                 // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#deprecated_attributes
                 'charset', 'name', 'rev'
             )
