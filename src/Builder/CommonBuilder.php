@@ -50,6 +50,8 @@ class CommonBuilder implements BuilderInterface
         $isHttpOrLocalUri = new Behavior\RegExpAttrValue('#^(https?://|/(?!/)|[^/:][^:]*$)#');
         // + starting with `mailto:`
         $isMailtoUri = new Behavior\RegExpAttrValue('#^mailto:#');
+        // + starting with `tel:`
+        $isTelUri = new Behavior\RegExpAttrValue('#^tel:#');
 
         $this->globalAttrs = $this->createGlobalAttrs();
         $this->srcAttr = (new Behavior\Attr('src', Behavior\Attr::MATCH_FIRST_VALUE))
@@ -60,7 +62,7 @@ class CommonBuilder implements BuilderInterface
             // @todo Add test for `srcset="media.png 1080w"`
             ->addValues($isHttpOrLocalUri);
         $this->hrefAttr = (new Behavior\Attr('href', Behavior\Attr::MATCH_FIRST_VALUE))
-            ->addValues($isHttpOrLocalUri, $isMailtoUri);
+            ->addValues($isHttpOrLocalUri, $isMailtoUri, $isTelUri);
     }
 
     /**

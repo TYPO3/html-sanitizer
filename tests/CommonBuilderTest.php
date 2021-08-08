@@ -114,6 +114,10 @@ class CommonBuilderTest extends TestCase
                 '<a href="#anchor">anchor</a><a name="anchor">content</a>',
                 '<a href="#anchor">anchor</a><a name="anchor">content</a>',
             ],
+            '#055' => [
+                '<a href="tel:123456789">anchor</a>',
+                '<a href="tel:123456789">anchor</a>',
+            ],
             '#090' => [
                 '<p data-bool><span data-bool><strong data-bool>value</strong></span></p>',
                 '<p data-bool><span data-bool><strong data-bool>value</strong></span></p>'
