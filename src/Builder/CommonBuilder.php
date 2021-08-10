@@ -91,7 +91,7 @@ class CommonBuilder implements BuilderInterface
             'address', 'article', 'aside', 'footer', 'header',
             'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'main', 'nav', 'section',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#text_content
-            'blockquote', 'dd', 'div', 'dl', 'dt', 'figcaption', 'li', 'ol', 'p', 'pre', 'ul',
+            'blockquote', 'dd', 'div', 'dl', 'dt', 'figcaption', 'figure', 'li', 'ol', 'p', 'pre', 'ul',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#inline_text_semantics
             'a', 'abbr',  'b', 'bdi', 'bdo', 'cite', 'code', 'data', 'dfn', 'em', 'i', 'kbd', 'mark',
             'q', 'rb', 'rp', 'rt', 'rtc', 'ruby', 's', 'samp', 'small', 'span', 'strong', 'sub', 'sup',
@@ -147,7 +147,10 @@ class CommonBuilder implements BuilderInterface
             ->addAttrs(...$this->createAttrs('default', 'kind', 'label', 'srcLang'));
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#embedded_content
         $tags['picture'] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(...$this->globalAttrs);
-        $tags['source'] = (new Behavior\Tag('source'))->addAttrs(...$this->globalAttrs);
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/source
+        $tags['source'] = (new Behavior\Tag('source'))
+            ->addAttrs(...$this->globalAttrs)
+            ->addAttrs(...$this->createAttrs('media', 'sizes', 'src', 'srcset', 'type'));
         return $tags;
     }
 
