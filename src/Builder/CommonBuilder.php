@@ -54,6 +54,8 @@ class CommonBuilder implements BuilderInterface
         $isMailtoUri = new Behavior\RegExpAttrValue('#^mailto:#');
         // + starting with `tel:`
         $isTelUri = new Behavior\RegExpAttrValue('#^tel:#');
+        // + TYPO3 spam protected email address
+        $isSpamProtectedEmailUri = new Behavior\RegExpAttrValue('#^javascript:linkTo_UnCryptMailto#');
 
         $this->globalAttrs = $this->createGlobalAttrs();
         $this->srcAttr = (new Behavior\Attr('src', Behavior\Attr::MATCH_FIRST_VALUE))
@@ -64,7 +66,7 @@ class CommonBuilder implements BuilderInterface
             // @todo Add test for `srcset="media.png 1080w"`
             ->addValues($isHttpOrLocalUri);
         $this->hrefAttr = (new Behavior\Attr('href', Behavior\Attr::MATCH_FIRST_VALUE))
-            ->addValues($isHttpOrLocalUri, $isMailtoUri, $isTelUri);
+            ->addValues($isHttpOrLocalUri, $isMailtoUri, $isTelUri, $isSpamProtectedEmailUri);
     }
 
     public function build(): Sanitizer

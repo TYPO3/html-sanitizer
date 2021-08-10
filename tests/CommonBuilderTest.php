@@ -117,6 +117,10 @@ class CommonBuilderTest extends TestCase
                 '<a href="tel:123456789">anchor</a>',
                 '<a href="tel:123456789">anchor</a>',
             ],
+            '#056' => [
+                '<a href="javascript:linkTo_UnCryptMailto(%27ocknvq%2CkphqBrtczku%5C%2Fmkghgt0fg%27);">email(at)domain.tld</a>',
+                '<a href="javascript:linkTo_UnCryptMailto(%27ocknvq%2CkphqBrtczku%5C%2Fmkghgt0fg%27);">email(at)domain.tld</a>',
+            ],
             '#090' => [
                 '<p data-bool><span data-bool><strong data-bool>value</strong></span></p>',
                 '<p data-bool><span data-bool><strong data-bool>value</strong></span></p>'
