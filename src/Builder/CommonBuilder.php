@@ -126,8 +126,39 @@ class CommonBuilder implements BuilderInterface
         $tags['br'] = (new Behavior\Tag('br'))->addAttrs(...$this->globalAttrs);
         $tags['hr'] = (new Behavior\Tag('hr'))->addAttrs(...$this->globalAttrs);
         $tags['label']->addAttrs(...$this->createAttrs('for'));
-        $tags['td']->addAttrs(...$this->createAttrs('colspan', 'rowspan', 'scope'));
-        $tags['th']->addAttrs(...$this->createAttrs('colspan', 'rowspan', 'scope'));
+
+        // declarations related to <table> elements
+        $commonTableAttrs = $this->createAttrs('align', 'valign', 'bgcolor');
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/caption
+        $tags['caption']->addAttrs(...$this->createAttrs('align'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/thead
+        $tags['thead']->addAttrs(...$commonTableAttrs);
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tbody
+        $tags['tbody']->addAttrs(...$commonTableAttrs);
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tfoot
+        $tags['tfoot']->addAttrs(...$commonTableAttrs);
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/table
+        $tags['table']
+            ->addAttrs(...$commonTableAttrs)
+            ->addAttrs(...$this->createAttrs('border', 'cellpadding', 'cellspacing', 'summary'));
+        $tags['tr']->addAttrs(...$commonTableAttrs);
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/td
+        $tags['td']
+            ->addAttrs(...$commonTableAttrs)
+            ->addAttrs(...$this->createAttrs('abbr', 'axis', 'headers', 'colspan', 'rowspan', 'scope', 'width', 'height'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/th
+        $tags['th']
+            ->addAttrs(...$commonTableAttrs)
+            ->addAttrs(...$this->createAttrs('colspan', 'rowspan', 'scope'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/colgroup
+        $tags['colgroup']
+            ->addAttrs(...$commonTableAttrs)
+            ->addAttrs(...$this->createAttrs('span'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/col
+        $tags['col']
+            ->addAttrs(...$commonTableAttrs)
+            ->addAttrs(...$this->createAttrs('span', 'width'));
+
         return $tags;
     }
 
