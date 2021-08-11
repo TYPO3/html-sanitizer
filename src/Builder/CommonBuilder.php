@@ -90,7 +90,7 @@ class CommonBuilder implements BuilderInterface
             'address', 'article', 'aside', 'footer', 'header',
             'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'main', 'nav', 'section',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#text_content
-            'blockquote', 'dd', 'div', 'dl', 'dt', 'figcaption', 'li', 'ol', 'p', 'pre', 'ul',
+            'blockquote', 'dd', 'div', 'dl', 'dt', 'figcaption', 'figure', 'li', 'ol', 'p', 'pre', 'ul',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#inline_text_semantics
             'a', 'abbr',  'b', 'bdi', 'bdo', 'cite', 'code', 'data', 'dfn', 'em', 'i', 'kbd', 'mark',
             'q', 'rb', 'rp', 'rt', 'rtc', 'ruby', 's', 'samp', 'small', 'span', 'strong', 'sub', 'sup',
@@ -143,13 +143,13 @@ class CommonBuilder implements BuilderInterface
             ->addAttrs(...$this->createAttrs('autoplay', 'controls', 'height', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'width'));
         $tags[] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))
             ->addAttrs($this->srcAttr, $this->srcsetAttr, ...$this->globalAttrs)
-            ->addAttrs(...$this->createAttrs('alt', 'decoding', 'height', 'sizes', 'width'));
+            ->addAttrs(...$this->createAttrs('alt', 'decoding', 'height', 'sizes', 'width', 'loading'));
         $tags[] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))
             ->addAttrs($this->srcAttr, ...$this->globalAttrs)
             ->addAttrs(...$this->createAttrs('default', 'kind', 'label', 'srcLang'));
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#embedded_content
         $tags[] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(...$this->globalAttrs);
-        $tags[] = (new Behavior\Tag('source'))->addAttrs(...$this->globalAttrs);
+        $tags[] = (new Behavior\Tag('source'))->addAttrs(...$this->createAttrs('media', 'sizes', 'src', 'srcset', 'type'), ...$this->globalAttrs);
         return $tags;
     }
 
