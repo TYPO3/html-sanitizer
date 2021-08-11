@@ -84,7 +84,8 @@ class CommonBuilder implements BuilderInterface
             ->withFlags(Behavior::ENCODE_INVALID_TAG + Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('common')
             ->withTags(array_values($this->createBasicTags()))
-            ->withTags(array_values($this->createMediaTags()));
+            ->withTags(array_values($this->createMediaTags()))
+            ->withTags(array_values($this->createTableTags()));
     }
 
     /**
@@ -104,8 +105,6 @@ class CommonBuilder implements BuilderInterface
             'time', 'u', 'var', 'wbr',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#demarcating_edits
             'del', 'ins',
-            // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#table_content
-            'caption', 'col', 'colgroup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#forms
             'button', 'datalist', 'label', 'legend', 'meter', 'output', 'progress',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#interactive_elements
@@ -135,8 +134,7 @@ class CommonBuilder implements BuilderInterface
         $tags['br'] = (new Behavior\Tag('br'))->addAttrs($this->globalAttrs);
         $tags['hr'] = (new Behavior\Tag('hr'))->addAttrs($this->globalAttrs);
         $tags['label']->addAttrs($this->createAttrs('for'));
-        $tags['td']->addAttrs($this->createAttrs('colspan', 'rowspan', 'scope'));
-        $tags['th']->addAttrs($this->createAttrs('colspan', 'rowspan', 'scope'));
+
         return $tags;
     }
 
@@ -147,22 +145,22 @@ class CommonBuilder implements BuilderInterface
     {
         $tags = [];
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#image_and_multimedia
-        $tags[] = (new Behavior\Tag('audio', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(array_merge(
+        $tags['audio'] = (new Behavior\Tag('audio', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(array_merge(
             [$this->srcAttr],
             $this->globalAttrs,
             $this->createAttrs('autoplay', 'controls', 'loop', 'muted', 'preload')
         ));
-        $tags[] = (new Behavior\Tag('video', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(array_merge(
+        $tags['video'] = (new Behavior\Tag('video', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(array_merge(
             [$this->srcAttr],
             $this->globalAttrs,
             $this->createAttrs('autoplay', 'controls', 'height', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'width')
         ));
-        $tags[] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs(array_merge(
+        $tags['img'] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs(array_merge(
             [$this->srcAttr],
             $this->globalAttrs,
             $this->createAttrs('alt', 'decoding', 'height', 'sizes', 'width')
         ));
-        $tags[] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs(array_merge(
+        $tags['track'] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs(array_merge(
             [$this->srcAttr],
             $this->globalAttrs,
             $this->createAttrs('default', 'kind', 'label', 'srcLang')
@@ -172,6 +170,50 @@ class CommonBuilder implements BuilderInterface
         $tags[] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN))->addAttrs($this->globalAttrs);
         $tags[] = (new Behavior\Tag('source', Behavior\Tag::ALLOW_CHILDREN))->addAttrs($this->globalAttrs);
 
+        return $tags;
+    }
+
+    protected function createTableTags()
+    {
+        // // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#table_content
+        $tags = [];
+        // declarations related to <table> elements
+        $commonTableAttrs = $this->createAttrs('align', 'valign', 'bgcolor');
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/table
+        $tags['table'] = (new Behavior\Tag('table', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(array_merge($this->globalAttrs, $commonTableAttrs))
+            ->addAttrs($this->createAttrs('border', 'cellpadding', 'cellspacing', 'summary'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/caption
+        $tags['caption'] = (new Behavior\Tag('caption', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs($this->globalAttrs)
+            ->addAttrs($this->createAttrs('align'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/thead
+        $tags['thead'] = (new Behavior\Tag('thead', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(array_merge($this->globalAttrs, $commonTableAttrs));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tbody
+        $tags['tbody'] = (new Behavior\Tag('tbody', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(array_merge($this->globalAttrs, $commonTableAttrs));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tfoot
+        $tags['tfoot'] = (new Behavior\Tag('tfoot', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(array_merge($this->globalAttrs, $commonTableAttrs));
+        $tags['tr'] = (new Behavior\Tag('tr', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(array_merge($this->globalAttrs, $commonTableAttrs));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/td
+        $tags['td'] = (new Behavior\Tag('td', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(array_merge($this->globalAttrs, $commonTableAttrs))
+            ->addAttrs($this->createAttrs('abbr', 'axis', 'headers', 'colspan', 'rowspan', 'scope', 'width', 'height'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/th
+        $tags['th'] = (new Behavior\Tag('th', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(array_merge($this->globalAttrs, $commonTableAttrs))
+            ->addAttrs($this->createAttrs('colspan', 'rowspan', 'scope'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/colgroup
+        $tags['colgroup'] = (new Behavior\Tag('colgroup', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(array_merge($this->globalAttrs, $commonTableAttrs))
+            ->addAttrs($this->createAttrs('span'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/col
+        $tags['col'] = (new Behavior\Tag('col')) // no children here
+            ->addAttrs(array_merge($this->globalAttrs, $commonTableAttrs))
+            ->addAttrs($this->createAttrs('span', 'width'));
         return $tags;
     }
 

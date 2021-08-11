@@ -122,6 +122,42 @@ class CommonBuilderTest extends TestCase
                 '<p data-bool><span data-bool><strong data-bool>value</strong></span></p>',
                 '<p data-bool><span data-bool><strong data-bool>value</strong></span></p>'
             ],
+            '#100' => [
+                '<table><caption>c</caption><thead><tr><th>h</th></tr></thead><tbody><tr><td>b</td></tr></tbody><tfoot><tr><td>f</td></tr></tfoot></table>',
+                '<table><caption>c</caption><thead><tr><th>h</th></tr></thead><tbody><tr><td>b</td></tr></tbody><tfoot><tr><td>f</td></tr></tfoot></table>',
+            ],
+            '#101' => [
+                '<table align="left" border="2" cellpadding="2" cellspacing="2" class="table" summary="summary"></table>',
+                '<table align="left" border="2" cellpadding="2" cellspacing="2" class="table" summary="summary"></table>',
+            ],
+            '#102' => [
+                '<caption align="left">caption</caption>',
+                '<caption align="left">caption</caption>',
+            ],
+            '#104' => [
+                '<tr align="left" valign="top" bgcolor="#cc0000"><td>td</td></tr>',
+                '<tr align="left" valign="top" bgcolor="#cc0000"><td>td</td></tr>',
+            ],
+            '#105' => [
+                '<td abbr="abbr" align="left" valign="top" colspan="2" rowspan="2" bgcolor="#cc0000" axis="axis,axis" headers="head,head" scope="scope" width="100" height="100">value</td>',
+                '<td abbr="abbr" align="left" valign="top" colspan="2" rowspan="2" bgcolor="#cc0000" axis="axis,axis" headers="head,head" scope="scope" width="100" height="100">value</td>',
+            ],
+            '#106' => [
+                '<thead align="left" valign="top" bgcolor="#cc0000"><td>td</td></thead>',
+                '<thead align="left" valign="top" bgcolor="#cc0000"><td>td</td></thead>',
+            ],
+            '#107' => [
+                '<thead align="left" valign="top" bgcolor="#cc0000"><td>td</td></thead>',
+                '<thead align="left" valign="top" bgcolor="#cc0000"><td>td</td></thead>',
+            ],
+            '#108' => [
+                '<tfoot align="left" valign="top" bgcolor="#cc0000"><td>td</td></tfoot>',
+                '<tfoot align="left" valign="top" bgcolor="#cc0000"><td>td</td></tfoot>',
+            ],
+            '#109' => [
+                '<colgroup align="left" valign="top" bgcolor="#cc0000" span="1"><col><col span="2" align="left" valign="top" bgcolor="#cc0000" width="100"></colgroup>',
+                '<colgroup align="left" valign="top" bgcolor="#cc0000" span="1"><col><col span="2" align="left" valign="top" bgcolor="#cc0000" width="100"></colgroup>',
+            ],
             '#900' => [
                 '<div id="main">' .
                     '<a href="https://typo3.org/" data-type="url" wrong-attr="is-removed">TYPO3</a><br>' .
