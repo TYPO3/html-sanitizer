@@ -98,7 +98,7 @@ class CommonBuilder implements BuilderInterface
             'address', 'article', 'aside', 'footer', 'header',
             'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'main', 'nav', 'section',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#text_content
-            'blockquote', 'dd', 'div', 'dl', 'dt', 'figcaption', 'li', 'ol', 'p', 'pre', 'ul',
+            'blockquote', 'dd', 'div', 'dl', 'dt', 'figcaption', 'figure', 'li', 'ol', 'p', 'pre', 'ul',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#inline_text_semantics
             'a', 'abbr',  'b', 'bdi', 'bdo', 'cite', 'code', 'data', 'dfn', 'em', 'i', 'kbd', 'mark',
             'q', 'rb', 'rp', 'rt', 'rtc', 'ruby', 's', 'samp', 'small', 'span', 'strong', 'sub', 'sup',
@@ -158,7 +158,7 @@ class CommonBuilder implements BuilderInterface
         $tags['img'] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs(array_merge(
             [$this->srcAttr],
             $this->globalAttrs,
-            $this->createAttrs('alt', 'decoding', 'height', 'sizes', 'width')
+            $this->createAttrs('alt', 'decoding', 'height', 'sizes', 'width', 'loading')
         ));
         $tags['track'] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs(array_merge(
             [$this->srcAttr],
@@ -167,8 +167,12 @@ class CommonBuilder implements BuilderInterface
         ));
 
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#embedded_content
-        $tags[] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN))->addAttrs($this->globalAttrs);
-        $tags[] = (new Behavior\Tag('source', Behavior\Tag::ALLOW_CHILDREN))->addAttrs($this->globalAttrs);
+        $tags['picture'] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN))->addAttrs($this->globalAttrs);
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/source
+        $tags['source'] = (new Behavior\Tag('source'))->addAttrs(array_merge(
+            $this->globalAttrs,
+            $this->createAttrs('media', 'sizes', 'src', 'srcset', 'type')
+        ));
 
         return $tags;
     }
