@@ -80,7 +80,8 @@ class CommonBuilder implements BuilderInterface
             ->withFlags(Behavior::ENCODE_INVALID_TAG + Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('common')
             ->withTags(...array_values($this->createBasicTags()))
-            ->withTags(...array_values($this->createMediaTags()));
+            ->withTags(...array_values($this->createMediaTags()))
+            ->withTags(...array_values($this->createTableTags()));
     }
 
     protected function createBasicTags(): array
@@ -97,8 +98,6 @@ class CommonBuilder implements BuilderInterface
             'time', 'u', 'var', 'wbr',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#demarcating_edits
             'del', 'ins',
-            // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#table_content
-            'caption', 'col', 'colgroup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#forms
             'button', 'datalist', 'label', 'legend', 'meter', 'output', 'progress',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#interactive_elements
@@ -127,38 +126,6 @@ class CommonBuilder implements BuilderInterface
         $tags['hr'] = (new Behavior\Tag('hr'))->addAttrs(...$this->globalAttrs);
         $tags['label']->addAttrs(...$this->createAttrs('for'));
 
-        // declarations related to <table> elements
-        $commonTableAttrs = $this->createAttrs('align', 'valign', 'bgcolor');
-        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/caption
-        $tags['caption']->addAttrs(...$this->createAttrs('align'));
-        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/thead
-        $tags['thead']->addAttrs(...$commonTableAttrs);
-        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tbody
-        $tags['tbody']->addAttrs(...$commonTableAttrs);
-        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tfoot
-        $tags['tfoot']->addAttrs(...$commonTableAttrs);
-        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/table
-        $tags['table']
-            ->addAttrs(...$commonTableAttrs)
-            ->addAttrs(...$this->createAttrs('border', 'cellpadding', 'cellspacing', 'summary'));
-        $tags['tr']->addAttrs(...$commonTableAttrs);
-        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/td
-        $tags['td']
-            ->addAttrs(...$commonTableAttrs)
-            ->addAttrs(...$this->createAttrs('abbr', 'axis', 'headers', 'colspan', 'rowspan', 'scope', 'width', 'height'));
-        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/th
-        $tags['th']
-            ->addAttrs(...$commonTableAttrs)
-            ->addAttrs(...$this->createAttrs('colspan', 'rowspan', 'scope'));
-        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/colgroup
-        $tags['colgroup']
-            ->addAttrs(...$commonTableAttrs)
-            ->addAttrs(...$this->createAttrs('span'));
-        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/col
-        $tags['col']
-            ->addAttrs(...$commonTableAttrs)
-            ->addAttrs(...$this->createAttrs('span', 'width'));
-
         return $tags;
     }
 
@@ -181,6 +148,50 @@ class CommonBuilder implements BuilderInterface
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#embedded_content
         $tags['picture'] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(...$this->globalAttrs);
         $tags['source'] = (new Behavior\Tag('source'))->addAttrs(...$this->globalAttrs);
+        return $tags;
+    }
+
+    protected function createTableTags(): array
+    {
+        // // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#table_content
+        $tags = [];
+        // declarations related to <table> elements
+        $commonTableAttrs = $this->createAttrs('align', 'valign', 'bgcolor');
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/table
+        $tags['table'] = (new Behavior\Tag('table', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(...$this->globalAttrs, ...$commonTableAttrs)
+            ->addAttrs(...$this->createAttrs('border', 'cellpadding', 'cellspacing', 'summary'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/caption
+        $tags['caption'] = (new Behavior\Tag('caption', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(...$this->globalAttrs)
+            ->addAttrs(...$this->createAttrs('align'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/thead
+        $tags['thead'] = (new Behavior\Tag('thead', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(...$this->globalAttrs, ...$commonTableAttrs);
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tbody
+        $tags['tbody'] = (new Behavior\Tag('tbody', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(...$this->globalAttrs, ...$commonTableAttrs);
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tfoot
+        $tags['tfoot'] = (new Behavior\Tag('tfoot', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(...$this->globalAttrs, ...$commonTableAttrs);
+        $tags['tr'] = (new Behavior\Tag('tr', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(...$this->globalAttrs, ...$commonTableAttrs);
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/td
+        $tags['td'] = (new Behavior\Tag('td', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(...$this->globalAttrs, ...$commonTableAttrs)
+            ->addAttrs(...$this->createAttrs('abbr', 'axis', 'headers', 'colspan', 'rowspan', 'scope', 'width', 'height'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/th
+        $tags['th'] = (new Behavior\Tag('th', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(...$this->globalAttrs, ...$commonTableAttrs)
+            ->addAttrs(...$this->createAttrs('colspan', 'rowspan', 'scope'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/colgroup
+        $tags['colgroup'] = (new Behavior\Tag('colgroup', Behavior\Tag::ALLOW_CHILDREN))
+            ->addAttrs(...$this->globalAttrs, ...$commonTableAttrs)
+            ->addAttrs(...$this->createAttrs('span'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/col
+        $tags['col'] = (new Behavior\Tag('col')) // no children here
+            ->addAttrs(...$this->globalAttrs, ...$commonTableAttrs)
+            ->addAttrs(...$this->createAttrs('span', 'width'));
         return $tags;
     }
 
