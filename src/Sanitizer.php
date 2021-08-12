@@ -65,13 +65,14 @@ class Sanitizer
 
     /**
      * @param string $html
+     * @param InitiatorInterface $initiator
      * @return string
      */
-    public function sanitize($html)
+    public function sanitize($html, InitiatorInterface $initiator = null)
     {
         $html = (string) $html;
         $this->root = $this->parse($html);
-        $this->context = new Context($this->parser);
+        $this->context = new Context($this->parser, $initiator);
         $this->beforeTraverse();
         $this->traverseNodeList($this->root->childNodes);
         $this->afterTraverse();
