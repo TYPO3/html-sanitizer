@@ -25,8 +25,14 @@ class Context
      */
     public $parser;
 
-    public function __construct(HTML5 $parser)
+    /**
+     * @var InitiatorInterface
+     */
+    public $initiator;
+
+    public function __construct(HTML5 $parser, InitiatorInterface $initiator = null)
     {
         $this->parser = $parser;
+        $this->initiator = $initiator;
     }
 }
