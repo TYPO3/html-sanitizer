@@ -93,6 +93,10 @@ class CommonBuilderTest extends TestCase
                 '<img src="//typo3.org/logo.svg" onerror="alert(1)">',
                 '',
             ],
+            '#046' => [
+                '<img src="/typo3.org/logo.svg" alt="logo" loading="lazy" width="100" height="100" sizes="33.3vw">',
+                '<img src="/typo3.org/logo.svg" alt="logo" loading="lazy" width="100" height="100" sizes="33.3vw">',
+            ],
             '#050' => [
                 '<a href="https://typo3.org/" role="button">value</a>',
                 '<a href="https://typo3.org/" role="button">value</a>',
@@ -156,6 +160,14 @@ class CommonBuilderTest extends TestCase
             '#109' => [
                 '<colgroup align="left" valign="top" bgcolor="#cc0000" span="1"><col><col span="2" align="left" valign="top" bgcolor="#cc0000" width="100"></colgroup>',
                 '<colgroup align="left" valign="top" bgcolor="#cc0000" span="1"><col><col span="2" align="left" valign="top" bgcolor="#cc0000" width="100"></colgroup>',
+            ],
+            '#120' => [
+                '<figure><img src="https://typo3.org/logo.svg" alt="logo"><figcaption>TYPO3 logo</figcaption></figure>',
+                '<figure><img src="https://typo3.org/logo.svg" alt="logo"><figcaption>TYPO3 logo</figcaption></figure>',
+            ],
+            '#121' => [
+                '<picture><source srcset="/logo-800.png" media="(min-width: 800px)" type="image/png" sizes="33.3vw"></picture>',
+                '<picture><source srcset="/logo-800.png" media="(min-width: 800px)" type="image/png" sizes="33.3vw"></picture>'
             ],
             '#900' => [
                 '<div id="main">' .
