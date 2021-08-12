@@ -62,10 +62,10 @@ class Sanitizer
         $this->parser = $this->createParser();
     }
 
-    public function sanitize(string $html): string
+    public function sanitize(string $html, InitiatorInterface $initiator = null): string
     {
         $this->root = $this->parse($html);
-        $this->context = new Context($this->parser);
+        $this->context = new Context($this->parser, $initiator);
         $this->beforeTraverse();
         $this->traverseNodeList($this->root->childNodes);
         $this->afterTraverse();

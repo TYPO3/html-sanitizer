@@ -62,13 +62,13 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         if ($tag === null) {
             // pass custom elements, in case it has been declared
             if ($this->behavior->shallAllowCustomElements() && $this->isCustomElement($node)) {
-                $this->logger->debug('Allowed custom element {nodeName}', [
+                $this->log('Allowed custom element {nodeName}', [
                     'behavior' => $this->behavior->getName(),
                     'nodeName' => $node->nodeName,
                 ]);
                 return $node;
             }
-            $this->logger->debug('Found unexpected tag {nodeName}', [
+            $this->log('Found unexpected tag {nodeName}', [
                 'behavior' => $this->behavior->getName(),
                 'nodeName' => $node->nodeName,
             ]);
@@ -135,7 +135,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
             && $node->childNodes->length > 0
             && $this->behavior->shallRemoveUnexpectedChildren()
         ) {
-            $this->logger->debug('Found unexpected children for {nodeName}', [
+            $this->log('Found unexpected children for {nodeName}', [
                 'behavior' => $this->behavior->getName(),
                 'nodeName' => $node->nodeName,
             ]);
@@ -161,7 +161,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         $name = strtolower($attribute->name);
         $attr = $tag->getAttr($name);
         if ($attr === null || !$attr->matchesValue($attribute->value)) {
-            $this->logger->debug('Found invalid attribute {nodeName}.{attrName}', [
+            $this->log('Found invalid attribute {nodeName}.{attrName}', [
                 'behavior' => $this->behavior->getName(),
                 'nodeName' => $node->nodeName,
                 'attrName' => $attribute->nodeName,
@@ -211,5 +211,14 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
     {
         return $node instanceof DOMElement
             && preg_match('#^[a-z][a-z0-9]*-.+#', $node->nodeName) > 0;
+    }
+
+    protected function log(string $message, array $context = [], $level = null): void
+    {
+        // @todo consider given minimun log-level
+        if (!isset($context['initiator'])) {
+            $context['initiator'] = (string)$this->context->initiator;
+        }
+        $this->logger->debug($message, $context);
     }
 }
