@@ -166,21 +166,21 @@ class CommonBuilder implements BuilderInterface
     {
         $tags = [];
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#image_and_multimedia
-        $tags[] = (new Behavior\Tag('audio', Behavior\Tag::ALLOW_CHILDREN))
+        $tags['audio'] = (new Behavior\Tag('audio', Behavior\Tag::ALLOW_CHILDREN))
             ->addAttrs($this->srcAttr, ...$this->globalAttrs)
             ->addAttrs(...$this->createAttrs('autoplay', 'controls', 'loop', 'muted', 'preload'));
-        $tags[] = (new Behavior\Tag('video', Behavior\Tag::ALLOW_CHILDREN))
+        $tags['video'] = (new Behavior\Tag('video', Behavior\Tag::ALLOW_CHILDREN))
             ->addAttrs($this->srcAttr, ...$this->globalAttrs)
             ->addAttrs(...$this->createAttrs('autoplay', 'controls', 'height', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'width'));
-        $tags[] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))
+        $tags['img'] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))
             ->addAttrs($this->srcAttr, $this->srcsetAttr, ...$this->globalAttrs)
             ->addAttrs(...$this->createAttrs('alt', 'decoding', 'height', 'sizes', 'width'));
-        $tags[] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))
+        $tags['track'] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))
             ->addAttrs($this->srcAttr, ...$this->globalAttrs)
             ->addAttrs(...$this->createAttrs('default', 'kind', 'label', 'srcLang'));
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#embedded_content
-        $tags[] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(...$this->globalAttrs);
-        $tags[] = (new Behavior\Tag('source'))->addAttrs(...$this->globalAttrs);
+        $tags['picture'] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(...$this->globalAttrs);
+        $tags['source'] = (new Behavior\Tag('source'))->addAttrs(...$this->globalAttrs);
         return $tags;
     }
 
