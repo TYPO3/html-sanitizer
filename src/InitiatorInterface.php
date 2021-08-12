@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the TYPO3 project.
  *
@@ -20,5 +18,5 @@ namespace TYPO3\HtmlSanitizer;
  */
 interface InitiatorInterface
 {
-    public function __toString(): string;
+    public function __toString();
 }
