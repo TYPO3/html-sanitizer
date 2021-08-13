@@ -95,8 +95,8 @@ class CommonBuilderTest extends TestCase
                 '',
             ],
             '#046' => [
-                '<img src="/typo3.org/logo.svg" alt="logo" loading="lazy" width="100" height="100" sizes="33.3vw">',
-                '<img src="/typo3.org/logo.svg" alt="logo" loading="lazy" width="100" height="100" sizes="33.3vw">',
+                '<img src="/typo3.org/logo.svg" alt="logo" loading="lazy" width="100" height="100" sizes="33.3vw" name="logo" align="left" border="0">',
+                '<img src="/typo3.org/logo.svg" alt="logo" loading="lazy" width="100" height="100" sizes="33.3vw" name="logo" align="left" border="0">',
             ],
             '#050' => [
                 '<a href="https://typo3.org/" role="button">value</a>',

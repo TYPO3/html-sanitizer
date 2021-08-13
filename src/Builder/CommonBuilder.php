@@ -158,7 +158,7 @@ class CommonBuilder implements BuilderInterface
         $tags['img'] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs(array_merge(
             [$this->srcAttr],
             $this->globalAttrs,
-            $this->createAttrs('alt', 'decoding', 'height', 'sizes', 'width', 'loading')
+            $this->createAttrs('align', 'alt', 'border', 'decoding', 'height', 'sizes', 'width', 'loading', 'name')
         ));
         $tags['track'] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))->addAttrs(array_merge(
             [$this->srcAttr],
