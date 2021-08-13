@@ -125,6 +125,10 @@ class CommonBuilder implements BuilderInterface
         $tags['br'] = (new Behavior\Tag('br'))->addAttrs(...$this->globalAttrs);
         $tags['hr'] = (new Behavior\Tag('hr'))->addAttrs(...$this->globalAttrs);
         $tags['label']->addAttrs(...$this->createAttrs('for'));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta
+        $tags['meta'] = (new Behavior\Tag('meta', Behavior\Tag::PURGE_WITHOUT_ATTRS))
+            ->addAttrs(...$this->globalAttrs)
+            ->addAttrs((new Behavior\Attr('content'))->addValues(new Behavior\RegExpAttrValue('#^[\w]*$#')));
 
         return $tags;
     }
