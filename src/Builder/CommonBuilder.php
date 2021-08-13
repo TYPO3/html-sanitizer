@@ -141,7 +141,7 @@ class CommonBuilder implements BuilderInterface
             ->addAttrs(...$this->createAttrs('autoplay', 'controls', 'height', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'width'));
         $tags['img'] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))
             ->addAttrs($this->srcAttr, $this->srcsetAttr, ...$this->globalAttrs)
-            ->addAttrs(...$this->createAttrs('alt', 'decoding', 'height', 'sizes', 'width', 'loading'));
+            ->addAttrs(...$this->createAttrs('align', 'alt', 'border', 'decoding', 'height', 'sizes', 'width', 'loading', 'name'));
         $tags['track'] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))
             ->addAttrs($this->srcAttr, ...$this->globalAttrs)
             ->addAttrs(...$this->createAttrs('default', 'kind', 'label', 'srcLang'));
