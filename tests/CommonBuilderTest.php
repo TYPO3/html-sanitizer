@@ -180,6 +180,20 @@ class CommonBuilderTest extends TestCase
                     '(the &lt;script&gt;alert(1)&lt;/script&gt; tag shall be encoded to HTML entities)'.
                 '</div>',
             ],
+            '#901' => [
+                '<div itemprop="tel" itemscope>' .
+                '<span itemprop="value">+1-234-56789</span>' .
+                '<meta itemprop="type" content="voice">' .
+                '</div>',
+                '<div itemprop="tel" itemscope>' .
+                '<span itemprop="value">+1-234-56789</span>' .
+                '<meta itemprop="type" content="voice">' .
+                '</div>'
+            ],
+            '#902' => [
+                '<div><meta http-equiv="refresh" content="1;https://evil.typo3.org/" name="referrer" charset="utf-8"></div>',
+                '<div></div>'
+            ],
         ];
     }
 
