@@ -6,6 +6,10 @@
 
 ## In a Nutshell
 
+This `typo3/html-sanitizer` package aims to be a standalone component that can be used by any PHP-based
+project or library. Albeit it is released within the TYPO3 namespace, it is agnostic to specifics of
+[TYPO3 CMS](https://github.com/typo3/typo3).
+
 + [`\TYPO3\HtmlSanitizer\Behavior`](src/Behavior.php) contains declarative settings for
   a particular process for sanitizing HTML.
 + [`\TYPO3\HtmlSanitizer\Visitor\VisitorInterface`](src/Visitor/VisitorInterface.php)
@@ -18,6 +22,12 @@
   be used to create multiple different builder instances - in terms of "presets" - which
   combine declaring a particular `Behavior`, initialization of `VisitorInterface` instances,
   and finally returning a ready-to-use `Sanitizer` instance
+
+## Installation
+
+```bash
+composer req typo3/html-sanitizer
+```
 
 ## Example & API
 
