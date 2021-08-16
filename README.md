@@ -1,8 +1,8 @@
 # TYPO3 HTML Sanitizer
 
-> :warning: This package is still experimental, common safe HTML tags & attributes
-> as given in [`\TYPO3\HtmlSanitizer\Builder\CommonBuilder`](src/Builder/CommonBuilder.php)
-> still might be adjusted.
+> :information_source: Common safe HTML tags & attributes as given in
+> [`\TYPO3\HtmlSanitizer\Builder\CommonBuilder`](src/Builder/CommonBuilder.php)
+> still might be adjusted, extended or rearranged to more specific builders.
 
 ## In a Nutshell
 
