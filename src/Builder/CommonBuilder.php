@@ -105,7 +105,7 @@ class CommonBuilder implements BuilderInterface
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#web_components
             // 'slot', 'template',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#obsolete_and_deprecated_elements
-            'acronym', 'big', 'nobr', 'tt',
+            'acronym', 'big', 'font', 'nobr', 'tt',
         ];
 
         $tags = [];
@@ -129,6 +129,8 @@ class CommonBuilder implements BuilderInterface
         $tags['meta'] = (new Behavior\Tag('meta', Behavior\Tag::PURGE_WITHOUT_ATTRS))
             ->addAttrs(...$this->globalAttrs)
             ->addAttrs((new Behavior\Attr('content'))->addValues(new Behavior\RegExpAttrValue('#^[\w]*$#')));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/font
+        $tags['font']->addAttrs(...$this->createAttrs('color', 'face', 'size'));
 
         return $tags;
     }

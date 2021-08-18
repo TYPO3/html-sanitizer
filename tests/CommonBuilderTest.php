@@ -48,6 +48,12 @@ class CommonBuilderTest extends TestCase
                     '<div>value</div>' .
                     '&lt;unknown&gt;value&lt;/unknown&gt;&lt;unknown&gt;value&lt;/unknown&gt;'
             ],
+            '#015' => [
+                '<unknown unknown="unknown" class="nested"><div class="nested">value</div></unknown>',
+                // '&lt;unknown unknown="unknown" class="nested"&gt;<div class="nested">value</div>&lt;/unknown&gt;',
+                // @todo invalidating nested nodes due invalid parent node is currently expected - topic for discussion
+                '&lt;unknown unknown="unknown" class="nested"&gt;&lt;div class="nested"&gt;value&lt;/div&gt;&lt;/unknown&gt;',
+            ],
             // @todo bug in https://github.com/Masterminds/html5-php/issues
             // '#013' => [
             //    '<strong>Given that x < y and y > z...</strong>',
@@ -192,6 +198,10 @@ class CommonBuilderTest extends TestCase
             '#902' => [
                 '<div><meta http-equiv="refresh" content="1;https://evil.typo3.org/" name="referrer" charset="utf-8"></div>',
                 '<div></div>'
+            ],
+            '#903' => [
+                '<font class="font" color="#000000" face="Verdana,Arial" size="13">value</font>',
+                '<font class="font" color="#000000" face="Verdana,Arial" size="13">value</font>'
             ],
         ];
     }
