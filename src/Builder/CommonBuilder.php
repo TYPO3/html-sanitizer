@@ -112,7 +112,7 @@ class CommonBuilder implements BuilderInterface
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#web_components
             // 'slot', 'template',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#obsolete_and_deprecated_elements
-            'acronym', 'big', 'nobr', 'tt',
+            'acronym', 'big', 'font', 'nobr', 'tt',
         ];
 
         /** @var Behavior\Tag[] $tags */
@@ -139,6 +139,8 @@ class CommonBuilder implements BuilderInterface
             $this->globalAttrs,
             [(new Behavior\Attr('content'))->addValues(new Behavior\RegExpAttrValue('#^[\w]*$#'))]
         ));
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/font
+        $tags['font']->addAttrs($this->createAttrs('color', 'face', 'size'));
 
         return $tags;
     }
