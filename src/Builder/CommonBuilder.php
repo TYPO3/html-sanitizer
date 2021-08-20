@@ -95,7 +95,7 @@ class CommonBuilder implements BuilderInterface
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#inline_text_semantics
             'a', 'abbr',  'b', 'bdi', 'bdo', 'cite', 'code', 'data', 'dfn', 'em', 'i', 'kbd', 'mark',
             'q', 'rb', 'rp', 'rt', 'rtc', 'ruby', 's', 'samp', 'small', 'span', 'strong', 'sub', 'sup',
-            'time', 'u', 'var', 'wbr',
+            'time', 'u', 'var', 'wbr', 'svg', 'use',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#demarcating_edits
             'del', 'ins',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#forms

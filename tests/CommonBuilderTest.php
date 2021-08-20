@@ -203,6 +203,10 @@ class CommonBuilderTest extends TestCase
                 '<font class="font" color="#000000" face="Verdana,Arial" size="13">value</font>',
                 '<font class="font" color="#000000" face="Verdana,Arial" size="13">value</font>'
             ],
+            '#904' => [
+                '<svg><use xlink:href="https://typo3.org/logo.svg"></use></svg>',
+                '<svg><use xlink:href="https://typo3.org/logo.svg" xmlns:xlink="http://www.w3.org/1999/xlink" /></svg>'
+            ],
         ];
     }
 
