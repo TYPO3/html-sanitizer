@@ -113,22 +113,22 @@ class Attr
     }
 
     /**
-     * @param string $value
+     * @param string $givenValue
      * @return bool
      */
-    public function matchesValue($value)
+    public function matchesValue($givenValue)
     {
-        $value = (string) $value;
-        // no declared assertions means `true` as well
+        $givenValue = (string) $givenValue;
+        // no declared values, means `true` as well
         if ($this->values === []) {
             return true;
         }
         $matchFirstValue = $this->shallMatchFirstValue();
-        foreach ($this->values as $assertion) {
+        foreach ($this->values as $value) {
             // + result: false, matchFirstValue: false --> return false
             // + result: true, matchFirstValue: true --> return true
             // (anything else continues processing)
-            $result = $assertion->matches($value);
+            $result = $value->matches($givenValue);
             if ($result === $matchFirstValue) {
                 return $matchFirstValue;
             }
