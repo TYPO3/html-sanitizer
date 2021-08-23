@@ -36,6 +36,7 @@ class CommonBuilder implements BuilderInterface
 
     /**
      * @var Behavior\Attr
+     * @internal currently not used anymore
      */
     protected $srcsetAttr;
 
@@ -62,6 +63,7 @@ class CommonBuilder implements BuilderInterface
         $this->srcsetAttr = (new Behavior\Attr('srcset', Behavior\Attr::MATCH_FIRST_VALUE))
             // @todo consider adding `data:` check
             // @todo Add test for `srcset="media.png 1080w"`
+            // @todo currently not used anymore
             ->addValues($isHttpOrLocalUri);
         $this->hrefAttr = (new Behavior\Attr('href', Behavior\Attr::MATCH_FIRST_VALUE))
             ->addValues($isHttpOrLocalUri, $isMailtoUri, $isTelUri);
@@ -137,17 +139,22 @@ class CommonBuilder implements BuilderInterface
 
     protected function createMediaTags(): array
     {
+        $audioSrcAttr = $this->srcAttr->withValues($this->createDataUriValue('audio'));
+        $videoSrcAttr = $this->srcAttr->withValues($this->createDataUriValue('video'));
+        $imageSrcAttr = $this->srcAttr->withValues($this->createDataUriValue('image'));
+        $mediaSrcAttr = $this->srcAttr->withValues($this->createDataUriValue('image', 'audio', 'video'));
+
         $tags = [];
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#image_and_multimedia
         $tags['audio'] = (new Behavior\Tag('audio', Behavior\Tag::ALLOW_CHILDREN))
-            ->addAttrs($this->srcAttr, ...$this->globalAttrs)
+            ->addAttrs($audioSrcAttr, ...$this->globalAttrs)
             ->addAttrs(...$this->createAttrs('autoplay', 'controls', 'loop', 'muted', 'preload'));
         $tags['video'] = (new Behavior\Tag('video', Behavior\Tag::ALLOW_CHILDREN))
-            ->addAttrs($this->srcAttr, ...$this->globalAttrs)
+            ->addAttrs($videoSrcAttr, ...$this->globalAttrs)
             ->addAttrs(...$this->createAttrs('autoplay', 'controls', 'height', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'width'));
         $tags['img'] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))
-            ->addAttrs($this->srcAttr, $this->srcsetAttr, ...$this->globalAttrs)
-            ->addAttrs(...$this->createAttrs('align', 'alt', 'border', 'decoding', 'height', 'sizes', 'width', 'loading', 'name'));
+            ->addAttrs($imageSrcAttr, ...$this->globalAttrs)
+            ->addAttrs(...$this->createAttrs('align', 'alt', 'border', 'decoding', 'height', 'sizes', 'srcset', 'width', 'loading', 'name'));
         $tags['track'] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))
             ->addAttrs($this->srcAttr, ...$this->globalAttrs)
             ->addAttrs(...$this->createAttrs('default', 'kind', 'label', 'srcLang'));
@@ -155,8 +162,8 @@ class CommonBuilder implements BuilderInterface
         $tags['picture'] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(...$this->globalAttrs);
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/source
         $tags['source'] = (new Behavior\Tag('source'))
-            ->addAttrs(...$this->globalAttrs)
-            ->addAttrs(...$this->createAttrs('media', 'sizes', 'src', 'srcset', 'type'));
+            ->addAttrs($mediaSrcAttr, ...$this->globalAttrs)
+            ->addAttrs(...$this->createAttrs('media', 'sizes', 'srcset', 'type'));
         return $tags;
     }
 
@@ -243,6 +250,20 @@ class CommonBuilder implements BuilderInterface
                 return new Behavior\Attr($name);
             },
             $names
+        );
+    }
+
+    protected function createDataUriValue(string ...$mediaTypes): Behavior\RegExpAttrValue
+    {
+        $mediaTypes = array_map(
+            function (string $mediaType): string {
+                return preg_quote($mediaType, '#');
+            },
+            $mediaTypes
+        );
+        return new Behavior\RegExpAttrValue(
+            // pattern example: `data:image/[^;,]+(?:;(?:base64)?)?,`
+            sprintf('#data:(?:%s)/[^;,]+(?:;(?:base64)?)?,#', implode('|', $mediaTypes))
         );
     }
 }

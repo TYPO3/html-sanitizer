@@ -55,10 +55,33 @@ class Attr
         $this->flags = $flags;
     }
 
+    /**
+     * Adds value items directly to the current `Attr` instance.
+     *
+     * @param AttrValueInterface ...$values
+     * @return $this
+     */
     public function addValues(AttrValueInterface ...$values): self
     {
         $this->values = array_merge($this->values, $values);
         return $this;
+    }
+
+    /**
+     * Clones current `Attr` instance, then adds value items to that cloned instance.
+     *
+     * @param AttrValueInterface ...$values
+     * @return $this
+     */
+    public function withValues(AttrValueInterface ...$values): self
+    {
+        $differences = array_udiff($values, $this->values, [$this, 'isDifferentValue']);
+        if (empty($differences)) {
+            return $this;
+        }
+        $target = clone $this;
+        $target->values = array_merge($target->values, $values);
+        return $target;
     }
 
     public function getName(): string
@@ -110,5 +133,10 @@ class Attr
         // + matchFirstValue: false --> return true (since no other match failed before)
         // + matchFirstValue: true --> return false (since no other match succeeded before)
         return !$matchFirstValue;
+    }
+
+    protected function isDifferentValue(AttrValueInterface $a, AttrValueInterface $b): int
+    {
+        return (int)($a !== $b);
     }
 }
