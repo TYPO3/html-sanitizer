@@ -55,9 +55,9 @@ class Attr
         $this->flags = $flags;
     }
 
-    public function addValues(AttrValueInterface ...$assertions): self
+    public function addValues(AttrValueInterface ...$values): self
     {
-        $this->values = array_merge($this->values, $assertions);
+        $this->values = array_merge($this->values, $values);
         return $this;
     }
 
@@ -91,18 +91,18 @@ class Attr
             || $this->isPrefix() && strpos($name, $this->name) === 0;
     }
 
-    public function matchesValue(string $value): bool
+    public function matchesValue(string $givenValue): bool
     {
-        // no declared assertions means `true` as well
+        // no declared values, means `true` as well
         if ($this->values === []) {
             return true;
         }
         $matchFirstValue = $this->shallMatchFirstValue();
-        foreach ($this->values as $assertion) {
+        foreach ($this->values as $value) {
             // + result: false, matchFirstValue: false --> return false
             // + result: true, matchFirstValue: true --> return true
             // (anything else continues processing)
-            $result = $assertion->matches($value);
+            $result = $value->matches($givenValue);
             if ($result === $matchFirstValue) {
                 return $matchFirstValue;
             }
