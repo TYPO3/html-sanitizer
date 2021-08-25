@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace TYPO3\HtmlSanitizer;
 
 /**
- * Contractor for initiators, used to keep track of of origins
- * of sanitization invocations. Data is forwared to logger (as string).
+ * Contract for initiators, used to keep track of origins
+ * of sanitization invocations. Data is forwarded to logger (as string).
  */
 interface InitiatorInterface
 {
