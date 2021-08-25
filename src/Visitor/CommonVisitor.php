@@ -83,7 +83,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         }
         $node = $this->processAttributes($node, $tag);
         $node = $this->processChildren($node, $tag);
-        // completely remove node, in case it is expect to exist with attributes only
+        // completely remove node, in case it is expected to exist with attributes only
         if ($node !== null && $node->attributes->length === 0 && $tag->shallPurgeWithoutAttrs()) {
             return null;
         }
@@ -107,7 +107,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
             // unexpected node, that should have been handled in `enterNode` already
             return null;
         }
-        // completely remove node, in case it is expect to exist with children only
+        // completely remove node, in case it is expected to exist with children only
         if ($node->childNodes->length === 0 && $tag->shallPurgeWithoutChildren()) {
             return null;
         }
@@ -238,7 +238,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
      */
     protected function log($message, array $context = [], $level = null)
     {
-        // @todo consider given minimun log-level
+        // @todo consider given minimum log-level
         if (!isset($context['initiator'])) {
             $context['initiator'] = (string)$this->context->initiator;
         }
