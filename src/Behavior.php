@@ -22,6 +22,11 @@ use TYPO3\HtmlSanitizer\Behavior\Tag;
 class Behavior
 {
     /**
+     * not having any behavioral capabilities
+     */
+    const BLUNT = 0;
+
+    /**
      * in case an unexpected tag was found, encode the whole tag as HTML
      */
     const ENCODE_INVALID_TAG = 1;
