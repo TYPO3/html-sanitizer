@@ -22,11 +22,41 @@ use TYPO3\HtmlSanitizer\Context;
  */
 interface VisitorInterface
 {
+    /**
+     * Executed before traversing any nodes
+     * (e.g. used to initialize visitors)
+     *
+     * @param Context $context
+     */
     public function beforeTraverse(Context $context);
 
+    /**
+     * Executed when entering a node level.
+     * + returning `null` means "remove node"
+     * + returning same `DOMNode` means "keep node"
+     * + returning different `DOMNode` means "replace node"
+     *
+     * @param DOMNode $node
+     * @return DOMNode|null
+     */
     public function enterNode(DOMNode $node): ?DOMNode;
 
+    /**
+     * Executed when leaving a node level.
+     * + returning `null` means "remove node"
+     * + returning same `DOMNode` means "keep node"
+     * + returning different `DOMNode` means "replace node"
+     *
+     * @param DOMNode $node
+     * @return DOMNode|null
+     */
     public function leaveNode(DOMNode $node): ?DOMNode;
 
+    /**
+     * Executed after having traversed all nodes
+     * (e.g. used to finalize visitors)
+     *
+     * @param Context $context
+     */
     public function afterTraverse(Context $context);
 }
