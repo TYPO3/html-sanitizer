@@ -3,7 +3,7 @@
     bootstrap="vendor/autoload.php"
     backupGlobals="true"
     colors="true"
-    processIsolation="true"
+    processIsolation="false"
     verbose="true">
     <testsuites>
         <testsuite name="tests">

@@ -20,6 +20,11 @@ namespace TYPO3\HtmlSanitizer\Behavior;
 class Attr
 {
     /**
+     * not having any behavioral capabilities
+     */
+    public const BLUNT = 0;
+
+    /**
      * whether given name shall be considered as prefix, e.g.
      * `data-` or `aria-` for multiple similar and safe attribute names
      */
@@ -84,11 +89,11 @@ class Attr
         return ($this->flags & self::MATCH_FIRST_VALUE) === self::MATCH_FIRST_VALUE;
     }
 
-    public function matchesName(string $name): bool
+    public function matchesName(string $givenName): bool
     {
-        $name = strtolower($name);
-        return $name === $this->name
-            || $this->isPrefix() && strpos($name, $this->name) === 0;
+        $givenName = strtolower($givenName);
+        return $givenName === $this->name
+            || $this->isPrefix() && strpos($givenName, $this->name) === 0;
     }
 
     public function matchesValue(string $givenValue): bool
