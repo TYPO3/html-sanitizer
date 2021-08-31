@@ -203,6 +203,14 @@ class CommonBuilderTest extends TestCase
                 '<font class="font" color="#000000" face="Verdana,Arial" size="13">value</font>',
                 '<font class="font" color="#000000" face="Verdana,Arial" size="13">value</font>'
             ],
+            '#904' => [
+                '<img src="cid:DC117C9322DEB502C3B16769A8A64E08@example.test">',
+                '<img src="cid:DC117C9322DEB502C3B16769A8A64E08@example.test">',
+            ],
+            '#905' => [
+                '<a href="mid:D89CD33E-F9CF-4CA0-BCE3-AC89E5D41DE1@example.test/DC117C9322DEB502C3B16769A8A64E08@example.test">see previous message</a>',
+                '<a href="mid:D89CD33E-F9CF-4CA0-BCE3-AC89E5D41DE1@example.test/DC117C9322DEB502C3B16769A8A64E08@example.test">see previous message</a>',
+            ],
         ];
     }
 
