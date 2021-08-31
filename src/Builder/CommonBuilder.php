@@ -54,17 +54,21 @@ class CommonBuilder implements BuilderInterface
         $isMailtoUri = new Behavior\RegExpAttrValue('#^mailto:#');
         // + starting with `tel:`
         $isTelUri = new Behavior\RegExpAttrValue('#^tel:#');
+        // + starting with `cid:` (emails, see https://datatracker.ietf.org/doc/html/rfc2392)
+        $isContentId = new Behavior\RegExpAttrValue('#^cid:#');
+        // + starting with `mid:` (emails, see https://datatracker.ietf.org/doc/html/rfc2392)
+        $isMessageId = new Behavior\RegExpAttrValue('#^mid:#');
 
         $this->globalAttrs = $this->createGlobalAttrs();
         $this->srcAttr = (new Behavior\Attr('src', Behavior\Attr::MATCH_FIRST_VALUE))
             // @todo consider adding `data:` check
-            ->addValues($isHttpOrLocalUri);
+            ->addValues($isHttpOrLocalUri, $isContentId);
         $this->srcsetAttr = (new Behavior\Attr('srcset', Behavior\Attr::MATCH_FIRST_VALUE))
             // @todo consider adding `data:` check
             // @todo Add test for `srcset="media.png 1080w"`
             ->addValues($isHttpOrLocalUri);
         $this->hrefAttr = (new Behavior\Attr('href', Behavior\Attr::MATCH_FIRST_VALUE))
-            ->addValues($isHttpOrLocalUri, $isMailtoUri, $isTelUri);
+            ->addValues($isHttpOrLocalUri, $isMailtoUri, $isTelUri, $isMessageId);
     }
 
     public function build(): Sanitizer
