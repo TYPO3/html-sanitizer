@@ -175,6 +175,14 @@ class CommonBuilderTest extends TestCase
                 '<picture><source srcset="/logo-800.png" media="(min-width: 800px)" type="image/png" sizes="33.3vw"></picture>',
                 '<picture><source srcset="/logo-800.png" media="(min-width: 800px)" type="image/png" sizes="33.3vw"></picture>'
             ],
+            '200' => [
+                '<ul><li>item</li><li>item</li></ul>',
+                '<ul><li>item</li><li>item</li></ul>',
+            ],
+            '201' => [
+                '<ol reversed start="3" type="I"><li>item</li><li value="13">item</li></ol>',
+                '<ol reversed start="3" type="I"><li>item</li><li value="13">item</li></ol>',
+            ],
             '#900' => [
                 '<div id="main">' .
                     '<a href="https://typo3.org/" data-type="url" wrong-attr="is-removed">TYPO3</a><br>' .
