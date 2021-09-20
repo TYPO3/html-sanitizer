@@ -244,6 +244,13 @@ class CommonBuilder implements BuilderInterface
             'href' => (new UriAttrValueBuilder())
                 ->allowLocal(true)
                 ->allowSchemes('http', 'https', 'mailto', 'tel')
+                // https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
+                // + addressing files
+                ->allowSchemes('file', 'ftp', 'git', 'nfs', 's3', 'sftp', 'svn')
+                // + addressing resources
+                ->allowSchemes('geo', 'maps', 'news', 'snews', 'spotify', 'webcal')
+                // + addressing applications
+                ->allowSchemes('facetime', 'irc', 'ircs', 'jabber', 'skype', 'slack', 'sms')
                 // emails, see https://datatracker.ietf.org/doc/html/rfc2392
                 ->allowSchemes('mid'),
             'src' => (new UriAttrValueBuilder())

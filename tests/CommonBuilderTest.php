@@ -111,6 +111,10 @@ class CommonBuilderTest extends TestCase
                 '<img src="data:image/png,..."><img src="data:image/png;,..."><img src="data:image/png;base64,..."><img src="data:image/svg+xml;base64,...">',
                 '<img src="data:image/png,..."><img src="data:image/png;,..."><img src="data:image/png;base64,..."><img src="data:image/svg+xml;base64,...">',
             ],
+            '#049' => [
+                '<a href="git://github.com/typo3/typo3">GitHub</a>',
+                '<a href="git://github.com/typo3/typo3">GitHub</a>',
+            ],
             '#050' => [
                 '<a href="https://typo3.org/" role="button">value</a>',
                 '<a href="https://typo3.org/" role="button">value</a>',
