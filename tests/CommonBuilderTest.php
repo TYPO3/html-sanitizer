@@ -103,6 +103,14 @@ class CommonBuilderTest extends TestCase
                 '<img src="/typo3.org/logo.svg" alt="logo" loading="lazy" width="100" height="100" sizes="33.3vw" name="logo" align="left" border="0">',
                 '<img src="/typo3.org/logo.svg" alt="logo" loading="lazy" width="100" height="100" sizes="33.3vw" name="logo" align="left" border="0">',
             ],
+            '#047' => [
+                '<img src="data:text/html,<script>alert(1)</script>">',
+                '',
+            ],
+            '#048' => [
+                '<img src="data:image/png,..."><img src="data:image/png;,..."><img src="data:image/png;base64,..."><img src="data:image/svg+xml;base64,...">',
+                '<img src="data:image/png,..."><img src="data:image/png;,..."><img src="data:image/png;base64,..."><img src="data:image/svg+xml;base64,...">',
+            ],
             '#050' => [
                 '<a href="https://typo3.org/" role="button">value</a>',
                 '<a href="https://typo3.org/" role="button">value</a>',

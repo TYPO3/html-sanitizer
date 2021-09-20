@@ -37,6 +37,11 @@ class UriAttrValueBuilder
      */
     protected $allowSchemes = [];
 
+    /**
+     * @var string[]
+     */
+    protected $allowDataMediaTypes = [];
+
     public function allowLocal(bool $allowLocal): self
     {
         $this->allowLocal = $allowLocal;
@@ -53,6 +58,13 @@ class UriAttrValueBuilder
     {
         $differences = array_diff_assoc($allowSchemes, array_unique($this->allowSchemes));
         $this->allowSchemes = array_merge($this->allowSchemes, $differences);
+        return $this;
+    }
+
+    public function allowDataMediaTypes(string ...$allowDataMediaTypes): self
+    {
+        $differences = array_diff_assoc($allowDataMediaTypes, array_unique($this->allowDataMediaTypes));
+        $this->allowDataMediaTypes = array_merge($this->allowDataMediaTypes, $differences);
         return $this;
     }
 
@@ -75,6 +87,13 @@ class UriAttrValueBuilder
             $values[] = new RegExpAttrValue(sprintf(
                 '#^(%s):#i',
                 implode('|', array_map([$this, 'pregQuote'], $this->allowSchemes))
+            ));
+        }
+        if ($this->allowDataMediaTypes !== []) {
+            $values[] = new RegExpAttrValue(sprintf(
+                // example: `data:image/[^;,]+(?:;(?:base64)?)?,`
+                '#^data:(?:%s)/[^;,]+(?:;(?:base64)?)?,#',
+                implode('|', array_map([$this, 'pregQuote'], $this->allowDataMediaTypes))
             ));
         }
         return $values;

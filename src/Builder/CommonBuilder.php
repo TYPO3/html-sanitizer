@@ -250,7 +250,8 @@ class CommonBuilder implements BuilderInterface
                 ->allowLocal(true)
                 ->allowSchemes('http', 'https')
                 // emails, see https://datatracker.ietf.org/doc/html/rfc2392
-                ->allowSchemes('cid'),
+                ->allowSchemes('cid')
+                ->allowDataMediaTypes('audio', 'image', 'video'),
         ];
     }
 
