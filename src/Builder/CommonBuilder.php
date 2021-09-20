@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace TYPO3\HtmlSanitizer\Builder;
 
 use TYPO3\HtmlSanitizer\Behavior;
+use TYPO3\HtmlSanitizer\Behavior\Attr\UriAttrValueBuilder;
 use TYPO3\HtmlSanitizer\Sanitizer;
 use TYPO3\HtmlSanitizer\Visitor\CommonVisitor;
 
@@ -32,43 +33,37 @@ class CommonBuilder implements BuilderInterface
     /**
      * @var Behavior\Attr
      */
+    protected $hrefAttr;
+
+    /**
+     * @var Behavior\Attr
+     */
     protected $srcAttr;
 
     /**
      * @var Behavior\Attr
+     * @deprecated not used anymore
      */
     protected $srcsetAttr;
 
-    /**
-     * @var Behavior\Attr
-     */
-    protected $hrefAttr;
-
     public function __construct()
     {
-        // + starting with `http://` or `https://`
-        // + starting with `/` but, not starting with `//`
-        // + not starting with `/` and not having `:` at all
-        $isHttpOrLocalUri = new Behavior\RegExpAttrValue('#^(https?://|/(?!/)|[^/:][^:]*$)#');
-        // + starting with `mailto:`
-        $isMailtoUri = new Behavior\RegExpAttrValue('#^mailto:#');
-        // + starting with `tel:`
-        $isTelUri = new Behavior\RegExpAttrValue('#^tel:#');
-        // + starting with `cid:` (emails, see https://datatracker.ietf.org/doc/html/rfc2392)
-        $isContentId = new Behavior\RegExpAttrValue('#^cid:#');
-        // + starting with `mid:` (emails, see https://datatracker.ietf.org/doc/html/rfc2392)
-        $isMessageId = new Behavior\RegExpAttrValue('#^mid:#');
+        $bluntUriAttrValueBuilder = new UriAttrValueBuilder();
+        $uriAttrValueBuilders = $this->createUriAttrValueBuilders();
 
         $this->globalAttrs = $this->createGlobalAttrs();
-        $this->srcAttr = (new Behavior\Attr('src', Behavior\Attr::MATCH_FIRST_VALUE))
-            // @todo consider adding `data:` check
-            ->addValues($isHttpOrLocalUri, $isContentId);
-        $this->srcsetAttr = (new Behavior\Attr('srcset', Behavior\Attr::MATCH_FIRST_VALUE))
-            // @todo consider adding `data:` check
-            // @todo Add test for `srcset="media.png 1080w"`
-            ->addValues($isHttpOrLocalUri);
+
         $this->hrefAttr = (new Behavior\Attr('href', Behavior\Attr::MATCH_FIRST_VALUE))
-            ->addValues($isHttpOrLocalUri, $isMailtoUri, $isTelUri, $isMessageId);
+            ->addValues(...($uriAttrValueBuilders['href'] ?? $bluntUriAttrValueBuilder)->getValues());
+        $this->srcAttr = (new Behavior\Attr('src', Behavior\Attr::MATCH_FIRST_VALUE))
+            ->addValues(...($uriAttrValueBuilders['src'] ?? $bluntUriAttrValueBuilder)->getValues());
+
+        // @deprecated not used anymore
+        $srcsetAttrValueBuilder = (new UriAttrValueBuilder())
+            ->allowLocal(true)
+            ->allowSchemes('http', 'https');
+        $this->srcsetAttr = (new Behavior\Attr('src', Behavior\Attr::MATCH_FIRST_VALUE))
+            ->addValues(...$srcsetAttrValueBuilder->getValues());
     }
 
     public function build(): Sanitizer
@@ -150,8 +145,8 @@ class CommonBuilder implements BuilderInterface
             ->addAttrs($this->srcAttr, ...$this->globalAttrs)
             ->addAttrs(...$this->createAttrs('autoplay', 'controls', 'height', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'width'));
         $tags['img'] = (new Behavior\Tag('img', Behavior\Tag::PURGE_WITHOUT_ATTRS))
-            ->addAttrs($this->srcAttr, $this->srcsetAttr, ...$this->globalAttrs)
-            ->addAttrs(...$this->createAttrs('align', 'alt', 'border', 'decoding', 'height', 'sizes', 'width', 'loading', 'name'));
+            ->addAttrs($this->srcAttr, ...$this->globalAttrs)
+            ->addAttrs(...$this->createAttrs('align', 'alt', 'border', 'decoding', 'height', 'sizes', 'srcset', 'width', 'loading', 'name'));
         $tags['track'] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))
             ->addAttrs($this->srcAttr, ...$this->globalAttrs)
             ->addAttrs(...$this->createAttrs('default', 'kind', 'label', 'srcLang'));
@@ -234,6 +229,25 @@ class CommonBuilder implements BuilderInterface
         $attrs[] = new Behavior\Attr('aria-', Behavior\Attr::NAME_PREFIX);
         $attrs[] = new Behavior\Attr('data-', Behavior\Attr::NAME_PREFIX);
         return $attrs;
+    }
+
+    /**
+     * @return array<'href'|'src', UriAttrValueBuilder>
+     */
+    protected function createUriAttrValueBuilders(): array
+    {
+        return [
+            'href' => (new UriAttrValueBuilder())
+                ->allowLocal(true)
+                ->allowSchemes('http', 'https', 'mailto', 'tel')
+                // emails, see https://datatracker.ietf.org/doc/html/rfc2392
+                ->allowSchemes('mid'),
+            'src' => (new UriAttrValueBuilder())
+                ->allowLocal(true)
+                ->allowSchemes('http', 'https')
+                // emails, see https://datatracker.ietf.org/doc/html/rfc2392
+                ->allowSchemes('cid'),
+        ];
     }
 
     /**
