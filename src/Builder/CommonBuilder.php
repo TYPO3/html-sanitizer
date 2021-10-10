@@ -104,7 +104,7 @@ class CommonBuilder implements BuilderInterface
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#web_components
             // 'slot', 'template',
             // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#obsolete_and_deprecated_elements
-            'acronym', 'big', 'font', 'nobr', 'tt',
+            'acronym', 'big', 'center', 'font', 'nobr', 'strike', 'tt',
         ];
 
         $tags = [];
