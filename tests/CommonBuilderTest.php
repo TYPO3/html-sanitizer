@@ -231,6 +231,10 @@ class CommonBuilderTest extends TestCase
                 '<a href="mid:D89CD33E-F9CF-4CA0-BCE3-AC89E5D41DE1@example.test/DC117C9322DEB502C3B16769A8A64E08@example.test">see previous message</a>',
                 '<a href="mid:D89CD33E-F9CF-4CA0-BCE3-AC89E5D41DE1@example.test/DC117C9322DEB502C3B16769A8A64E08@example.test">see previous message</a>',
             ],
+            '#906' => [
+                '<center>value</center><strike>value</strike><nobr>value</nobr>',
+                '<center>value</center><strike>value</strike><nobr>value</nobr>',
+            ],
         ];
     }
 
