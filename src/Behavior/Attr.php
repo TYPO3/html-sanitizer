@@ -34,8 +34,17 @@ class Attr
      * whether the first match in `$values` shall be considered
      * as indicator the attribute value is valid in general - if
      * this flag is not given, all declared `$values` must match
+     *
+     * @deprecated since version 2.0.13 (it is the default behavior now)
      */
     public const MATCH_FIRST_VALUE = 2;
+
+    /**
+     * whether all `$values` shall be considered as indicator an
+     * attribute value is valid - if this flag is not given, the
+     * first match in `$values` is taken
+     */
+    public const MATCH_ALL_VALUES = 4;
 
     /**
      * either specific attribute name (`class`) or a prefix
@@ -107,9 +116,17 @@ class Attr
         return ($this->flags & self::NAME_PREFIX) === self::NAME_PREFIX;
     }
 
+    /**
+     * @deprecated since version 2.0.13 (it is the default behavior now)
+     */
     public function shallMatchFirstValue(): bool
     {
         return ($this->flags & self::MATCH_FIRST_VALUE) === self::MATCH_FIRST_VALUE;
+    }
+
+    public function shallMatchAllValues(): bool
+    {
+        return ($this->flags & self::MATCH_ALL_VALUES) === self::MATCH_ALL_VALUES;
     }
 
     public function matchesName(string $givenName): bool
@@ -125,19 +142,19 @@ class Attr
         if ($this->values === []) {
             return true;
         }
-        $matchFirstValue = $this->shallMatchFirstValue();
+        $matchAllValues = $this->shallMatchAllValues();
         foreach ($this->values as $value) {
-            // + result: false, matchFirstValue: false --> return false
-            // + result: true, matchFirstValue: true --> return true
+            // + result: false, matchAllValues: true --> return false
+            // + result: true, matchAllValues: false --> return true
             // (anything else continues processing)
             $result = $value->matches($givenValue);
-            if ($result === $matchFirstValue) {
-                return $matchFirstValue;
+            if ($result !== $matchAllValues) {
+                return !$matchAllValues;
             }
         }
-        // + matchFirstValue: false --> return true (since no other match failed before)
-        // + matchFirstValue: true --> return false (since no other match succeeded before)
-        return !$matchFirstValue;
+        // + matchAllValues: true --> return true (since no other match failed before)
+        // + matchAllValues: false --> return false (since no other match succeeded before)
+        return $matchAllValues;
     }
 
     protected function isDifferentValue(AttrValueInterface $a, AttrValueInterface $b): int
