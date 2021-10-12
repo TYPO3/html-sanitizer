@@ -100,20 +100,22 @@ class AttrTest extends TestCase
         $equalsAorB = new DatasetAttrValue('a', 'b');
 
         return [
+            [ Attr::MATCH_ALL_VALUES, [$equalsA], 'a', true ],
+            [ Attr::MATCH_ALL_VALUES, [$equalsA], 'b', false ],
+            [ Attr::MATCH_ALL_VALUES, [$equalsAorB], 'a', true ],
+            [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsAorB], 'a', true ],
+            [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsB], 'a', false ], // both `$equalsA` and `$equalsB` must match
+            [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsB], 'b', false ], // both `$equalsA` and `$equalsB` must match
+            [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsB], 'c', false ],
+            [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsB, $equalsAorB], 'c', false ],
             [ Attr::BLUNT, [$equalsA], 'a', true ],
+            [ Attr::BLUNT, [$equalsA], 'b', false ],
             [ Attr::BLUNT, [$equalsAorB], 'a', true ],
             [ Attr::BLUNT, [$equalsA, $equalsAorB], 'a', true ],
-            [ Attr::BLUNT, [$equalsA, $equalsB], 'a', false ], // both `$equalsA` and `$equalsB` must match
-            [ Attr::BLUNT, [$equalsA, $equalsB], 'b', false ], // both `$equalsA` and `$equalsB` must match
+            [ Attr::BLUNT, [$equalsA, $equalsB], 'a', true ],
+            [ Attr::BLUNT, [$equalsA, $equalsB], 'b', true ],
             [ Attr::BLUNT, [$equalsA, $equalsB], 'c', false ],
             [ Attr::BLUNT, [$equalsA, $equalsB, $equalsAorB], 'c', false ],
-            [ Attr::MATCH_FIRST_VALUE, [$equalsA], 'a', true ],
-            [ Attr::MATCH_FIRST_VALUE, [$equalsAorB], 'a', true ],
-            [ Attr::MATCH_FIRST_VALUE, [$equalsA, $equalsAorB], 'a', true ],
-            [ Attr::MATCH_FIRST_VALUE, [$equalsA, $equalsB], 'a', true ],
-            [ Attr::MATCH_FIRST_VALUE, [$equalsA, $equalsB], 'b', true ],
-            [ Attr::MATCH_FIRST_VALUE, [$equalsA, $equalsB], 'c', false ],
-            [ Attr::MATCH_FIRST_VALUE, [$equalsA, $equalsB, $equalsAorB], 'c', false ],
         ];
     }
 

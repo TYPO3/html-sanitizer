@@ -53,16 +53,16 @@ class CommonBuilder implements BuilderInterface
 
         $this->globalAttrs = $this->createGlobalAttrs();
 
-        $this->hrefAttr = (new Behavior\Attr('href', Behavior\Attr::MATCH_FIRST_VALUE))
+        $this->hrefAttr = (new Behavior\Attr('href'))
             ->addValues(...($uriAttrValueBuilders['href'] ?? $bluntUriAttrValueBuilder)->getValues());
-        $this->srcAttr = (new Behavior\Attr('src', Behavior\Attr::MATCH_FIRST_VALUE))
+        $this->srcAttr = (new Behavior\Attr('src'))
             ->addValues(...($uriAttrValueBuilders['src'] ?? $bluntUriAttrValueBuilder)->getValues());
 
         // @deprecated not used anymore
         $srcsetAttrValueBuilder = (new UriAttrValueBuilder())
             ->allowLocal(true)
             ->allowSchemes('http', 'https');
-        $this->srcsetAttr = (new Behavior\Attr('src', Behavior\Attr::MATCH_FIRST_VALUE))
+        $this->srcsetAttr = (new Behavior\Attr('src'))
             ->addValues(...$srcsetAttrValueBuilder->getValues());
     }
 
