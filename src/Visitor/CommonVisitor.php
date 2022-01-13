@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace TYPO3\HtmlSanitizer\Visitor;
 
 use DOMAttr;
+use DOMCharacterData;
+use DOMComment;
 use DOMElement;
 use DOMNode;
 use DOMText;
@@ -101,7 +103,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
             return null;
         }
         // completely remove node, in case it is expected to exist with children only
-        if ($node->childNodes->length === 0 && $tag->shallPurgeWithoutChildren()) {
+        if (!$this->hasNonEmptyChildren($node) && $tag->shallPurgeWithoutChildren()) {
             return null;
         }
         return $node;
@@ -198,6 +200,30 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         $text = new DOMText();
         $text->nodeValue = $this->context->parser->saveHTML($node);
         return $text;
+    }
+
+    /**
+     * Determines whether a node has children. This is a special
+     * handling for nodes that only allow text nodes that still can be empty.
+     *
+     * For instance `<script></script>` is considered empty,
+     * albeit `$node->childNodes->length === 1`.
+     */
+    protected function hasNonEmptyChildren(DOMNode $node): bool
+    {
+        if ($node->childNodes->length === 0) {
+            return false;
+        }
+        for ($i = $node->childNodes->length - 1; $i >= 0; $i--) {
+            $child = $node->childNodes->item($i);
+            if ($child instanceof DOMComment
+                || !$child instanceof DOMCharacterData
+                || trim($child->textContent) !== ''
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
