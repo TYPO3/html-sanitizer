@@ -128,8 +128,8 @@ class ScenarioTest extends TestCase
             '1:',
             '2:',
             '3:',
-            '4:<script id="identifier">alert(1)</script>',
-            '5:<script id="identifier">alert(2)</script>',
+            '4:&lt;script id="identifier"&gt;alert(1)&lt;/script&gt;',
+            '5:&lt;script id="identifier"&gt;alert(2)&lt;/script&gt;',
             '6:',
             '7:<script type="application/ld+json">alert(4)</script>',
             '8:<script type="application/ld+json">{"@id": "https://github.com/TYPO3/html-sanitizer"}</script>',
@@ -144,7 +144,7 @@ class ScenarioTest extends TestCase
                     Behavior\Tag::PURGE_WITHOUT_ATTRS + Behavior\Tag::PURGE_WITHOUT_CHILDREN + Behavior\Tag::ALLOW_CHILDREN
                 ))->addAttrs(
                     (new Behavior\Attr('id')),
-                    (new Behavior\Attr('type'))
+                    (new Behavior\Attr('type', Behavior\Attr::MANDATORY))
                         ->addValues(new Behavior\DatasetAttrValue('application/ld+json'))
                 )
             );

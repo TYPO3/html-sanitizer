@@ -72,17 +72,15 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
                 'behavior' => $this->behavior->getName(),
                 'nodeName' => $node->nodeName,
             ]);
-            if ($this->behavior->shallEncodeInvalidTag()) {
-                return $this->convertToText($node);
-            }
-            return null;
+            return $this->handleInvalidTag($node);
         }
         $node = $this->processAttributes($node, $tag);
         $node = $this->processChildren($node, $tag);
         // completely remove node, in case it is expected to exist with attributes only
-        if ($node !== null && $node->attributes->length === 0 && $tag->shallPurgeWithoutAttrs()) {
+        if ($node instanceof DOMElement && $node->attributes->length === 0 && $tag->shallPurgeWithoutAttrs()) {
             return null;
         }
+        $node = $this->handleMandatoryAttributes($node, $tag);
         return $node;
     }
 
@@ -107,10 +105,10 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         return $node;
     }
 
-    protected function processAttributes(?DOMElement $node, Behavior\Tag $tag): ?DOMElement
+    protected function processAttributes(?DOMNode $node, Behavior\Tag $tag): ?DOMNode
     {
-        if ($node === null) {
-            return null;
+        if (!$node instanceof DOMElement) {
+            return $node;
         }
         // reverse processing of attributes,
         // allowing to directly remove attribute nodes
@@ -126,10 +124,10 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         return $node;
     }
 
-    protected function processChildren(?DOMElement $node, Behavior\Tag $tag): ?DOMElement
+    protected function processChildren(?DOMNode $node, Behavior\Tag $tag): ?DOMNode
     {
-        if ($node === null) {
-            return null;
+        if (!$node instanceof DOMElement) {
+            return $node;
         }
         if (!$tag->shallAllowChildren()
             && $node->childNodes->length > 0
@@ -168,6 +166,32 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
             ]);
             $this->handleInvalidAttr($node, $name);
         }
+    }
+
+    protected function handleMandatoryAttributes(?DOMNode $node, Behavior\Tag $tag): ?DOMNode
+    {
+        if (!$node instanceof DOMElement) {
+            return $node;
+        }
+        foreach ($tag->getAttrs() as $attr) {
+            if ($attr->isMandatory() && !$node->hasAttribute($attr->getName())) {
+                $this->log('Missing mandatory attribute {nodeName}.{attrName}', [
+                    'behavior' => $this->behavior->getName(),
+                    'nodeName' => $node->nodeName,
+                    'attrName' => $attr->getName(),
+                ]);
+                return $this->handleInvalidTag($node);
+            }
+        }
+        return $node;
+    }
+
+    protected function handleInvalidTag(DOMNode $node): ?DOMNode
+    {
+        if ($this->behavior->shallEncodeInvalidTag()) {
+            return $this->convertToText($node);
+        }
+        return null;
     }
 
     /**
