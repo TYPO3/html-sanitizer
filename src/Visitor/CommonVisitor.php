@@ -15,8 +15,6 @@ declare(strict_types=1);
 namespace TYPO3\HtmlSanitizer\Visitor;
 
 use DOMAttr;
-use DOMCharacterData;
-use DOMComment;
 use DOMElement;
 use DOMNode;
 use DOMText;
@@ -216,8 +214,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         }
         for ($i = $node->childNodes->length - 1; $i >= 0; $i--) {
             $child = $node->childNodes->item($i);
-            if ($child instanceof DOMComment
-                || !$child instanceof DOMCharacterData
+            if (!$child instanceof DOMText
                 || trim($child->textContent) !== ''
             ) {
                 return true;

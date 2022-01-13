@@ -235,6 +235,14 @@ class CommonBuilderTest extends TestCase
                 '<center>value</center><strike>value</strike><nobr>value</nobr>',
                 '<center>value</center><strike>value</strike><nobr>value</nobr>',
             ],
+            '#907' => [
+                '<script>alert(1)</script>'
+                . '<script type="application/javascript">alert(2)</script>'
+                . '<script type="application/ecmascript">alert(3)</script>',
+                '&lt;script&gt;alert(1)&lt;/script&gt;'
+                . '&lt;script type="application/javascript"&gt;alert(2)&lt;/script&gt;'
+                . '&lt;script type="application/ecmascript"&gt;alert(3)&lt;/script&gt;'
+            ],
         ];
     }
 

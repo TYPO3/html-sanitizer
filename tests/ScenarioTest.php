@@ -79,4 +79,57 @@ class ScenarioTest extends TestCase
         );
         self::assertSame($expectation, $sanitizer->sanitize($payload));
     }
+
+    /**
+     * @test
+     */
+    public function isJsonLdScriptAllowed(): void
+    {
+        $payload = implode("\n" , [
+            // tag will be removed due to `PURGE_WITHOUT_ATTRS`
+            '1:<script>alert(1)</script>',
+            // `type` attr will be removed -> no attrs -> tag will be removed due to `PURGE_WITHOUT_ATTRS`
+            '2:<script type="application/javascript">alert(2)</script>',
+            // `type` attr will be removed -> no attrs -> tag will be removed due to `PURGE_WITHOUT_ATTRS`
+            '3:<script type="application/ecmascript">alert(3)</script>',
+            // @todo not sanitized by `PURGE_WITHOUT_ATTRS` -> `type` attr value needs to be mandatory
+            '4:<script id="identifier">alert(1)</script>',
+            // @todo not sanitized by `PURGE_WITHOUT_ATTRS` -> `type` attr value needs to be mandatory
+            '5:<script id="identifier" type="application/javascript">alert(2)</script>',
+            // tag will be removed due to `PURGE_WITHOUT_CHILDREN`
+            '6:<script type="application/ld+json"></script>',
+            // rest is keep, since `type` attr value matches and child content is given
+            '7:<script type="application/ld+json">alert(4)</script>',
+            '8:<script type="application/ld+json">{"@id": "https://github.com/TYPO3/html-sanitizer"}</script>',
+        ]);
+        $expectation = implode("\n" , [
+            '1:',
+            '2:',
+            '3:',
+            '4:<script id="identifier">alert(1)</script>',
+            '5:<script id="identifier">alert(2)</script>',
+            '6:',
+            '7:<script type="application/ld+json">alert(4)</script>',
+            '8:<script type="application/ld+json">{"@id": "https://github.com/TYPO3/html-sanitizer"}</script>',
+        ]);
+
+        $behavior = (new Behavior())
+            ->withFlags(Behavior::ENCODE_INVALID_TAG + Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withName('scenario-test')
+            ->withTags(
+                (new Behavior\Tag(
+                    'script',
+                    Behavior\Tag::PURGE_WITHOUT_ATTRS + Behavior\Tag::PURGE_WITHOUT_CHILDREN + Behavior\Tag::ALLOW_CHILDREN
+                ))->addAttrs(
+                    (new Behavior\Attr('id')),
+                    (new Behavior\Attr('type'))
+                        ->addValues(new Behavior\DatasetAttrValue('application/ld+json'))
+                )
+            );
+
+        $sanitizer = new Sanitizer(
+            new CommonVisitor($behavior)
+        );
+        self::assertSame($expectation, $sanitizer->sanitize($payload));
+    }
 }
