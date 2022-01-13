@@ -16,6 +16,7 @@ namespace TYPO3\HtmlSanitizer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use TYPO3\HtmlSanitizer\Behavior;
+use TYPO3\HtmlSanitizer\Behavior\Attr\UriAttrValueBuilder;
 use TYPO3\HtmlSanitizer\Sanitizer;
 use TYPO3\HtmlSanitizer\Visitor\CommonVisitor;
 
@@ -146,6 +147,61 @@ class ScenarioTest extends TestCase
                     (new Behavior\Attr('id')),
                     (new Behavior\Attr('type', Behavior\Attr::MANDATORY))
                         ->addValues(new Behavior\DatasetAttrValue('application/ld+json'))
+                )
+            );
+
+        $sanitizer = new Sanitizer(
+            new CommonVisitor($behavior)
+        );
+        self::assertSame($expectation, $sanitizer->sanitize($payload));
+    }
+
+    /**
+     * @test
+     */
+    public function iframeSandboxIsAllowed(): void
+    {
+        $payload = implode("\n" , [
+            '1:<iframe src="https://example.org/"></iframe>',
+            '2:<iframe src="https://example.org/" sandbox></iframe>',
+            // `sandbox` will be removed, since token is not valid
+            '3:<iframe src="https://example.org/" sandbox="allow-non-existing-property"></iframe>',
+            '4:<iframe src="https://example.org/" allow="fullscreen" sandbox="allow-downloads allow-modals"></iframe>',
+            '5:<iframe src="https://example.org/" sandbox="allow-downloads allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-scripts"></iframe>',
+        ]);
+        $expectation = implode("\n" , [
+            '1:&lt;iframe src="https://example.org/"&gt;&lt;/iframe&gt;',
+            '2:<iframe src="https://example.org/" sandbox></iframe>',
+            '3:&lt;iframe src="https://example.org/"&gt;&lt;/iframe&gt;',
+            '4:<iframe src="https://example.org/" allow="fullscreen" sandbox="allow-downloads allow-modals"></iframe>',
+            '5:<iframe src="https://example.org/" sandbox="allow-downloads allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-scripts"></iframe>',
+        ]);
+
+        $behavior = (new Behavior())
+            ->withFlags(Behavior::ENCODE_INVALID_TAG + Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withName('scenario-test')
+            ->withTags(
+                (new Behavior\Tag('iframe'))->addAttrs(
+                    (new Behavior\Attr('id')),
+                    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-allow
+                    (new Behavior\Attr('allow'))->withValues(
+                        new Behavior\MultiTokenAttrValue(' ', 'fullscreen')
+                    ),
+                    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
+                    (new Behavior\Attr('sandbox', Behavior\Attr::MANDATORY))->withValues(
+                        new Behavior\MultiTokenAttrValue(
+                            ' ',
+                            'allow-downloads',
+                            'allow-modals',
+                            'allow-orientation-lock',
+                            'allow-pointer-lock',
+                            'allow-popups',
+                            'allow-scripts'
+                        )
+                    ),
+                    (new Behavior\Attr('src'))->withValues(
+                        ...(new UriAttrValueBuilder())->allowSchemes('http', 'https')->getValues()
+                    )
                 )
             );
 
