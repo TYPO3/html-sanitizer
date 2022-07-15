@@ -153,7 +153,7 @@ class CommonBuilder implements BuilderInterface
             ->addAttrs(...$this->createAttrs('align', 'alt', 'border', 'decoding', 'height', 'sizes', 'srcset', 'width', 'loading', 'name'));
         $tags['track'] = (new Behavior\Tag('track', Behavior\Tag::PURGE_WITHOUT_ATTRS))
             ->addAttrs($this->srcAttr, ...$this->globalAttrs)
-            ->addAttrs(...$this->createAttrs('default', 'kind', 'label', 'srcLang'));
+            ->addAttrs(...$this->createAttrs('default', 'kind', 'label', 'srclang'));
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element#embedded_content
         $tags['picture'] = (new Behavior\Tag('picture', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(...$this->globalAttrs);
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/source
