@@ -100,8 +100,8 @@ class CommonBuilderTest extends TestCase
                 '',
             ],
             '#046' => [
-                '<img src="/typo3.org/logo.svg" alt="logo" loading="lazy" width="100" height="100" sizes="33.3vw" name="logo" align="left" border="0">',
-                '<img src="/typo3.org/logo.svg" alt="logo" loading="lazy" width="100" height="100" sizes="33.3vw" name="logo" align="left" border="0">',
+                '<img src="/typo3.org/logo.svg" alt="logo" loading="lazy" fetchpriority="low" decoding="async" width="100" height="100" sizes="33.3vw" name="logo" align="left" border="0">',
+                '<img src="/typo3.org/logo.svg" alt="logo" loading="lazy" fetchpriority="low" decoding="async" width="100" height="100" sizes="33.3vw" name="logo" align="left" border="0">',
             ],
             '#047' => [
                 '<img src="data:text/html,<script>alert(1)</script>">',
