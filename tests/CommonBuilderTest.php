@@ -187,6 +187,10 @@ class CommonBuilderTest extends TestCase
                 '<picture><source srcset="/logo-800.png" media="(min-width: 800px)" type="image/png" sizes="33.3vw"></picture>',
                 '<picture><source srcset="/logo-800.png" media="(min-width: 800px)" type="image/png" sizes="33.3vw"></picture>'
             ],
+            '#122' => [
+                '<video controls src="/video.mp4"><track default kind="captions" srclang="en" src="/video.vtt"></video>',
+                '<video controls src="/video.mp4"><track default kind="captions" srclang="en" src="/video.vtt"></video>',
+            ],
             '200' => [
                 '<ul><li>item</li><li>item</li></ul>',
                 '<ul><li>item</li><li>item</li></ul>',
