@@ -247,6 +247,10 @@ class CommonBuilderTest extends TestCase
                 . '&lt;script type="application/javascript"&gt;alert(2)&lt;/script&gt;'
                 . '&lt;script type="application/ecmascript"&gt;alert(3)&lt;/script&gt;'
             ],
+            '#908' => [
+                '<a href="xmpp:user@example.org?message">value</a>',
+                '<a href="xmpp:user@example.org?message">value</a>',
+            ],
         ];
     }
 
