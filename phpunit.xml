@@ -2,6 +2,7 @@
 <phpunit
     bootstrap="vendor/autoload.php"
     backupGlobals="true"
+    cacheResult="false"
     colors="true"
     processIsolation="false"
     verbose="true">
