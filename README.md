@@ -1,3 +1,5 @@
+![tests](https://github.com/TYPO3/html-sanitizer/actions/workflows/tests.yml/badge.svg)
+
 # TYPO3 HTML Sanitizer
 
 > :information_source: Common safe HTML tags & attributes as given in
