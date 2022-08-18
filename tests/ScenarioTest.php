@@ -21,6 +21,28 @@ use TYPO3\HtmlSanitizer\Visitor\CommonVisitor;
 
 class ScenarioTest extends TestCase
 {
+    public static function allTagsAreRemovedOnMissingDeclarationDataProvider(): array
+    {
+        return [
+            ['<div class="content">value</div><span class="content">value</span>', ''],
+            ['<!--any--><div class="content">value</div>', '<!--any-->'],
+            ['<!--any--!><div class="content">value</div>', '<!--any-->'],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider allTagsAreRemovedOnMissingDeclarationDataProvider
+     */
+    public function allTagsAreRemovedOnMissingDeclaration(string $payload, string $expectation): void
+    {
+        $behavior = new Behavior();
+        $sanitizer = new Sanitizer(
+            new CommonVisitor($behavior)
+        );
+        self::assertSame($expectation, $sanitizer->sanitize($payload));
+    }
+
     public static function tagFlagsAreProcessedDataProvider(): array
     {
         return [
