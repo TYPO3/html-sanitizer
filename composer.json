@@ -16,7 +16,7 @@
 	},
 	"require": {
 		"ext-dom": "*",
-		"masterminds/html5": "^2.7",
+		"masterminds/html5": "^2.7.6",
 		"php": "^7.2 || ^8.0",
 		"psr/log": "^1.0 || ^2.0 || ^3.0"
 	},
