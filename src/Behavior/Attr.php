@@ -74,6 +74,16 @@ class Attr
         $this->flags = $flags;
     }
 
+    public function withFlags(int $flags): self
+    {
+        if ($flags === $this->flags) {
+            return $this;
+        }
+        $target = clone $this;
+        $target->flags = $flags;
+        return $target;
+    }
+
     /**
      * Adds value items directly to the current `Attr` instance.
      *
@@ -106,6 +116,11 @@ class Attr
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function getFlags(): int
+    {
+        return $this->flags;
     }
 
     /**
