@@ -115,9 +115,9 @@ class ScenarioTest extends TestCase
             '2:<script type="application/javascript">alert(2)</script>',
             // `type` attr will be removed -> no attrs -> tag will be removed due to `PURGE_WITHOUT_ATTRS`
             '3:<script type="application/ecmascript">alert(3)</script>',
-            // @todo not sanitized by `PURGE_WITHOUT_ATTRS` -> `type` attr value needs to be mandatory
+            // tag will be encoded due to incompleteness, mandatory `type` attr is missing
             '4:<script id="identifier">alert(1)</script>',
-            // @todo not sanitized by `PURGE_WITHOUT_ATTRS` -> `type` attr value needs to be mandatory
+            // tag will be encoded due to incompleteness, mandatory `type` attr mismatches
             '5:<script id="identifier" type="application/javascript">alert(2)</script>',
             // tag will be removed due to `PURGE_WITHOUT_CHILDREN`
             '6:<script type="application/ld+json"></script>',
