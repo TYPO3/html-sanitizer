@@ -45,10 +45,9 @@ class MultiTokenAttrValue implements AttrValueInterface
     {
         $tokens = explode($this->delimiter, $value);
         $tokens = array_filter($tokens, [$this, 'keepNonEmpty']);
-        // in case there is no token, the result implicit is `true`
-        // @todo has to be changed, in case mandatory tokes would be implemented
+        // in case there is no token, the result implicitly is `false`
         if (empty($tokens)) {
-            return true;
+            return false;
         }
         return array_diff($tokens, $this->tokens) === [];
     }
