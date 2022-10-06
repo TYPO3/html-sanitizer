@@ -112,28 +112,31 @@ class ScenarioTest extends TestCase
             // tag will be removed due to `PURGE_WITHOUT_ATTRS`
             '1:<script>alert(1)</script>',
             // `type` attr will be removed -> no attrs -> tag will be removed due to `PURGE_WITHOUT_ATTRS`
-            '2:<script type="application/javascript">alert(2)</script>',
+            '2:<script type>alert(2)</script>',
             // `type` attr will be removed -> no attrs -> tag will be removed due to `PURGE_WITHOUT_ATTRS`
-            '3:<script type="application/ecmascript">alert(3)</script>',
+            '3:<script type="application/javascript">alert(2)</script>',
+            // `type` attr will be removed -> no attrs -> tag will be removed due to `PURGE_WITHOUT_ATTRS`
+            '4:<script type="application/ecmascript">alert(3)</script>',
             // tag will be encoded due to incompleteness, mandatory `type` attr is missing
-            '4:<script id="identifier">alert(1)</script>',
+            '5:<script id="identifier">alert(1)</script>',
             // tag will be encoded due to incompleteness, mandatory `type` attr mismatches
-            '5:<script id="identifier" type="application/javascript">alert(2)</script>',
+            '6:<script id="identifier" type="application/javascript">alert(2)</script>',
             // tag will be removed due to `PURGE_WITHOUT_CHILDREN`
-            '6:<script type="application/ld+json"></script>',
+            '7:<script type="application/ld+json"></script>',
             // rest is keep, since `type` attr value matches and child content is given
-            '7:<script type="application/ld+json">alert(4)</script>',
-            '8:<script type="application/ld+json">{"@id": "https://github.com/TYPO3/html-sanitizer"}</script>',
+            '8:<script type="application/ld+json">alert(4)</script>',
+            '9:<script type="application/ld+json">{"@id": "https://github.com/TYPO3/html-sanitizer"}</script>',
         ]);
         $expectation = implode("\n" , [
             '1:',
             '2:',
             '3:',
-            '4:&lt;script id="identifier"&gt;alert(1)&lt;/script&gt;',
-            '5:&lt;script id="identifier"&gt;alert(2)&lt;/script&gt;',
-            '6:',
-            '7:<script type="application/ld+json">alert(4)</script>',
-            '8:<script type="application/ld+json">{"@id": "https://github.com/TYPO3/html-sanitizer"}</script>',
+            '4:',
+            '5:&lt;script id="identifier"&gt;alert(1)&lt;/script&gt;',
+            '6:&lt;script id="identifier"&gt;alert(2)&lt;/script&gt;',
+            '7:',
+            '8:<script type="application/ld+json">alert(4)</script>',
+            '9:<script type="application/ld+json">{"@id": "https://github.com/TYPO3/html-sanitizer"}</script>',
         ]);
 
         $behavior = (new Behavior())
@@ -164,17 +167,19 @@ class ScenarioTest extends TestCase
         $payload = implode("\n" , [
             '1:<iframe src="https://example.org/"></iframe>',
             '2:<iframe src="https://example.org/" sandbox></iframe>',
+            '3:<iframe src="https://example.org/" sandbox=""></iframe>',
             // `sandbox` will be removed, since token is not valid
-            '3:<iframe src="https://example.org/" sandbox="allow-non-existing-property"></iframe>',
-            '4:<iframe src="https://example.org/" allow="fullscreen" sandbox="allow-downloads allow-modals"></iframe>',
-            '5:<iframe src="https://example.org/" sandbox="allow-downloads allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-scripts"></iframe>',
+            '4:<iframe src="https://example.org/" sandbox="allow-non-existing-property"></iframe>',
+            '5:<iframe src="https://example.org/" allow="fullscreen" sandbox="allow-downloads allow-modals"></iframe>',
+            '6:<iframe src="https://example.org/" sandbox="allow-downloads allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-scripts"></iframe>',
         ]);
         $expectation = implode("\n" , [
             '1:&lt;iframe src="https://example.org/"&gt;&lt;/iframe&gt;',
             '2:<iframe src="https://example.org/" sandbox></iframe>',
-            '3:&lt;iframe src="https://example.org/"&gt;&lt;/iframe&gt;',
-            '4:<iframe src="https://example.org/" allow="fullscreen" sandbox="allow-downloads allow-modals"></iframe>',
-            '5:<iframe src="https://example.org/" sandbox="allow-downloads allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-scripts"></iframe>',
+            '3:<iframe src="https://example.org/" sandbox></iframe>',
+            '4:&lt;iframe src="https://example.org/"&gt;&lt;/iframe&gt;',
+            '5:<iframe src="https://example.org/" allow="fullscreen" sandbox="allow-downloads allow-modals"></iframe>',
+            '6:<iframe src="https://example.org/" sandbox="allow-downloads allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-scripts"></iframe>',
         ]);
 
         $behavior = (new Behavior())
@@ -189,6 +194,7 @@ class ScenarioTest extends TestCase
                     ),
                     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
                     (new Behavior\Attr('sandbox', Behavior\Attr::MANDATORY))->withValues(
+                        new Behavior\EmptyAttrValue(),
                         new Behavior\MultiTokenAttrValue(
                             ' ',
                             'allow-downloads',
