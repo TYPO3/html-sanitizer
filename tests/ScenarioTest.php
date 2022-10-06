@@ -16,6 +16,7 @@ namespace TYPO3\HtmlSanitizer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use TYPO3\HtmlSanitizer\Behavior;
+use TYPO3\HtmlSanitizer\Behavior\Attr\UriAttrValueBuilder;
 use TYPO3\HtmlSanitizer\Sanitizer;
 use TYPO3\HtmlSanitizer\Visitor\CommonVisitor;
 
@@ -114,9 +115,9 @@ class ScenarioTest extends TestCase
             '2:<script type="application/javascript">alert(2)</script>',
             // `type` attr will be removed -> no attrs -> tag will be removed due to `PURGE_WITHOUT_ATTRS`
             '3:<script type="application/ecmascript">alert(3)</script>',
-            // @todo not sanitized by `PURGE_WITHOUT_ATTRS` -> `type` attr value needs to be mandatory
+            // tag will be encoded due to incompleteness, mandatory `type` attr is missing
             '4:<script id="identifier">alert(1)</script>',
-            // @todo not sanitized by `PURGE_WITHOUT_ATTRS` -> `type` attr value needs to be mandatory
+            // tag will be encoded due to incompleteness, mandatory `type` attr mismatches
             '5:<script id="identifier" type="application/javascript">alert(2)</script>',
             // tag will be removed due to `PURGE_WITHOUT_CHILDREN`
             '6:<script type="application/ld+json"></script>',
@@ -128,8 +129,8 @@ class ScenarioTest extends TestCase
             '1:',
             '2:',
             '3:',
-            '4:<script id="identifier">alert(1)</script>',
-            '5:<script id="identifier">alert(2)</script>',
+            '4:&lt;script id="identifier"&gt;alert(1)&lt;/script&gt;',
+            '5:&lt;script id="identifier"&gt;alert(2)&lt;/script&gt;',
             '6:',
             '7:<script type="application/ld+json">alert(4)</script>',
             '8:<script type="application/ld+json">{"@id": "https://github.com/TYPO3/html-sanitizer"}</script>',
@@ -144,8 +145,63 @@ class ScenarioTest extends TestCase
                     Behavior\Tag::PURGE_WITHOUT_ATTRS + Behavior\Tag::PURGE_WITHOUT_CHILDREN + Behavior\Tag::ALLOW_CHILDREN
                 ))->addAttrs(
                     (new Behavior\Attr('id')),
-                    (new Behavior\Attr('type'))
+                    (new Behavior\Attr('type', Behavior\Attr::MANDATORY))
                         ->addValues(new Behavior\DatasetAttrValue('application/ld+json'))
+                )
+            );
+
+        $sanitizer = new Sanitizer(
+            new CommonVisitor($behavior)
+        );
+        self::assertSame($expectation, $sanitizer->sanitize($payload));
+    }
+
+    /**
+     * @test
+     */
+    public function iframeSandboxIsAllowed(): void
+    {
+        $payload = implode("\n" , [
+            '1:<iframe src="https://example.org/"></iframe>',
+            '2:<iframe src="https://example.org/" sandbox></iframe>',
+            // `sandbox` will be removed, since token is not valid
+            '3:<iframe src="https://example.org/" sandbox="allow-non-existing-property"></iframe>',
+            '4:<iframe src="https://example.org/" allow="fullscreen" sandbox="allow-downloads allow-modals"></iframe>',
+            '5:<iframe src="https://example.org/" sandbox="allow-downloads allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-scripts"></iframe>',
+        ]);
+        $expectation = implode("\n" , [
+            '1:&lt;iframe src="https://example.org/"&gt;&lt;/iframe&gt;',
+            '2:<iframe src="https://example.org/" sandbox></iframe>',
+            '3:&lt;iframe src="https://example.org/"&gt;&lt;/iframe&gt;',
+            '4:<iframe src="https://example.org/" allow="fullscreen" sandbox="allow-downloads allow-modals"></iframe>',
+            '5:<iframe src="https://example.org/" sandbox="allow-downloads allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-scripts"></iframe>',
+        ]);
+
+        $behavior = (new Behavior())
+            ->withFlags(Behavior::ENCODE_INVALID_TAG + Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withName('scenario-test')
+            ->withTags(
+                (new Behavior\Tag('iframe'))->addAttrs(
+                    (new Behavior\Attr('id')),
+                    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-allow
+                    (new Behavior\Attr('allow'))->withValues(
+                        new Behavior\MultiTokenAttrValue(' ', 'fullscreen')
+                    ),
+                    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
+                    (new Behavior\Attr('sandbox', Behavior\Attr::MANDATORY))->withValues(
+                        new Behavior\MultiTokenAttrValue(
+                            ' ',
+                            'allow-downloads',
+                            'allow-modals',
+                            'allow-orientation-lock',
+                            'allow-pointer-lock',
+                            'allow-popups',
+                            'allow-scripts'
+                        )
+                    ),
+                    (new Behavior\Attr('src'))->withValues(
+                        ...(new UriAttrValueBuilder())->allowSchemes('http', 'https')->getValues()
+                    )
                 )
             );
 

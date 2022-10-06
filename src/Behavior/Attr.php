@@ -47,6 +47,11 @@ class Attr
     public const MATCH_ALL_VALUES = 4;
 
     /**
+     * whether the current attribute is mandatory for the tag
+     */
+    public const MANDATORY = 8;
+
+    /**
      * either specific attribute name (`class`) or a prefix
      * (`data-`) in case corresponding NAME_PREFIX flag is set
      * @var string
@@ -67,6 +72,16 @@ class Attr
     {
         $this->name = $name;
         $this->flags = $flags;
+    }
+
+    public function withFlags(int $flags): self
+    {
+        if ($flags === $this->flags) {
+            return $this;
+        }
+        $target = clone $this;
+        $target->flags = $flags;
+        return $target;
     }
 
     /**
@@ -103,6 +118,11 @@ class Attr
         return $this->name;
     }
 
+    public function getFlags(): int
+    {
+        return $this->flags;
+    }
+
     /**
      * @return AttrValueInterface[]
      */
@@ -127,6 +147,11 @@ class Attr
     public function shallMatchAllValues(): bool
     {
         return ($this->flags & self::MATCH_ALL_VALUES) === self::MATCH_ALL_VALUES;
+    }
+
+    public function isMandatory(): bool
+    {
+        return ($this->flags & self::MANDATORY) === self::MANDATORY;
     }
 
     public function matchesName(string $givenName): bool

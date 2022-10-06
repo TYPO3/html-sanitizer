@@ -57,7 +57,8 @@ $behavior = (new Behavior())
         (new Behavior\Tag('div', Behavior\Tag::ALLOW_CHILDREN))
             ->addAttrs(...$commonAttrs),
         (new Behavior\Tag('a', Behavior\Tag::ALLOW_CHILDREN))
-            ->addAttrs($hrefAttr, ...$commonAttrs),
+            ->addAttrs(...$commonAttrs)
+            ->addAttrs($hrefAttr->withFlags(Behavior\Attr::MANDATORY)),
         (new Behavior\Tag('br'))
     );
 
@@ -66,6 +67,7 @@ $sanitizer = new Sanitizer(...$visitors);
 
 $html = <<< EOH
 <div id="main">
+    <a class="no-href">invalidated, due to missing mandatory `href` attr</a>
     <a href="https://typo3.org/" data-type="url" wrong-attr="is-removed">TYPO3</a><br>
     (the <span>SPAN, SPAN, SPAN</span> tag shall be encoded to HTML entities)
 </div>
@@ -78,6 +80,7 @@ will result in the following sanitized output
 
 ```html
 <div id="main">
+    &lt;a class="no-href"&gt;invalidated, due to missing mandatory `href` attr&lt;/a&gt;
     <a href="https://typo3.org/" data-type="url">TYPO3</a><br>
     (the &lt;span&gt;SPAN, SPAN, SPAN&lt;/span&gt; tag shall be encoded to HTML entities)
 </div>

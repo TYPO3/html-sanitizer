@@ -24,6 +24,18 @@ class AttrTest extends TestCase
     /**
      * @test
      */
+    public function withFlagsClonesInstance(): void
+    {
+        $attr = new Attr('test', Attr::BLUNT);
+        $modifiedAttr = $attr->withFlags(Attr::MANDATORY);
+        self::assertNotSame($attr, $modifiedAttr);
+        self::assertEquals(Attr::BLUNT, $attr->getFlags());
+        self::assertEquals(Attr::MANDATORY, $modifiedAttr->getFlags());
+    }
+
+    /**
+     * @test
+     */
     public function addValuesKeepsInstance(): void
     {
         $valueA = new DatasetAttrValue('a1', 'a2');
@@ -36,7 +48,7 @@ class AttrTest extends TestCase
     /**
      * @test
      */
-    public function withValuesKeepsInstance(): void
+    public function withValuesKeepsInstanceWhenNotModified(): void
     {
         $valueA = new DatasetAttrValue('a1', 'a2');
         $valueB = new DatasetAttrValue('b1', 'b2');
@@ -51,7 +63,7 @@ class AttrTest extends TestCase
     /**
      * @test
      */
-    public function withValuesClonesInstance(): void
+    public function withValuesClonesInstanceWhenModified(): void
     {
         $valueA = new DatasetAttrValue('a1', 'a2');
         $valueB = new DatasetAttrValue('b1', 'b2');
