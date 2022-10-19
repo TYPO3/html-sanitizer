@@ -36,10 +36,10 @@ interface VisitorInterface
      * + returning same `DOMNode` means "keep node"
      * + returning different `DOMNode` means "replace node"
      *
-     * @param DOMNode $node
+     * @param DOMNode $domNode
      * @return DOMNode|null
      */
-    public function enterNode(DOMNode $node): ?DOMNode;
+    public function enterNode(DOMNode $domNode): ?DOMNode;
 
     /**
      * Executed when leaving a node level.
@@ -47,10 +47,10 @@ interface VisitorInterface
      * + returning same `DOMNode` means "keep node"
      * + returning different `DOMNode` means "replace node"
      *
-     * @param DOMNode $node
+     * @param DOMNode $domNode
      * @return DOMNode|null
      */
-    public function leaveNode(DOMNode $node): ?DOMNode;
+    public function leaveNode(DOMNode $domNode): ?DOMNode;
 
     /**
      * Executed after having traversed all nodes
