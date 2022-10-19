@@ -76,7 +76,7 @@ class CommonBuilder implements BuilderInterface
     protected function createBehavior(): Behavior
     {
         return (new Behavior())
-            ->withFlags(Behavior::ENCODE_INVALID_TAG + Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('common')
             ->withTags(...array_values($this->createBasicTags()))
             ->withTags(...array_values($this->createMediaTags()))

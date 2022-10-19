@@ -48,7 +48,7 @@ class ScenarioTest extends TestCase
     {
         return [
             [
-                Behavior\Tag::ALLOW_CHILDREN + Behavior\Tag::PURGE_WITHOUT_CHILDREN,
+                Behavior\Tag::ALLOW_CHILDREN | Behavior\Tag::PURGE_WITHOUT_CHILDREN,
                 implode("\n", [
                     '<div></div><div data-test="test"></div>',
                     '<div>test</div><div data-test="test">test</div>',
@@ -65,7 +65,7 @@ class ScenarioTest extends TestCase
                 ]),
             ],
             [
-                Behavior\Tag::ALLOW_CHILDREN + Behavior\Tag::PURGE_WITHOUT_CHILDREN,
+                Behavior\Tag::ALLOW_CHILDREN | Behavior\Tag::PURGE_WITHOUT_CHILDREN,
                 implode("\n", [
                     '<script></script><script data-test="test"></script>',
                     '<script>test</script><script data-test="test">test</script>',
@@ -89,7 +89,7 @@ class ScenarioTest extends TestCase
     public function tagFlagsAreProcessed(int $flags, string $payload, string $expectation): void
     {
         $behavior = (new Behavior())
-            ->withFlags(Behavior::ENCODE_INVALID_TAG + Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('scenario-test')
             ->withTags(
                 (new Behavior\Tag('i')), // just used as DOM child element
@@ -140,12 +140,12 @@ class ScenarioTest extends TestCase
         ]);
 
         $behavior = (new Behavior())
-            ->withFlags(Behavior::ENCODE_INVALID_TAG + Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('scenario-test')
             ->withTags(
                 (new Behavior\Tag(
                     'script',
-                    Behavior\Tag::PURGE_WITHOUT_ATTRS + Behavior\Tag::PURGE_WITHOUT_CHILDREN + Behavior\Tag::ALLOW_CHILDREN
+                    Behavior\Tag::PURGE_WITHOUT_ATTRS | Behavior\Tag::PURGE_WITHOUT_CHILDREN | Behavior\Tag::ALLOW_CHILDREN
                 ))->addAttrs(
                     (new Behavior\Attr('id')),
                     (new Behavior\Attr('type', Behavior\Attr::MANDATORY))
@@ -183,7 +183,7 @@ class ScenarioTest extends TestCase
         ]);
 
         $behavior = (new Behavior())
-            ->withFlags(Behavior::ENCODE_INVALID_TAG + Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('scenario-test')
             ->withTags(
                 (new Behavior\Tag('iframe'))->addAttrs(
