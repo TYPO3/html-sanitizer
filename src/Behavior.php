@@ -39,7 +39,7 @@ class Behavior
     public const ENCODE_INVALID_ATTR = 2;
 
     /**
-     * remove children at tags that did not expect children
+     * remove children at nodes that did not expect children
      */
     public const REMOVE_UNEXPECTED_CHILDREN = 4;
 
@@ -116,24 +116,18 @@ class Behavior
         return $target;
     }
 
-    /**
-     * @return int
-     */
     public function getFlags(): int
     {
         return $this->flags;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
     /**
-     * @return Tag[]
+     * @return list<Tag>
      */
     public function getTags(): array
     {
@@ -141,8 +135,6 @@ class Behavior
     }
 
     /**
-     * @param string $name
-     * @return Tag|null
      */
     public function getTag(string $name): ?Tag
     {
@@ -171,7 +163,7 @@ class Behavior
     }
 
     /**
-     * @param string[] $names
+     * @param list<string> $names
      * @throws LogicException
      */
     protected function assertScalarUniqueness(array $names): void
