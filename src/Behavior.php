@@ -16,6 +16,7 @@ namespace TYPO3\HtmlSanitizer;
 
 use LogicException;
 use TYPO3\HtmlSanitizer\Behavior\Tag;
+use TYPO3\HtmlSanitizer\Builder\Preset\PresetInterface;
 
 /**
  * Declares behavior used by node visitors
@@ -64,6 +65,11 @@ class Behavior
      * @var array<string, Tag>
      */
     protected $tags = [];
+
+    public function withPreset(PresetInterface $preset, int $flags = 0): self
+    {
+        return $preset->applyTo($this, $flags);
+    }
 
     public function withFlags(int $flags): self
     {
