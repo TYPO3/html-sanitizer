@@ -26,14 +26,14 @@ abstract class AbstractVisitor implements VisitorInterface
     {
     }
 
-    public function enterNode(DOMNode $node): ?DOMNode
+    public function enterNode(DOMNode $domNode): ?DOMNode
     {
-        return $node;
+        return $domNode;
     }
 
-    public function leaveNode(DOMNode $node): ?DOMNode
+    public function leaveNode(DOMNode $domNode): ?DOMNode
     {
-        return $node;
+        return $domNode;
     }
 
     public function afterTraverse(Context $context): void

@@ -89,24 +89,24 @@ class Sanitizer
         }
     }
 
-    protected function traverse(DOMNode $node): void
+    protected function traverse(DOMNode $domNode): void
     {
         foreach ($this->visitors as $visitor) {
-            $result = $visitor->enterNode($node);
-            $node = $this->replaceNode($node, $result);
-            if ($node === null) {
+            $result = $visitor->enterNode($domNode);
+            $domNode = $this->replaceNode($domNode, $result);
+            if ($domNode === null) {
                 return;
             }
         }
 
-        if ($node->hasChildNodes()) {
-            $this->traverseNodeList($node->childNodes);
+        if ($domNode->hasChildNodes()) {
+            $this->traverseNodeList($domNode->childNodes);
         }
 
         foreach ($this->visitors as $visitor) {
-            $result = $visitor->leaveNode($node);
-            $node = $this->replaceNode($node, $result);
-            if ($node === null) {
+            $result = $visitor->leaveNode($domNode);
+            $domNode = $this->replaceNode($domNode, $result);
+            if ($domNode === null) {
                 return;
             }
         }
@@ -116,13 +116,13 @@ class Sanitizer
      * Traverses node-list (child-nodes) in reverse(!) order to allow
      * directly removing child nodes, keeping node-list indexes.
      *
-     * @param DOMNodeList $nodeList
+     * @param DOMNodeList $domNodeList
      */
-    protected function traverseNodeList(DOMNodeList $nodeList): void
+    protected function traverseNodeList(DOMNodeList $domNodeList): void
     {
-        for ($i = $nodeList->length - 1; $i >= 0; $i--) {
+        for ($i = $domNodeList->length - 1; $i >= 0; $i--) {
             /** @var DOMNode $item */
-            $item = $nodeList->item($i);
+            $item = $domNodeList->item($i);
             $this->traverse($item);
         }
     }
