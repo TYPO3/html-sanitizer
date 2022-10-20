@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace TYPO3\HtmlSanitizer\Visitor;
 
 use DOMAttr;
+use DOMCdataSection;
+use DOMComment;
 use DOMElement;
 use DOMNode;
 use DOMText;
@@ -51,15 +53,28 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
     public function beforeTraverse(Context $context): void
     {
         $this->context = $context;
+        // v2.1.0: adding `#comment` and `#cdata-section` nodes for backward compatibility, will be removed with v3.0.0
+        if ($this->behavior->hasNode('#comment') && $this->behavior->getNode('#comment') === null) {
+            $this->behavior = $this->behavior->withNodes(new Behavior\Comment());
+        }
+        if ($this->behavior->hasNode('#cdata-section') && $this->behavior->getNode('#cdata-section') === null) {
+            $this->behavior = $this->behavior->withNodes(new Behavior\CdataSection());
+        }
     }
 
     public function enterNode(DOMNode $domNode): ?DOMNode
     {
+        $node = $this->behavior->getNode($domNode->nodeName);
+        if ($domNode instanceof DOMCdataSection && $node === null) {
+            return $this->handleInvalidNode($domNode);
+        }
+        if ($domNode instanceof DOMComment && $node === null) {
+            return $this->handleInvalidNode($domNode);
+        }
         if (!$domNode instanceof DOMElement) {
             return $domNode;
         }
-        $tag = $this->behavior->getTag($domNode->nodeName);
-        if ($tag === null) {
+        if (!$node instanceof Behavior\Tag) {
             // pass custom elements, in case it has been declared
             if ($this->behavior->shallAllowCustomElements() && $this->isCustomElement($domNode)) {
                 $this->log('Allowed custom element {nodeName}', [
@@ -72,15 +87,15 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
                 'behavior' => $this->behavior->getName(),
                 'nodeName' => $domNode->nodeName,
             ]);
-            return $this->handleInvalidTag($domNode);
+            return $this->handleInvalidNode($domNode);
         }
-        $domNode = $this->processAttributes($domNode, $tag);
-        $domNode = $this->processChildren($domNode, $tag);
+        $domNode = $this->processAttributes($domNode, $node);
+        $domNode = $this->processChildren($domNode, $node);
         // completely remove node, in case it is expected to exist with attributes only
-        if ($domNode instanceof DOMElement && $domNode->attributes->length === 0 && $tag->shallPurgeWithoutAttrs()) {
+        if ($domNode instanceof DOMElement && $domNode->attributes->length === 0 && $node->shallPurgeWithoutAttrs()) {
             return null;
         }
-        $domNode = $this->handleMandatoryAttributes($domNode, $tag);
+        $domNode = $this->handleMandatoryAttributes($domNode, $node);
         return $domNode;
     }
 
@@ -177,15 +192,21 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
                     'nodeName' => $domNode->nodeName,
                     'attrName' => $attr->getName(),
                 ]);
-                return $this->handleInvalidTag($domNode);
+                return $this->handleInvalidNode($domNode);
             }
         }
         return $domNode;
     }
 
-    protected function handleInvalidTag(DOMNode $domNode): ?DOMNode
+    protected function handleInvalidNode(DOMNode $domNode): ?DOMNode
     {
-        if ($this->behavior->shallEncodeInvalidTag()) {
+        if ($domNode instanceof DOMComment && $this->behavior->shallEncodeInvalidComment()) {
+            return $this->convertToText($domNode);
+        }
+        if ($domNode instanceof DOMCdataSection && $this->behavior->shallEncodeInvalidCdataSection()) {
+            return $this->convertToText($domNode);
+        }
+        if ($domNode instanceof DOMElement && $this->behavior->shallEncodeInvalidTag()) {
             return $this->convertToText($domNode);
         }
         return null;
