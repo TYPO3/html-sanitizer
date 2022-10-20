@@ -16,7 +16,7 @@ namespace TYPO3\HtmlSanitizer\Tests;
 
 use PHPUnit\Framework\TestCase;
 use TYPO3\HtmlSanitizer\Behavior;
-use TYPO3\HtmlSanitizer\Behavior\Attr\UriAttrValueBuilder;
+use TYPO3\HtmlSanitizer\Builder\Preset\IframePreset;
 use TYPO3\HtmlSanitizer\Sanitizer;
 use TYPO3\HtmlSanitizer\Visitor\CommonVisitor;
 
@@ -185,32 +185,7 @@ class ScenarioTest extends TestCase
         $behavior = (new Behavior())
             ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('scenario-test')
-            ->withTags(
-                (new Behavior\Tag('iframe'))->addAttrs(
-                    (new Behavior\Attr('id')),
-                    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-allow
-                    (new Behavior\Attr('allow'))->withValues(
-                        new Behavior\MultiTokenAttrValue(' ', 'fullscreen')
-                    ),
-                    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
-                    (new Behavior\Attr('sandbox', Behavior\Attr::MANDATORY))->withValues(
-                        new Behavior\EmptyAttrValue(),
-                        new Behavior\MultiTokenAttrValue(
-                            ' ',
-                            'allow-downloads',
-                            'allow-modals',
-                            'allow-orientation-lock',
-                            'allow-pointer-lock',
-                            'allow-popups',
-                            'allow-scripts'
-                        )
-                    ),
-                    (new Behavior\Attr('src'))->withValues(
-                        ...(new UriAttrValueBuilder())->allowSchemes('http', 'https')->getValues()
-                    )
-                )
-            );
-
+            ->withPreset(new IframePreset());
         $sanitizer = new Sanitizer(
             new CommonVisitor($behavior)
         );
