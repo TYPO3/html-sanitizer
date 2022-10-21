@@ -251,6 +251,18 @@ class CommonBuilderTest extends TestCase
                 '<a href="xmpp:user@example.org?message">value</a>',
                 '<a href="xmpp:user@example.org?message">value</a>',
             ],
+            '#909' => [
+                '<!-- #comment -->',
+                '<!-- #comment -->',
+            ],
+            '#910' => [
+                '<![CDATA[ #cdata ]]>',
+                '<![CDATA[ #cdata ]]>',
+            ],
+            '#911' => [
+                '#text',
+                '#text',
+            ],
         ];
     }
 

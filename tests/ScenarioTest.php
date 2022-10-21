@@ -103,6 +103,102 @@ class ScenarioTest extends TestCase
         self::assertSame($expectation, $sanitizer->sanitize($payload));
     }
 
+    public static function commentsAreHandledDataProvider(): array
+    {
+        return [
+            'not allowed' => [
+                false,
+                Behavior::BLUNT,
+                '<div><!-- before -->test<!-- after --></div>',
+                '<div>test</div>'
+            ],
+            'allowed' => [
+                true,
+                Behavior::BLUNT,
+                '<div><!-- before -->test<!-- after --></div>',
+                '<div><!-- before -->test<!-- after --></div>'
+            ],
+            'not allowed, encoded' => [
+                false,
+                Behavior::ENCODE_INVALID_COMMENT,
+                '<div><!-- before -->test<!-- after --></div>',
+                '<div>&lt;!-- before --&gt;test&lt;!-- after --&gt;</div>',
+            ],
+            'allowed, encoded' => [
+                true,
+                Behavior::ENCODE_INVALID_COMMENT,
+                '<div><!-- before -->test<!-- after --></div>',
+                '<div><!-- before -->test<!-- after --></div>'
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider commentsAreHandledDataProvider
+     */
+    public function commentsAreHandled(bool $allowed, int $flags, string $payload, string $expectation): void
+    {
+        $behavior = (new Behavior())
+            ->withFlags($flags)
+            ->withName('scenario-test')
+            ->withTags(new Behavior\Tag('div', Behavior\Tag::ALLOW_CHILDREN));
+        $comment = new Behavior\Comment();
+        $behavior = $allowed ? $behavior->withNodes($comment) : $behavior->withoutNodes($comment);
+        $sanitizer = new Sanitizer(
+            new CommonVisitor($behavior)
+        );
+        self::assertSame($expectation, $sanitizer->sanitize($payload));
+    }
+
+    public static function cdataSectionsAreHandledDataProvider(): array
+    {
+        return [
+            'not allowed' => [
+                false,
+                Behavior::BLUNT,
+                '<div><![CDATA[ before ]]>test<![CDATA[ after ]]></div>',
+                '<div>test</div>'
+            ],
+            'allowed' => [
+                true,
+                Behavior::BLUNT,
+                '<div><![CDATA[ before ]]>test<![CDATA[ after ]]></div>',
+                '<div><![CDATA[ before ]]>test<![CDATA[ after ]]></div>'
+            ],
+            'not allowed, encoded' => [
+                false,
+                Behavior::ENCODE_INVALID_CDATA_SECTION,
+                '<div><![CDATA[ before ]]>test<![CDATA[ after ]]></div>',
+                '<div>&lt;![CDATA[ before ]]&gt;test&lt;![CDATA[ after ]]&gt;</div>',
+            ],
+            'allowed, encoded' => [
+                true,
+                Behavior::ENCODE_INVALID_CDATA_SECTION,
+                '<div><![CDATA[ before ]]>test<![CDATA[ after ]]></div>',
+                '<div><![CDATA[ before ]]>test<![CDATA[ after ]]></div>'
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider cdataSectionsAreHandledDataProvider
+     */
+    public function cdataSectionsAreHandled(bool $allowed, int $flags, string $payload, string $expectation): void
+    {
+        $behavior = (new Behavior())
+            ->withFlags($flags)
+            ->withName('scenario-test')
+            ->withTags(new Behavior\Tag('div', Behavior\Tag::ALLOW_CHILDREN));
+        $cdataSection = new Behavior\CdataSection();
+        $behavior = $allowed ? $behavior->withNodes($cdataSection) : $behavior->withoutNodes($cdataSection);
+        $sanitizer = new Sanitizer(
+            new CommonVisitor($behavior)
+        );
+        self::assertSame($expectation, $sanitizer->sanitize($payload));
+    }
+
     /**
      * @test
      */

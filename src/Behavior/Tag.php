@@ -19,7 +19,7 @@ use LogicException;
 /**
  * Model of tag
  */
-class Tag
+class Tag implements NodeInterface
 {
     /**
      * not having any behavioral capabilities

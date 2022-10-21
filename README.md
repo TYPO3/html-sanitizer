@@ -52,7 +52,9 @@ $hrefAttr = (new Behavior\Attr('href'))
 // attention: only `Behavior` implementation uses immutability
 // (invoking `withFlags()` or `withTags()` returns new instance)
 $behavior = (new Behavior())
-    ->withFlags(Behavior::ENCODE_INVALID_TAG)
+    ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::ENCODE_INVALID_COMMENT)
+    ->withoutNodes(new Behavior\Comment())
+    ->withNodes(new Behavior\CdataSection())
     ->withTags(
         (new Behavior\Tag('div', Behavior\Tag::ALLOW_CHILDREN))
             ->addAttrs(...$commonAttrs),
@@ -80,16 +82,25 @@ will result in the following sanitized output
 
 ```html
 <div id="main">
+    &lt;!-- will be encoded, due to Behavior::ENCODE_INVALID_COMMENT --&gt;
     &lt;a class="no-href"&gt;invalidated, due to missing mandatory `href` attr&lt;/a&gt;
     <a href="https://typo3.org/" data-type="url">TYPO3</a><br>
     (the &lt;span&gt;SPAN, SPAN, SPAN&lt;/span&gt; tag shall be encoded to HTML entities)
 </div>
 ```
 
+### Changes
+
+* since `v2.1.0` newly introduced nodes `Behavior\Comment` and  `Behavior\CdataSection` are enabled per
+  default for backward compatibility reasons, use e.g. `$behavior->withoutNodes(new Behavior\Comment())`
+  to remove them (later versions of this package won't have this fallback anymore)
+
 ### `Behavior` flags
 
 * `Behavior::ENCODE_INVALID_TAG` keeps invalid tags, but "disarms" them (see `<span>` in example)
 * `Behavior::ENCODE_INVALID_ATTR` keeps invalid attributes, but "disarms" the whole(!) tag
+* `Behavior::ENCODE_INVALID_COMMENT` "disarms" unexpected HTML comments by completely encoding them
+* `Behavior::ENCODE_INVALID_CDATA_SECTION` "disarms" unexpected HTML CDATA sections by completely encoding them
 * `Behavior::REMOVE_UNEXPECTED_CHILDREN` removes children for `Tag` entities that were created
   without explicitly using `Tag::ALLOW_CHILDREN`, but actually contained child nodes
 * `Behavior::ALLOW_CUSTOM_ELEMENTS` allow using custom elements (having a hyphen `-`) - however,

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace TYPO3\HtmlSanitizer;
 
 use LogicException;
+use TYPO3\HtmlSanitizer\Behavior\NodeInterface;
 use TYPO3\HtmlSanitizer\Behavior\Tag;
 
 /**
@@ -50,6 +51,16 @@ class Behavior
     public const ALLOW_CUSTOM_ELEMENTS = 8;
 
     /**
+     * in case an unexpected comment was found, encode the whole comment as HTML
+     */
+    public const ENCODE_INVALID_COMMENT = 16;
+
+    /**
+     * in case an unexpected CDATA section was found, encode the whole CDATA section as HTML
+     */
+    public const ENCODE_INVALID_CDATA_SECTION = 32;
+
+    /**
      * @var int
      */
     protected $flags = 0;
@@ -60,10 +71,14 @@ class Behavior
     protected $name = 'undefined';
 
     /**
-     * Tag names as array index, e.g. `['strong' => new Tag('strong')]`
-     * @var array<string, Tag>
+     * Node names as array index, e.g. `['strong' => new Tag('strong', '#comment' => new Comment()]`
+     * @var array<string, ?NodeInterface>
      */
-    protected $tags = [];
+    protected $nodes = [
+        // v2.1.0: adding `#comment` and `#cdata-section` hints for backward compatibility, will be removed with v3.0.0
+        '#comment' => null,
+        '#cdata-section' => null,
+    ];
 
     public function withFlags(int $flags): self
     {
@@ -85,34 +100,53 @@ class Behavior
         return $target;
     }
 
+    /**
+     * @todo deprecate
+     */
     public function withTags(Tag ...$tags): self
     {
-        $names = array_map([$this, 'getTagName'], $tags);
+        return $this->withNodes(...$tags);
+    }
+
+    /**
+     * @todo deprecate
+     */
+    public function withoutTags(Tag ...$tags): self
+    {
+        return $this->withoutNodes(...$tags);
+    }
+
+    public function withNodes(NodeInterface ...$nodes): self
+    {
+        $names = array_map([$this, 'getNodeName'], $nodes);
         $this->assertScalarUniqueness($names);
-        // uses tag name as array index, e.g. `['strong' => new Tag('strong')]`
-        $indexedTags = array_combine($names, $tags);
-        if (!is_array($indexedTags)) {
+        // uses node name as array index, e.g. `['#comment' => new Comment()]`
+        $indexedNodes = array_combine($names, $nodes);
+        if (!is_array($indexedNodes)) {
             return $this;
         }
-        $this->assertTagUniqueness($indexedTags);
+        $this->assertNodeUniqueness($indexedNodes);
         $target = clone $this;
-        $target->tags = array_merge($target->tags, $indexedTags);
+        $target->nodes = array_merge($target->nodes, $indexedNodes);
         return $target;
     }
 
-    public function withoutTags(Tag ...$tags): self
+    public function withoutNodes(NodeInterface ...$nodes): self
     {
-        $filteredTags = array_filter(
-            $this->tags,
-            function (Tag $tag) use ($tags) {
-                return !in_array($tag, $tags, true);
-            }
+        $names = array_map([$this, 'getNodeName'], $nodes);
+        $filteredNodes = array_filter(
+            $this->nodes,
+            static function (?NodeInterface $node, string $name) use ($nodes, $names) {
+                return $node === null && !in_array($name, $names, true)
+                    || $node !== null && !in_array($node, $nodes, true);
+            },
+            ARRAY_FILTER_USE_BOTH
         );
-        if ($filteredTags === $this->tags) {
+        if ($filteredNodes === $this->nodes) {
             return $this;
         }
         $target = clone $this;
-        $target->tags = $filteredTags;
+        $target->nodes = $filteredNodes;
         return $target;
     }
 
@@ -131,15 +165,38 @@ class Behavior
      */
     public function getTags(): array
     {
-        return $this->tags;
+        return array_filter(
+            $this->nodes,
+            static function (NodeInterface $node) {
+                return $node instanceof Tag;
+            }
+        );
     }
 
-    /**
-     */
     public function getTag(string $name): ?Tag
     {
         $name = strtolower($name);
-        return $this->tags[$name] ?? null;
+        $node = $this->nodes[$name] ?? null;
+        return $node instanceof Tag ? $node : null;
+    }
+
+    /**
+     * @return list<NodeInterface>
+     */
+    public function getNodes(): array
+    {
+        return $this->nodes;
+    }
+
+    public function getNode(string $name): ?NodeInterface
+    {
+        $name = strtolower($name);
+        return $this->nodes[$name] ?? null;
+    }
+
+    public function hasNode(string $name): bool
+    {
+        return array_key_exists($name, $this->nodes);
     }
 
     public function shallEncodeInvalidTag(): bool
@@ -150,6 +207,16 @@ class Behavior
     public function shallEncodeInvalidAttr(): bool
     {
         return ($this->flags & self::ENCODE_INVALID_ATTR) === self::ENCODE_INVALID_ATTR;
+    }
+
+    public function shallEncodeInvalidComment(): bool
+    {
+        return ($this->flags & self::ENCODE_INVALID_COMMENT) === self::ENCODE_INVALID_COMMENT;
+    }
+
+    public function shallEncodeInvalidCdataSection(): bool
+    {
+        return ($this->flags & self::ENCODE_INVALID_CDATA_SECTION) === self::ENCODE_INVALID_CDATA_SECTION;
     }
 
     public function shallRemoveUnexpectedChildren(): bool
@@ -181,24 +248,24 @@ class Behavior
     }
 
     /**
-     * @param array<string, Tag> $tags
+     * @param array<string, NodeInterface> $nodes
      */
-    protected function assertTagUniqueness(array $tags): void
+    protected function assertNodeUniqueness(array $nodes): void
     {
-        $existingTagNames = array_intersect_key($this->tags, $tags);
-        if ($existingTagNames !== []) {
+        $existingNodeNames = array_intersect_key(array_filter($this->nodes), $nodes);
+        if ($existingNodeNames !== []) {
             throw new LogicException(
                 sprintf(
-                    'Cannot redeclare tag names %s. Remove duplicates first',
-                    implode(', ', array_keys($existingTagNames))
+                    'Cannot redeclare node names %s. Remove duplicates first',
+                    implode(', ', array_keys($existingNodeNames))
                 ),
                 1625391217
             );
         }
     }
 
-    protected function getTagName(Tag $tag): string
+    protected function getNodeName(NodeInterface $node): string
     {
-        return strtolower($tag->getName());
+        return strtolower($node->getName());
     }
 }
