@@ -64,30 +64,38 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
 
     public function enterNode(DOMNode $domNode): ?DOMNode
     {
-        $node = $this->behavior->getNode($domNode->nodeName);
-        if ($domNode instanceof DOMCdataSection && $node === null) {
-            return $this->handleInvalidNode($domNode);
-        }
-        if ($domNode instanceof DOMComment && $node === null) {
-            return $this->handleInvalidNode($domNode);
-        }
-        if (!$domNode instanceof DOMElement) {
+        if (!$domNode instanceof DOMCdataSection
+            && !$domNode instanceof DOMComment
+            && !$domNode instanceof DOMElement
+        ) {
             return $domNode;
         }
-        if (!$node instanceof Behavior\Tag) {
-            // pass custom elements, in case it has been declared
-            if ($this->behavior->shallAllowCustomElements() && $this->isCustomElement($domNode)) {
-                $this->log('Allowed custom element {nodeName}', [
-                    'behavior' => $this->behavior->getName(),
-                    'nodeName' => $domNode->nodeName,
-                ]);
-                return $domNode;
-            }
-            $this->log('Found unexpected tag {nodeName}', [
-                'behavior' => $this->behavior->getName(),
-                'nodeName' => $domNode->nodeName,
-            ]);
+
+        $node = $this->behavior->getNode($domNode->nodeName);
+        if (!$node instanceof Behavior\NodeInterface) {
             return $this->handleInvalidNode($domNode);
+        }
+
+        if ($node instanceof Behavior\NodeHandler) {
+            if ($node->shallHandleFirst()) {
+                $domNode = $node->getHandler()->handle($node->getNode(), $domNode, $this->context, $this->behavior);
+            }
+            if ($node->shallProcessDefaults() && $domNode instanceof DOMElement) {
+                $domNode = $this->enterDomElement($domNode, $node->getNode());
+            }
+            if (!$node->shallHandleFirst()) {
+                $domNode = $node->getHandler()->handle($node->getNode(), $domNode, $this->context, $this->behavior);
+            }
+        } elseif ($domNode instanceof DOMElement) {
+            $domNode = $this->enterDomElement($domNode, $node);
+        }
+        return $domNode;
+    }
+
+    protected function enterDomElement(?DOMNode $domNode, Behavior\NodeInterface $node): ?DOMNode
+    {
+        if (!$domNode instanceof DOMElement || !$node instanceof Behavior\Tag) {
+            return $domNode;
         }
         $domNode = $this->processAttributes($domNode, $node);
         $domNode = $this->processChildren($domNode, $node);
@@ -95,8 +103,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         if ($domNode instanceof DOMElement && $domNode->attributes->length === 0 && $node->shallPurgeWithoutAttrs()) {
             return null;
         }
-        $domNode = $this->handleMandatoryAttributes($domNode, $node);
-        return $domNode;
+        return $this->handleMandatoryAttributes($domNode, $node);
     }
 
     public function leaveNode(DOMNode $domNode): ?DOMNode
@@ -206,8 +213,22 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         if ($domNode instanceof DOMCdataSection && $this->behavior->shallEncodeInvalidCdataSection()) {
             return $this->convertToText($domNode);
         }
-        if ($domNode instanceof DOMElement && $this->behavior->shallEncodeInvalidTag()) {
-            return $this->convertToText($domNode);
+        if ($domNode instanceof DOMElement) {
+            // pass custom elements, in case it has been declared
+            if ($this->behavior->shallAllowCustomElements() && $this->isCustomElement($domNode)) {
+                $this->log('Allowed custom element {nodeName}', [
+                    'behavior' => $this->behavior->getName(),
+                    'nodeName' => $domNode->nodeName,
+                ]);
+                return $domNode;
+            }
+            $this->log('Found unexpected tag {nodeName}', [
+                'behavior' => $this->behavior->getName(),
+                'nodeName' => $domNode->nodeName,
+            ]);
+            if ($this->behavior->shallEncodeInvalidTag()) {
+                return $this->convertToText($domNode);
+            }
         }
         return null;
     }

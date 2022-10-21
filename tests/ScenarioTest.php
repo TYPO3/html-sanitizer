@@ -14,9 +14,12 @@ declare(strict_types=1);
 
 namespace TYPO3\HtmlSanitizer\Tests;
 
+use DOMNode;
+use DOMText;
 use PHPUnit\Framework\TestCase;
 use TYPO3\HtmlSanitizer\Behavior;
 use TYPO3\HtmlSanitizer\Behavior\Attr\UriAttrValueBuilder;
+use TYPO3\HtmlSanitizer\Behavior\NodeInterface;
 use TYPO3\HtmlSanitizer\Sanitizer;
 use TYPO3\HtmlSanitizer\Visitor\CommonVisitor;
 
@@ -97,6 +100,91 @@ class ScenarioTest extends TestCase
                 (new Behavior\Tag('script', $flags))->addAttrs((new Behavior\Attr('data-test')))
             );
 
+        $sanitizer = new Sanitizer(
+            new CommonVisitor($behavior)
+        );
+        self::assertSame($expectation, $sanitizer->sanitize($payload));
+    }
+
+    public static function tagIsHandledDataProcessor(): array
+    {
+        $node = new Behavior\Tag('div');
+        $asTextHandler = new Behavior\Handler\AsTextHandler();
+        $closureHandler = new Behavior\Handler\ClosureHandler(
+            static function (NodeInterface $node, ?DOMNode $domNode): ?\DOMNode {
+                if ($domNode === null) {
+                    return null;
+                }
+                return new DOMText(sprintf('Handled <%s>', $domNode->nodeName));
+            }
+        );
+
+        return [
+            [
+                new Behavior\NodeHandler(
+                    $node,
+                    $asTextHandler
+                ),
+                '<div invalid-attr="value"><i>unexpected</i></div>',
+                '&lt;div invalid-attr="value"&gt;&lt;i&gt;unexpected&lt;/i&gt;&lt;/div&gt;',
+            ],
+            [
+                new Behavior\NodeHandler(
+                    $node,
+                    $asTextHandler,
+                    Behavior\NodeHandler::PROCESS_DEFAULTS
+                ),
+                '<div invalid-attr="value"><i>unexpected</i></div>',
+                '&lt;div&gt;&lt;/div&gt;',
+            ],
+            [
+                new Behavior\NodeHandler(
+                    $node,
+                    $asTextHandler,
+                    Behavior\NodeHandler::PROCESS_DEFAULTS | Behavior\NodeHandler::HANDLE_FIRST
+                ),
+                '<div invalid-attr="value"><i>unexpected</i></div>',
+                '&lt;div invalid-attr="value"&gt;&lt;i&gt;unexpected&lt;/i&gt;&lt;/div&gt;',
+            ],
+            [
+                new Behavior\NodeHandler(
+                    $node,
+                    $closureHandler
+                ),
+                '<div invalid-attr="value"><i>unexpected</i></div>',
+                'Handled &lt;div&gt;',
+            ],
+            [
+                new Behavior\NodeHandler(
+                    $node,
+                    $closureHandler,
+                    Behavior\NodeHandler::PROCESS_DEFAULTS
+                ),
+                '<div invalid-attr="value"><i>unexpected</i></div>',
+                'Handled &lt;div&gt;',
+            ],
+            [
+                new Behavior\NodeHandler(
+                    $node,
+                    $closureHandler,
+                    Behavior\NodeHandler::PROCESS_DEFAULTS | Behavior\NodeHandler::HANDLE_FIRST
+                ),
+                '<div invalid-attr="value"><i>unexpected</i></div>',
+                'Handled &lt;div&gt;',
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider tagIsHandledDataProcessor
+     */
+    public function tagIsHandled(Behavior\NodeHandler $nodeHandler, string $payload, string $expectation): void
+    {
+        $behavior = (new Behavior())
+            ->withFlags(Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withName('scenario-test')
+            ->withNodes($nodeHandler);
         $sanitizer = new Sanitizer(
             new CommonVisitor($behavior)
         );
