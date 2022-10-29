@@ -14,8 +14,11 @@ declare(strict_types=1);
 
 namespace TYPO3\HtmlSanitizer\Builder;
 
+use DOMNode;
+use DOMText;
 use TYPO3\HtmlSanitizer\Behavior;
 use TYPO3\HtmlSanitizer\Behavior\Attr\UriAttrValueBuilder;
+use TYPO3\HtmlSanitizer\Behavior\NodeInterface;
 use TYPO3\HtmlSanitizer\Sanitizer;
 use TYPO3\HtmlSanitizer\Visitor\CommonVisitor;
 
@@ -80,7 +83,8 @@ class CommonBuilder implements BuilderInterface
             ->withName('common')
             ->withTags(...array_values($this->createBasicTags()))
             ->withTags(...array_values($this->createMediaTags()))
-            ->withTags(...array_values($this->createTableTags()));
+            ->withTags(...array_values($this->createTableTags()))
+            ->withNodes(...array_values($this->createSpecialNodes()));
     }
 
     protected function createBasicTags(): array
@@ -205,6 +209,23 @@ class CommonBuilder implements BuilderInterface
             ->addAttrs(...$this->globalAttrs, ...$commonTableAttrs)
             ->addAttrs(...$this->createAttrs('span', 'width'));
         return $tags;
+    }
+
+    /**
+     * @return array<string, Behavior\NodeInterface>
+     */
+    protected function createSpecialNodes(): array
+    {
+        $nodes = [];
+        $nodes['#cdata-section'] = (new Behavior\NodeHandler(
+            new Behavior\CdataSection(),
+            new Behavior\Handler\ClosureHandler(
+                static function (NodeInterface $node, $domNode) {
+                    return $domNode !== null ? new DOMText(trim($domNode->nodeValue)) : null;
+                }
+            )
+        ));
+        return $nodes;
     }
 
     /**
