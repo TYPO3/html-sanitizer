@@ -257,11 +257,15 @@ class CommonBuilderTest extends TestCase
             ],
             '#910' => [
                 '<![CDATA[ #cdata ]]>',
-                '<![CDATA[ #cdata ]]>',
+                '#cdata',
             ],
             '#911' => [
                 '#text',
                 '#text',
+            ],
+            '#921' => [
+                '<![CDATA[<any><span data-value="value"></any>*/]]>',
+                '&lt;any&gt;&lt;span data-value="value"&gt;&lt;/any&gt;*/',
             ],
         ];
     }
