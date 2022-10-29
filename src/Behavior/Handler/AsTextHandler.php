@@ -16,7 +16,6 @@ namespace TYPO3\HtmlSanitizer\Behavior\Handler;
 
 use DOMNode;
 use DOMText;
-use LogicException;
 use TYPO3\HtmlSanitizer\Behavior;
 use TYPO3\HtmlSanitizer\Behavior\HandlerInterface;
 use TYPO3\HtmlSanitizer\Behavior\NodeInterface;
@@ -29,12 +28,6 @@ class AsTextHandler implements HandlerInterface
         if ($domNode === null) {
             return null;
         }
-        // @todo might use `DOMChildNode` with PHP 8
-        if (($domNode->parentNode ?? null) === null) {
-            throw new LogicException('Cannot process nodes not having a parent', 1666333132);
-        }
-        $text = new DOMText();
-        $text->nodeValue = $context->parser->saveHTML($domNode);
-        return $text;
+        return new DOMText($context->parser->saveHTML($domNode));
     }
 }
