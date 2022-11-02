@@ -36,6 +36,7 @@ composer req typo3/html-sanitizer
 ```php
 <?php
 use TYPO3\HtmlSanitizer\Behavior;
+use TYPO3\HtmlSanitizer\Behavior\NodeInterface;
 use TYPO3\HtmlSanitizer\Sanitizer;
 use TYPO3\HtmlSanitizer\Visitor\CommonVisitor;
 
@@ -62,6 +63,21 @@ $behavior = (new Behavior())
             ->addAttrs(...$commonAttrs)
             ->addAttrs($hrefAttr->withFlags(Behavior\Attr::MANDATORY)),
         (new Behavior\Tag('br'))
+    )
+    ->withNodes(
+        (new Behavior\NodeHandler(
+            new Behavior\Tag('typo3'),
+            new Behavior\Handler\ClosureHandler(
+                static function (NodeInterface $node, ?DOMNode $domNode): ?DOMNode {
+                    return $domNode === null
+                        ? null
+                        : new DOMText(sprintf('%s says: "%s"',
+                            strtoupper($domNode->nodeName),
+                            $domNode->textContent
+                        ));
+                }
+            )
+        ))
     );
 
 $visitors = [new CommonVisitor($behavior)];
@@ -69,6 +85,8 @@ $sanitizer = new Sanitizer(...$visitors);
 
 $html = <<< EOH
 <div id="main">
+    <typo3>Inspiring People To Share</typo3>
+    <!-- will be encoded, due to Behavior::ENCODE_INVALID_COMMENT -->
     <a class="no-href">invalidated, due to missing mandatory `href` attr</a>
     <a href="https://typo3.org/" data-type="url" wrong-attr="is-removed">TYPO3</a><br>
     (the <span>SPAN, SPAN, SPAN</span> tag shall be encoded to HTML entities)
@@ -82,6 +100,7 @@ will result in the following sanitized output
 
 ```html
 <div id="main">
+    TYPO3 says: "Inspiring People To Share"
     &lt;!-- will be encoded, due to Behavior::ENCODE_INVALID_COMMENT --&gt;
     &lt;a class="no-href"&gt;invalidated, due to missing mandatory `href` attr&lt;/a&gt;
     <a href="https://typo3.org/" data-type="url">TYPO3</a><br>
