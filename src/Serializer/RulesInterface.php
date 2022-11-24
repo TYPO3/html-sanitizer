@@ -16,9 +16,21 @@ namespace TYPO3\HtmlSanitizer\Serializer;
 
 use DOMNode;
 use Masterminds\HTML5\Serializer\RulesInterface as MastermindsRulesInterface;
+use TYPO3\HtmlSanitizer\Behavior;
+use TYPO3\HtmlSanitizer\InitiatorInterface;
 
 interface RulesInterface extends MastermindsRulesInterface
 {
+    /**
+     * @return self
+     */
+    public function withBehavior(Behavior $behavior);
+
+    /**
+     * @return self
+     */
+    public function withInitiator(?InitiatorInterface $initiator);
+
     public function traverse(DOMNode $domNode): void;
 
     /**

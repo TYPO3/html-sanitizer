@@ -97,7 +97,10 @@ class Sanitizer
         // @todo drop deprecated property
         $this->root = $root;
         $this->handle($root, $initiator);
-        return $this->serialize($root);
+        $rules = $this->createRules($initiator);
+        $serialized = $this->serialize($root, $rules);
+        $this->closeRulesStream($rules);
+        return $serialized;
     }
 
     protected function parse(string $html): DOMDocumentFragment
@@ -117,21 +120,10 @@ class Sanitizer
     /**
      * Custom implementation of `\Masterminds\HTML5::save` and `\Masterminds\HTML5::saveHTML`.
      */
-    protected function serialize(DOMNode $domNode, RulesInterface $rules = null): string
+    protected function serialize(DOMNode $domNode, RulesInterface $rules): string
     {
-        if ($rules === null) {
-            $behavior = $this->behavior ?? new Behavior();
-            $stream = fopen('php://temp', 'wb');
-            $rules = Rules::create($behavior, $stream, self::mastermindsDefaultOptions);
-        }
-
         $rules->traverse($domNode);
-        $serialized = stream_get_contents($rules->getStream(), -1, 0);
-
-        if (isset($stream)) {
-            fclose($stream);
-        }
-        return $serialized;
+        return stream_get_contents($rules->getStream(), -1, 0);
     }
 
     protected function beforeTraverse(): void
@@ -197,6 +189,19 @@ class Sanitizer
             $source->parentNode->replaceChild($target, $source);
         }
         return $target;
+    }
+
+    protected function createRules(InitiatorInterface $initiator = null): Rules
+    {
+        $stream = fopen('php://temp', 'wb');
+        return (new Rules($stream, self::mastermindsDefaultOptions))
+            ->withBehavior($this->behavior ?? new Behavior())
+            ->withInitiator($initiator);
+    }
+
+    protected function closeRulesStream(RulesInterface $rules): bool
+    {
+        return fclose($rules->getStream());
     }
 
     protected function createParser(): HTML5

@@ -18,6 +18,7 @@ use DOMNode;
 use Masterminds\HTML5\Serializer\OutputRules;
 use Masterminds\HTML5\Serializer\Traverser;
 use TYPO3\HtmlSanitizer\Behavior;
+use TYPO3\HtmlSanitizer\InitiatorInterface;
 
 class Rules extends OutputRules implements RulesInterface
 {
@@ -37,6 +38,11 @@ class Rules extends OutputRules implements RulesInterface
     protected $behavior;
 
     /**
+     * @var ?InitiatorInterface
+     */
+    protected $initiator;
+
+    /**
      * @param Behavior $behavior
      * @param resource$output
      * @param array $options
@@ -47,6 +53,36 @@ class Rules extends OutputRules implements RulesInterface
         $target = new self($output, $options);
         $target->options = $options;
         $target->behavior = $behavior;
+        return $target;
+    }
+
+    /**
+     * @param resource $output
+     * @param array $options
+     */
+    public function __construct($output, $options = [])
+    {
+        $this->options = (array)$options;
+        parent::__construct($output, $this->options);
+    }
+
+    public function withBehavior(Behavior $behavior): self
+    {
+        if ($this->behavior === $behavior) {
+            return $this;
+        }
+        $target = clone $this;
+        $target->behavior = $behavior;
+        return $target;
+    }
+
+    public function withInitiator(?InitiatorInterface $initiator): self
+    {
+        if ($this->initiator === $initiator) {
+            return $this;
+        }
+        $target = clone $this;
+        $target->initiator = $initiator;
         return $target;
     }
 
