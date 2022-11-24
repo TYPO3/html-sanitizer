@@ -56,6 +56,7 @@ class Sanitizer
 
     /**
      * @var DOMDocumentFragment
+     * @deprecated since v2.1.0, not required anymore
      */
     protected $root;
 
@@ -72,9 +73,11 @@ class Sanitizer
 
     public function sanitize(string $html, InitiatorInterface $initiator = null): string
     {
-        $this->root = $this->parse($html);
-        $this->handle($this->root, $initiator);
-        return $this->serialize($this->root);
+        $root = $this->parse($html);
+        // @todo drop deprecated property
+        $this->root = $root;
+        $this->handle($root, $initiator);
+        return $this->serialize($root);
     }
 
     protected function parse(string $html): DOMDocumentFragment
