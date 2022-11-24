@@ -6,3 +6,4 @@
   use `\TYPO3\HtmlSanitizer\Behavior\NodeException::withDomNode(?DOMNode $domNode)` instead
 * deprecated `\TYPO3\HtmlSanitizer\Behavior\NodeException::getNode()`,
   use `\TYPO3\HtmlSanitizer\Behavior\NodeException::getDomNode()` instead
+* deprecated property `\TYPO3\HtmlSanitizer\Sanitizer::$root`, superfluous - don't use it anymore

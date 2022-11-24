@@ -36,6 +36,14 @@ use TYPO3\HtmlSanitizer\Visitor\VisitorInterface;
  */
 class Sanitizer
 {
+    protected const mastermindsDefaultOptions = [
+        // Whether the serializer should aggressively encode all characters as entities.
+        'encode_entities' => false,
+        // Prevents the parser from automatically assigning the HTML5 namespace to the DOM document.
+        // (adjusted due to https://github.com/Masterminds/html5-php/issues/181#issuecomment-643767471)
+        'disable_html_ns' => true,
+    ];
+
     /**
      * @var VisitorInterface[]
      */
@@ -48,6 +56,7 @@ class Sanitizer
 
     /**
      * @var DOMDocumentFragment
+     * @deprecated since v2.1.0, not required anymore
      */
     protected $root;
 
@@ -64,17 +73,25 @@ class Sanitizer
 
     public function sanitize(string $html, InitiatorInterface $initiator = null): string
     {
-        $this->root = $this->parse($html);
-        $this->context = new Context($this->parser, $initiator);
-        $this->beforeTraverse();
-        $this->traverseNodeList($this->root->childNodes);
-        $this->afterTraverse();
-        return $this->serialize($this->root);
+        $root = $this->parse($html);
+        // @todo drop deprecated property
+        $this->root = $root;
+        $this->handle($root, $initiator);
+        return $this->serialize($root);
     }
 
     protected function parse(string $html): DOMDocumentFragment
     {
         return $this->parser->parseFragment($html);
+    }
+
+    protected function handle(DOMNode $domNode, InitiatorInterface $initiator = null): DOMNode
+    {
+        $this->context = new Context($this->parser, $initiator);
+        $this->beforeTraverse();
+        $this->traverseNodeList($domNode->childNodes);
+        $this->afterTraverse();
+        return $domNode;
     }
 
     protected function serialize(DOMNode $document): string
@@ -149,10 +166,6 @@ class Sanitizer
 
     protected function createParser(): HTML5
     {
-        // set parser & applies work-around
-        // https://github.com/Masterminds/html5-php/issues/181#issuecomment-643767471
-        return new HTML5([
-            'disable_html_ns' => true,
-        ]);
+        return new HTML5(self::mastermindsDefaultOptions);
     }
 }

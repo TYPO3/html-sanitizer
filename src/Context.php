@@ -28,7 +28,7 @@ class Context
     public $parser;
 
     /**
-     * @var InitiatorInterface
+     * @var ?InitiatorInterface
      */
     public $initiator;
 
