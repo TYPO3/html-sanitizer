@@ -6,6 +6,10 @@ on:
   schedule:
     - cron:  '45 6 * * *'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,7 +20,7 @@ jobs:
         php: ['7.2', '7.3', '7.4', '8.0', '8.1', '8.2']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -33,12 +37,12 @@ jobs:
 
       - name: Install dependencies
         if: ${{ matrix.php <= '8.1' }}
-        run: composer install --prefer-dist --no-progress --no-suggest
+        run: composer install --prefer-dist --no-progress --ansi
 
       - name: Install dependencies PHP 8.2
         # @todo: Needed until prophecy (req by phpunit) allows PHP 8.2, https://github.com/phpspec/prophecy/issues/556
         if: ${{ matrix.php > '8.1' }}
-        run: composer install --prefer-dist --no-progress --no-suggest --ignore-platform-req=php+
+        run: composer install --prefer-dist --no-progress --ansi --ignore-platform-req=php+
 
       - name: Run test suite
         run: composer run-script test
