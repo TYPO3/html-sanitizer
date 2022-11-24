@@ -73,16 +73,22 @@ class Sanitizer
     public function sanitize(string $html, InitiatorInterface $initiator = null): string
     {
         $this->root = $this->parse($html);
-        $this->context = new Context($this->parser, $initiator);
-        $this->beforeTraverse();
-        $this->traverseNodeList($this->root->childNodes);
-        $this->afterTraverse();
+        $this->handle($this->root, $initiator);
         return $this->serialize($this->root);
     }
 
     protected function parse(string $html): DOMDocumentFragment
     {
         return $this->parser->parseFragment($html);
+    }
+
+    protected function handle(DOMNode $domNode, InitiatorInterface $initiator = null): DOMNode
+    {
+        $this->context = new Context($this->parser, $initiator);
+        $this->beforeTraverse();
+        $this->traverseNodeList($domNode->childNodes);
+        $this->afterTraverse();
+        return $domNode;
     }
 
     protected function serialize(DOMNode $document): string
