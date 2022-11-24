@@ -18,6 +18,8 @@ use DOMDocumentFragment;
 use DOMNode;
 use DOMNodeList;
 use Masterminds\HTML5;
+use TYPO3\HtmlSanitizer\Serializer\Rules;
+use TYPO3\HtmlSanitizer\Serializer\RulesInterface;
 use TYPO3\HtmlSanitizer\Visitor\VisitorInterface;
 
 /**
@@ -50,6 +52,11 @@ class Sanitizer
     protected $visitors = [];
 
     /**
+     * @var ?Behavior
+     */
+    protected $behavior = null;
+
+    /**
      * @var HTML5
      */
     protected $parser;
@@ -65,9 +72,22 @@ class Sanitizer
      */
     protected $context;
 
-    public function __construct(VisitorInterface ...$visitors)
+    /**
+     * @param Behavior|VisitorInterface[] $items
+     *
+     * @todo use `__construct(Behavior $behavior, VisitorInterface ...$visitors)`
+     * (which would have been a breaking change with a PHP fatal error)
+     */
+    public function __construct(...$items)
     {
-        $this->visitors = $visitors;
+        $this->visitors = [];
+        foreach ($items as $item) {
+            if ($item instanceof VisitorInterface) {
+                $this->visitors[] = $item;
+            } elseif ($item instanceof Behavior && $this->behavior === null) {
+                $this->behavior = $item;
+            }
+        }
         $this->parser = $this->createParser();
     }
 
@@ -94,9 +114,24 @@ class Sanitizer
         return $domNode;
     }
 
-    protected function serialize(DOMNode $document): string
+    /**
+     * Custom implementation of `\Masterminds\HTML5::save` and `\Masterminds\HTML5::saveHTML`.
+     */
+    protected function serialize(DOMNode $domNode, RulesInterface $rules = null): string
     {
-        return $this->parser->saveHTML($document);
+        if ($rules === null) {
+            $behavior = $this->behavior ?? new Behavior();
+            $stream = fopen('php://temp', 'wb');
+            $rules = Rules::create($behavior, $stream, self::mastermindsDefaultOptions);
+        }
+
+        $rules->traverse($domNode);
+        $serialized = stream_get_contents($rules->getStream(), -1, 0);
+
+        if (isset($stream)) {
+            fclose($stream);
+        }
+        return $serialized;
     }
 
     protected function beforeTraverse(): void

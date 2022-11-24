@@ -70,7 +70,7 @@ class CommonBuilder implements BuilderInterface
     {
         $behavior = $this->createBehavior();
         $visitor = new CommonVisitor($behavior);
-        return new Sanitizer($visitor);
+        return new Sanitizer($behavior, $visitor);
     }
 
     protected function createBehavior(): Behavior

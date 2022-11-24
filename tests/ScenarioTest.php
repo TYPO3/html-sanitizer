@@ -42,6 +42,7 @@ class ScenarioTest extends TestCase
     {
         $behavior = new Behavior();
         $sanitizer = new Sanitizer(
+            $behavior,
             new CommonVisitor($behavior)
         );
         self::assertSame($expectation, $sanitizer->sanitize($payload));
@@ -101,6 +102,7 @@ class ScenarioTest extends TestCase
             );
 
         $sanitizer = new Sanitizer(
+            $behavior,
             new CommonVisitor($behavior)
         );
         self::assertSame($expectation, $sanitizer->sanitize($payload));
@@ -186,6 +188,7 @@ class ScenarioTest extends TestCase
             ->withName('scenario-test')
             ->withNodes($nodeHandler);
         $sanitizer = new Sanitizer(
+            $behavior,
             new CommonVisitor($behavior)
         );
         self::assertSame($expectation, $sanitizer->sanitize($payload));
@@ -234,6 +237,7 @@ class ScenarioTest extends TestCase
         $comment = new Behavior\Comment();
         $behavior = $allowed ? $behavior->withNodes($comment) : $behavior->withoutNodes($comment);
         $sanitizer = new Sanitizer(
+            $behavior,
             new CommonVisitor($behavior)
         );
         self::assertSame($expectation, $sanitizer->sanitize($payload));
@@ -282,6 +286,7 @@ class ScenarioTest extends TestCase
         $cdataSection = new Behavior\CdataSection();
         $behavior = $allowed ? $behavior->withNodes($cdataSection) : $behavior->withoutNodes($cdataSection);
         $sanitizer = new Sanitizer(
+            $behavior,
             new CommonVisitor($behavior)
         );
         self::assertSame($expectation, $sanitizer->sanitize($payload));
@@ -338,6 +343,7 @@ class ScenarioTest extends TestCase
             );
 
         $sanitizer = new Sanitizer(
+            $behavior,
             new CommonVisitor($behavior)
         );
         self::assertSame($expectation, $sanitizer->sanitize($payload));
@@ -396,6 +402,7 @@ class ScenarioTest extends TestCase
             );
 
         $sanitizer = new Sanitizer(
+            $behavior,
             new CommonVisitor($behavior)
         );
         self::assertSame($expectation, $sanitizer->sanitize($payload));

@@ -81,7 +81,7 @@ $behavior = (new Behavior())
     );
 
 $visitors = [new CommonVisitor($behavior)];
-$sanitizer = new Sanitizer(...$visitors);
+$sanitizer = new Sanitizer($behavior, ...$visitors);
 
 $html = <<< EOH
 <div id="main">
