@@ -16,6 +16,7 @@ namespace TYPO3\HtmlSanitizer\Tests;
 
 use DOMNode;
 use DOMText;
+use Masterminds\HTML5\Elements;
 use PHPUnit\Framework\TestCase;
 use TYPO3\HtmlSanitizer\Behavior;
 use TYPO3\HtmlSanitizer\Behavior\Attr\UriAttrValueBuilder;
@@ -86,6 +87,21 @@ class ScenarioTest extends TestCase
             ],
             [
                 Behavior\Tag::ALLOW_CHILDREN | Behavior\Tag::PURGE_WITHOUT_CHILDREN,
+                implode("\n", [
+                    '<script></script><script data-test="test"></script>',
+                    '<script>test</script><script data-test="test">test</script>',
+                    '<script><!-- --></script><script data-test="test"><!-- --></script>',
+                    '<script><!-- test --></script><script data-test="test"><!-- test --></script>',
+                ]),
+                implode("\n", [
+                    '',
+                    '<script>test</script><script data-test="test">test</script>',
+                    '<script>&lt;!-- --&gt;</script><script data-test="test">&lt;!-- --&gt;</script>',
+                    '<script>&lt;!-- test --&gt;</script><script data-test="test">&lt;!-- test --&gt;</script>',
+                ]),
+            ],
+            [
+                Behavior\Tag::ALLOW_CHILDREN | Behavior\Tag::PURGE_WITHOUT_CHILDREN | Behavior\Tag::ALLOW_INSECURE_RAW_TEXT,
                 implode("\n", [
                     '<script></script><script data-test="test"></script>',
                     '<script>test</script><script data-test="test">test</script>',
@@ -308,6 +324,46 @@ class ScenarioTest extends TestCase
         self::assertSame($expectation, $sanitizer->sanitize($payload));
     }
 
+    public static function rawTextElementsAreHandledDataProvider(): \Generator
+    {
+        foreach (Elements::$html5 as $name => $flags) {
+            if (($flags & Elements::TEXT_RAW) !== Elements::TEXT_RAW) {
+                continue;
+            }
+            yield $name => [
+                sprintf('<%1$s><any>value</any></%1$s>', $name),
+                sprintf('<%1$s>&lt;any&gt;value&lt;/any&gt;</%1$s>', $name),
+            ];
+        };
+    }
+
+    /**
+     * @test
+     * @dataProvider rawTextElementsAreHandledDataProvider
+     */
+    public function rawTextElementsAreHandled(string $payload, string $expectation): void
+    {
+        $elements = array_filter(
+            Elements::$html5,
+            static function (int $flags) {
+                return ($flags & Elements::TEXT_RAW) === Elements::TEXT_RAW;
+            }
+        );
+        $behavior = (new Behavior())
+            ->withName('scenario-test')
+            ->withTags(...array_map(
+                static function (string $name) {
+                    return new Behavior\Tag($name, Behavior\Tag::ALLOW_CHILDREN);
+                },
+                array_keys($elements)
+            ));
+        $sanitizer = new Sanitizer(
+            $behavior,
+            new CommonVisitor($behavior)
+        );
+        self::assertSame($expectation, $sanitizer->sanitize($payload));
+    }
+
     /**
      * @test
      */
@@ -331,6 +387,7 @@ class ScenarioTest extends TestCase
             // rest is keep, since `type` attr value matches and child content is given
             '8:<script type="application/ld+json">alert(4)</script>',
             '9:<script type="application/ld+json">{"@id": "https://github.com/TYPO3/html-sanitizer"}</script>',
+            '10:<script type="application/ld+json">{{"@type":"Answer","text":"Usually the answer is <b>42</b>."}</script>',
         ]);
         $expectation = implode("\n" , [
             '1:',
@@ -342,6 +399,7 @@ class ScenarioTest extends TestCase
             '7:',
             '8:<script type="application/ld+json">alert(4)</script>',
             '9:<script type="application/ld+json">{"@id": "https://github.com/TYPO3/html-sanitizer"}</script>',
+            '10:<script type="application/ld+json">{{"@type":"Answer","text":"Usually the answer is <b>42</b>."}</script>',
         ]);
 
         $behavior = (new Behavior())
@@ -350,7 +408,8 @@ class ScenarioTest extends TestCase
             ->withTags(
                 (new Behavior\Tag(
                     'script',
-                    Behavior\Tag::PURGE_WITHOUT_ATTRS | Behavior\Tag::PURGE_WITHOUT_CHILDREN | Behavior\Tag::ALLOW_CHILDREN
+                    Behavior\Tag::PURGE_WITHOUT_ATTRS | Behavior\Tag::PURGE_WITHOUT_CHILDREN
+                        | Behavior\Tag::ALLOW_CHILDREN | Behavior\Tag::ALLOW_INSECURE_RAW_TEXT
                 ))->addAttrs(
                     (new Behavior\Attr('id')),
                     (new Behavior\Attr('type', Behavior\Attr::MANDATORY))
