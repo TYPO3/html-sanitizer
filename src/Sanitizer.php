@@ -89,6 +89,13 @@ class Sanitizer
             }
         }
         $this->parser = $this->createParser();
+
+        if (!$this->behavior instanceof Behavior) {
+            trigger_error(
+                'Add `Behavior` when creating new `Sanitizer` instances, e.g. `new Sanitizer($behavior, $visitor)`',
+                E_USER_DEPRECATED
+            );
+        }
     }
 
     public function sanitize(string $html, InitiatorInterface $initiator = null): string
