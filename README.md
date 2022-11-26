@@ -108,11 +108,15 @@ will result in the following sanitized output
 </div>
 ```
 
-### Changes
+### :information_source: Changes
 
 * since `v2.1.0` newly introduced nodes `Behavior\Comment` and  `Behavior\CdataSection` are enabled per
   default for backward compatibility reasons, use e.g. `$behavior->withoutNodes(new Behavior\Comment())`
   to remove them (later versions of this package won't have this fallback anymore)
+* since `v2.1.0` it is suggested to provide a `\TYPO3\HtmlSanitizer\Behavior` when creating a
+  new instance of `\TYPO3\HtmlSanitizer\Sanitizer`, e.g. `new Sanitizer($behavior, ...$visitors)`
+
+Find more details on all changes in [UPGRADING.md](UPGRADING.md).
 
 ### `Behavior` flags
 
