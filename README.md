@@ -132,7 +132,13 @@ In general the TYPO3 core is released under the GNU General Public License versi
 incompatibilities this package is licenced under the MIT License. In case  you
 duplicate or modify source code, credits are not required but really appreciated.
 
+## Local Testing
+
+Composer project [oliverhader/html-sanitizer-demo](https://github.com/ohader/html-sanitizer-demo)
+offers a local development server to ease manual testing for potentially vulnerable XSS payloads.
+
 ## Security Contact
 
-In case of finding additional security issues in the TYPO3 project or in this package  in particular,
-please get in touch with the [TYPO3 Security Team](mailto:security@typo3.org).
+In case of finding additional security issues in the TYPO3 project or in this package in particular,
+please get in touch with the [TYPO3 Security Team](mailto:security@typo3.org), or directly
+[report a vulnerability via GitHub](https://github.com/TYPO3/html-sanitizer/security/advisories/new).
