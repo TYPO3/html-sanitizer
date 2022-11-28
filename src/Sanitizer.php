@@ -18,6 +18,8 @@ use DOMDocumentFragment;
 use DOMNode;
 use DOMNodeList;
 use Masterminds\HTML5;
+use TYPO3\HtmlSanitizer\Serializer\Rules;
+use TYPO3\HtmlSanitizer\Serializer\RulesInterface;
 use TYPO3\HtmlSanitizer\Visitor\VisitorInterface;
 
 /**
@@ -50,6 +52,11 @@ class Sanitizer
     protected $visitors = [];
 
     /**
+     * @var ?Behavior
+     */
+    protected $behavior = null;
+
+    /**
      * @var HTML5
      */
     protected $parser;
@@ -65,10 +72,30 @@ class Sanitizer
      */
     protected $context;
 
-    public function __construct(VisitorInterface ...$visitors)
+    /**
+     * @param Behavior|VisitorInterface[] $items
+     *
+     * @todo use `__construct(Behavior $behavior, VisitorInterface ...$visitors)`
+     * (which would have been a breaking change with a PHP fatal error)
+     */
+    public function __construct(...$items)
     {
-        $this->visitors = $visitors;
+        $this->visitors = [];
+        foreach ($items as $item) {
+            if ($item instanceof VisitorInterface) {
+                $this->visitors[] = $item;
+            } elseif ($item instanceof Behavior && $this->behavior === null) {
+                $this->behavior = $item;
+            }
+        }
         $this->parser = $this->createParser();
+
+        if (!$this->behavior instanceof Behavior) {
+            trigger_error(
+                'Add `Behavior` when creating new `Sanitizer` instances, e.g. `new Sanitizer($behavior, $visitor)`',
+                E_USER_DEPRECATED
+            );
+        }
     }
 
     public function sanitize(string $html, InitiatorInterface $initiator = null): string
@@ -77,7 +104,10 @@ class Sanitizer
         // @todo drop deprecated property
         $this->root = $root;
         $this->handle($root, $initiator);
-        return $this->serialize($root);
+        $rules = $this->createRules($initiator);
+        $serialized = $this->serialize($root, $rules);
+        $this->closeRulesStream($rules);
+        return $serialized;
     }
 
     protected function parse(string $html): DOMDocumentFragment
@@ -94,9 +124,13 @@ class Sanitizer
         return $domNode;
     }
 
-    protected function serialize(DOMNode $document): string
+    /**
+     * Custom implementation of `\Masterminds\HTML5::save` and `\Masterminds\HTML5::saveHTML`.
+     */
+    protected function serialize(DOMNode $domNode, RulesInterface $rules): string
     {
-        return $this->parser->saveHTML($document);
+        $rules->traverse($domNode);
+        return stream_get_contents($rules->getStream(), -1, 0);
     }
 
     protected function beforeTraverse(): void
@@ -162,6 +196,19 @@ class Sanitizer
             $source->parentNode->replaceChild($target, $source);
         }
         return $target;
+    }
+
+    protected function createRules(InitiatorInterface $initiator = null): Rules
+    {
+        $stream = fopen('php://temp', 'wb');
+        return (new Rules($stream, self::mastermindsDefaultOptions))
+            ->withBehavior($this->behavior ?? new Behavior())
+            ->withInitiator($initiator);
+    }
+
+    protected function closeRulesStream(RulesInterface $rules): bool
+    {
+        return fclose($rules->getStream());
     }
 
     protected function createParser(): HTML5
