@@ -36,13 +36,7 @@ jobs:
           find src/ tests/ -name '*.php' -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null
 
       - name: Install dependencies
-        if: ${{ matrix.php <= '8.1' }}
         run: composer install --prefer-dist --no-progress --ansi
-
-      - name: Install dependencies PHP 8.2
-        # @todo: Needed until prophecy (req by phpunit) allows PHP 8.2, https://github.com/phpspec/prophecy/issues/556
-        if: ${{ matrix.php > '8.1' }}
-        run: composer install --prefer-dist --no-progress --ansi --ignore-platform-req=php+
 
       - name: Run test suite
         run: composer run-script test
