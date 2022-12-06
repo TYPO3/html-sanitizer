@@ -33,6 +33,11 @@ use TYPO3\HtmlSanitizer\Context;
 class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
+    
+    /**
+     * @var NullLogger
+     */
+    protected $logger;
 
     /**
      * @var Behavior
