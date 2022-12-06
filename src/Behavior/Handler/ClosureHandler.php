@@ -34,7 +34,14 @@ class ClosureHandler implements HandlerInterface
         $this->closure = $closure;
     }
 
-    public function handle(NodeInterface $node, ?DOMNode $domNode, Context $context, Behavior $behavior = null): ?DOMNode
+    /**
+     * @param NodeInterface $node
+     * @param DOMNode|null $domNode
+     * @param Context $context
+     * @param Behavior|null $behavior
+     * @return DOMNode|null
+     */
+    public function handle(NodeInterface $node, $domNode, Context $context, Behavior $behavior = null)
     {
         $result = call_user_func($this->closure, $node, $domNode, $context, $behavior);
         if ($result !== null && !$result instanceof DOMNode) {

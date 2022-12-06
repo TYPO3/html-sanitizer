@@ -24,7 +24,7 @@ class AttrTest extends TestCase
     /**
      * @test
      */
-    public function withFlagsClonesInstance(): void
+    public function withFlagsClonesInstance()
     {
         $attr = new Attr('test', Attr::BLUNT);
         $modifiedAttr = $attr->withFlags(Attr::MANDATORY);
@@ -36,7 +36,7 @@ class AttrTest extends TestCase
     /**
      * @test
      */
-    public function addValuesKeepsInstance(): void
+    public function addValuesKeepsInstance()
     {
         $valueA = new DatasetAttrValue('a1', 'a2');
         $valueB = new DatasetAttrValue('b1', 'b2');
@@ -48,7 +48,7 @@ class AttrTest extends TestCase
     /**
      * @test
      */
-    public function withValuesKeepsInstanceWhenNotModified(): void
+    public function withValuesKeepsInstanceWhenNotModified()
     {
         $valueA = new DatasetAttrValue('a1', 'a2');
         $valueB = new DatasetAttrValue('b1', 'b2');
@@ -63,7 +63,7 @@ class AttrTest extends TestCase
     /**
      * @test
      */
-    public function withValuesClonesInstanceWhenModified(): void
+    public function withValuesClonesInstanceWhenModified()
     {
         $valueA = new DatasetAttrValue('a1', 'a2');
         $valueB = new DatasetAttrValue('b1', 'b2');
@@ -99,7 +99,7 @@ class AttrTest extends TestCase
      * @test
      * @dataProvider matchesNameDataProvider
      */
-    public function matchesName(int $flags, string $name, string $matchName, bool $expectation): void
+    public function matchesName(int $flags, string $name, string $matchName, bool $expectation)
     {
         $attr = new Attr($name, $flags);
         self::assertSame($expectation, $attr->matchesName($matchName));
@@ -139,7 +139,7 @@ class AttrTest extends TestCase
      * @test
      * @dataProvider matchesValueDataProvider
      */
-    public function matchesValue(int $flags, array $values, string $matchValue, bool $expectation): void
+    public function matchesValue(int $flags, array $values, string $matchValue, bool $expectation)
     {
         $attr = new Attr('test', $flags);
         $attr->addValues(...$values);

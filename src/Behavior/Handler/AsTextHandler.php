@@ -23,7 +23,14 @@ use TYPO3\HtmlSanitizer\Context;
 
 class AsTextHandler implements HandlerInterface
 {
-    public function handle(NodeInterface $node, ?DOMNode $domNode, Context $context, Behavior $behavior = null): ?DOMNode
+    /**
+     * @param NodeInterface $node
+     * @param DOMNode|null $domNode
+     * @param Context $context
+     * @param Behavior|null $behavior
+     * @return DOMNode|null
+     */
+    public function handle(NodeInterface $node, $domNode, Context $context, Behavior $behavior = null)
     {
         if ($domNode === null) {
             return null;

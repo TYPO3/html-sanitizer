@@ -22,21 +22,33 @@ use TYPO3\HtmlSanitizer\Context;
  */
 abstract class AbstractVisitor implements VisitorInterface
 {
-    public function beforeTraverse(Context $context): void
+    /**
+     * @return void
+     */
+    public function beforeTraverse(Context $context)
     {
     }
 
-    public function enterNode(DOMNode $domNode): ?DOMNode
+    /**
+     * @return DOMNode|null
+     */
+    public function enterNode(DOMNode $domNode)
     {
         return $domNode;
     }
 
-    public function leaveNode(DOMNode $domNode): ?DOMNode
+    /**
+     * @return DOMNode|null
+     */
+    public function leaveNode(DOMNode $domNode)
     {
         return $domNode;
     }
 
-    public function afterTraverse(Context $context): void
+    /**
+     * @return void
+     */
+    public function afterTraverse(Context $context)
     {
     }
 }

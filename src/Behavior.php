@@ -27,38 +27,38 @@ class Behavior
     /**
      * not having any behavioral capabilities
      */
-    public const BLUNT = 0;
+    const BLUNT = 0;
 
     /**
      * in case an unexpected tag was found, encode the whole tag as HTML
      */
-    public const ENCODE_INVALID_TAG = 1;
+    const ENCODE_INVALID_TAG = 1;
 
     /**
      * in case an unexpected attribute was found, encode the whole tag as HTML
      */
-    public const ENCODE_INVALID_ATTR = 2;
+    const ENCODE_INVALID_ATTR = 2;
 
     /**
      * remove children at nodes that did not expect children
      */
-    public const REMOVE_UNEXPECTED_CHILDREN = 4;
+    const REMOVE_UNEXPECTED_CHILDREN = 4;
 
     /**
      * https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name
      * custom elements must contain a hyphen (`-`), start with ASCII lower alpha
      */
-    public const ALLOW_CUSTOM_ELEMENTS = 8;
+    const ALLOW_CUSTOM_ELEMENTS = 8;
 
     /**
      * in case an unexpected comment was found, encode the whole comment as HTML
      */
-    public const ENCODE_INVALID_COMMENT = 16;
+    const ENCODE_INVALID_COMMENT = 16;
 
     /**
      * in case an unexpected CDATA section was found, encode the whole CDATA section as HTML
      */
-    public const ENCODE_INVALID_CDATA_SECTION = 32;
+    const ENCODE_INVALID_CDATA_SECTION = 32;
 
     /**
      * @var int
@@ -136,7 +136,7 @@ class Behavior
         $names = array_map([$this, 'getNodeName'], $nodes);
         $filteredNodes = array_filter(
             $this->nodes,
-            static function (?NodeInterface $node, string $name) use ($nodes, $names) {
+            static function ($node, string $name) use ($nodes, $names) {
                 return $node === null && !in_array($name, $names, true)
                     || $node !== null && !in_array($node, $nodes, true);
             },
@@ -173,7 +173,10 @@ class Behavior
         );
     }
 
-    public function getTag(string $name): ?Tag
+    /**
+     * @return Tag|null
+     */
+    public function getTag(string $name)
     {
         $name = strtolower($name);
         $node = $this->nodes[$name] ?? null;
@@ -188,7 +191,10 @@ class Behavior
         return $this->nodes;
     }
 
-    public function getNode(string $name): ?NodeInterface
+    /**
+     * @return NodeInterface|null
+     */
+    public function getNode(string $name)
     {
         $name = strtolower($name);
         return $this->nodes[$name] ?? null;
@@ -231,9 +237,10 @@ class Behavior
 
     /**
      * @param list<string> $names
+     * @return void
      * @throws LogicException
      */
-    protected function assertScalarUniqueness(array $names): void
+    protected function assertScalarUniqueness(array $names)
     {
         $ambiguousNames = array_diff_assoc($names, array_unique($names));
         if ($ambiguousNames !== []) {
@@ -249,8 +256,9 @@ class Behavior
 
     /**
      * @param array<string, NodeInterface> $nodes
+     * @return void
      */
-    protected function assertNodeUniqueness(array $nodes): void
+    protected function assertNodeUniqueness(array $nodes)
     {
         $existingNodeNames = array_intersect_key(array_filter($this->nodes), $nodes);
         if ($existingNodeNames !== []) {

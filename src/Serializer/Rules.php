@@ -76,7 +76,10 @@ class Rules extends OutputRules implements RulesInterface
         return $target;
     }
 
-    public function withInitiator(?InitiatorInterface $initiator): self
+    /**
+     * @param InitiatorInterface|null $initiator
+     */
+    public function withInitiator($initiator): self
     {
         if ($this->initiator === $initiator) {
             return $this;
@@ -86,7 +89,10 @@ class Rules extends OutputRules implements RulesInterface
         return $target;
     }
 
-    public function traverse(DOMNode $domNode): void
+    /**
+     * @return void
+     */
+    public function traverse(DOMNode $domNode)
     {
         $traverser = new Traverser($domNode, $this->out, $this, $this->options);
         $traverser->walk();
