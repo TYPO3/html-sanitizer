@@ -28,7 +28,7 @@ class ScenarioTest extends TestCase
     /**
      * @test
      */
-    public function missingBehaviorTriggersDeprecationError(): void
+    public function missingBehaviorTriggersDeprecationError()
     {
         $this->markTestSkipped('see https://github.com/TYPO3/html-sanitizer/issues/99');
 
@@ -54,7 +54,7 @@ class ScenarioTest extends TestCase
      * @test
      * @dataProvider allTagsAreRemovedOnMissingDeclarationDataProvider
      */
-    public function allTagsAreRemovedOnMissingDeclaration(string $payload, string $expectation): void
+    public function allTagsAreRemovedOnMissingDeclaration(string $payload, string $expectation)
     {
         $behavior = new Behavior();
         $sanitizer = new Sanitizer(
@@ -106,7 +106,7 @@ class ScenarioTest extends TestCase
      * @test
      * @dataProvider tagFlagsAreProcessedDataProvider
      */
-    public function tagFlagsAreProcessed(int $flags, string $payload, string $expectation): void
+    public function tagFlagsAreProcessed(int $flags, string $payload, string $expectation)
     {
         $behavior = (new Behavior())
             ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
@@ -129,7 +129,7 @@ class ScenarioTest extends TestCase
         $node = new Behavior\Tag('div');
         $asTextHandler = new Behavior\Handler\AsTextHandler();
         $closureHandler = new Behavior\Handler\ClosureHandler(
-            static function (NodeInterface $node, ?DOMNode $domNode): ?\DOMNode {
+            static function (NodeInterface $node, $domNode) {
                 if ($domNode === null) {
                     return null;
                 }
@@ -197,7 +197,7 @@ class ScenarioTest extends TestCase
      * @test
      * @dataProvider tagIsHandledDataProcessor
      */
-    public function tagIsHandled(Behavior\NodeHandler $nodeHandler, string $payload, string $expectation): void
+    public function tagIsHandled(Behavior\NodeHandler $nodeHandler, string $payload, string $expectation)
     {
         $behavior = (new Behavior())
             ->withFlags(Behavior::REMOVE_UNEXPECTED_CHILDREN)
@@ -244,7 +244,7 @@ class ScenarioTest extends TestCase
      * @test
      * @dataProvider commentsAreHandledDataProvider
      */
-    public function commentsAreHandled(bool $allowed, int $flags, string $payload, string $expectation): void
+    public function commentsAreHandled(bool $allowed, int $flags, string $payload, string $expectation)
     {
         $behavior = (new Behavior())
             ->withFlags($flags)
@@ -293,7 +293,7 @@ class ScenarioTest extends TestCase
      * @test
      * @dataProvider cdataSectionsAreHandledDataProvider
      */
-    public function cdataSectionsAreHandled(bool $allowed, int $flags, string $payload, string $expectation): void
+    public function cdataSectionsAreHandled(bool $allowed, int $flags, string $payload, string $expectation)
     {
         $behavior = (new Behavior())
             ->withFlags($flags)
@@ -311,7 +311,7 @@ class ScenarioTest extends TestCase
     /**
      * @test
      */
-    public function isJsonLdScriptAllowed(): void
+    public function isJsonLdScriptAllowed()
     {
         $payload = implode("\n" , [
             // tag will be removed due to `PURGE_WITHOUT_ATTRS`
@@ -368,7 +368,7 @@ class ScenarioTest extends TestCase
     /**
      * @test
      */
-    public function iframeSandboxIsAllowed(): void
+    public function iframeSandboxIsAllowed()
     {
         $payload = implode("\n" , [
             '1:<iframe src="https://example.org/"></iframe>',

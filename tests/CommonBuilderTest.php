@@ -272,7 +272,7 @@ class CommonBuilderTest extends TestCase
      * @test
      * @dataProvider isSanitizedDataProvider
      */
-    public function isSanitized(string $payload, string $expectation): void
+    public function isSanitized(string $payload, string $expectation)
     {
         $builder = new CommonBuilder();
         $sanitizer = $builder->build();

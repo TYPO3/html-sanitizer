@@ -24,22 +24,22 @@ class Tag implements NodeInterface
     /**
      * not having any behavioral capabilities
      */
-    public const BLUNT = 0;
+    const BLUNT = 0;
 
     /**
      * whether to purge this tag in case it does not have any attributes
      */
-    public const PURGE_WITHOUT_ATTRS = 1;
+    const PURGE_WITHOUT_ATTRS = 1;
 
     /**
      * whether to purge this tag in case it does not have children
      */
-    public const PURGE_WITHOUT_CHILDREN = 2;
+    const PURGE_WITHOUT_CHILDREN = 2;
 
     /**
      * whether this tag allows to have children
      */
-    public const ALLOW_CHILDREN = 8;
+    const ALLOW_CHILDREN = 8;
 
     /**
      * @var string
@@ -112,7 +112,10 @@ class Tag implements NodeInterface
         return ($this->flags & self::ALLOW_CHILDREN) === self::ALLOW_CHILDREN;
     }
 
-    public function getAttr(string $name): ?Attr
+    /**
+     * @return Attr|null
+     */
+    public function getAttr(string $name)
     {
         $name = strtolower($name);
         if (isset($this->attrs[$name])) {
@@ -128,9 +131,10 @@ class Tag implements NodeInterface
 
     /**
      * @param string[] $names
+     * @return void
      * @throws LogicException
      */
-    protected function assertScalarUniqueness(array $names): void
+    protected function assertScalarUniqueness(array $names)
     {
         $ambiguousNames = array_diff_assoc($names, array_unique($names));
         if ($ambiguousNames !== []) {
@@ -146,9 +150,10 @@ class Tag implements NodeInterface
 
     /**
      * @param array<string, Attr> $attrs
+     * @return void
      * @throws LogicException
      */
-    protected function assertAttrUniqueness(array $attrs): void
+    protected function assertAttrUniqueness(array $attrs)
     {
         $existingAttrNames = [];
         $currentAttrNames = array_keys($this->attrs);

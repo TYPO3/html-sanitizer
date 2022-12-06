@@ -39,7 +39,7 @@ interface VisitorInterface
      * @param DOMNode $domNode
      * @return DOMNode|null
      */
-    public function enterNode(DOMNode $domNode): ?DOMNode;
+    public function enterNode(DOMNode $domNode);
 
     /**
      * Executed when leaving a node level.
@@ -50,7 +50,7 @@ interface VisitorInterface
      * @param DOMNode $domNode
      * @return DOMNode|null
      */
-    public function leaveNode(DOMNode $domNode): ?DOMNode;
+    public function leaveNode(DOMNode $domNode);
 
     /**
      * Executed after having traversed all nodes

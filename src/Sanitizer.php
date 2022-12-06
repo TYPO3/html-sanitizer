@@ -38,7 +38,10 @@ use TYPO3\HtmlSanitizer\Visitor\VisitorInterface;
  */
 class Sanitizer
 {
-    protected const mastermindsDefaultOptions = [
+    /**
+     * @internal
+     */
+    const mastermindsDefaultOptions = [
         // Whether the serializer should aggressively encode all characters as entities.
         'encode_entities' => false,
         // Prevents the parser from automatically assigning the HTML5 namespace to the DOM document.
@@ -63,7 +66,7 @@ class Sanitizer
 
     /**
      * @var DOMDocumentFragment
-     * @deprecated since v2.1.0, not required anymore
+     * @deprecated since v1.5.0, not required anymore
      */
     protected $root;
 
@@ -126,14 +129,20 @@ class Sanitizer
         return stream_get_contents($rules->getStream(), -1, 0);
     }
 
-    protected function beforeTraverse(): void
+    /**
+     * @return void
+     */
+    protected function beforeTraverse()
     {
         foreach ($this->visitors as $visitor) {
             $visitor->beforeTraverse($this->context);
         }
     }
 
-    protected function traverse(DOMNode $domNode): void
+    /**
+     * @return void
+     */
+    protected function traverse(DOMNode $domNode)
     {
         foreach ($this->visitors as $visitor) {
             $result = $visitor->enterNode($domNode);
@@ -161,8 +170,9 @@ class Sanitizer
      * directly removing child nodes, keeping node-list indexes.
      *
      * @param DOMNodeList $domNodeList
+     * @return void
      */
-    protected function traverseNodeList(DOMNodeList $domNodeList): void
+    protected function traverseNodeList(DOMNodeList $domNodeList)
     {
         for ($i = $domNodeList->length - 1; $i >= 0; $i--) {
             /** @var DOMNode $item */
@@ -171,14 +181,21 @@ class Sanitizer
         }
     }
 
-    protected function afterTraverse(): void
+    /**
+     * @return void
+     */
+    protected function afterTraverse()
     {
         foreach ($this->visitors as $visitor) {
             $visitor->afterTraverse($this->context);
         }
     }
 
-    protected function replaceNode(DOMNode $source, ?DOMNode $target): ?DOMNode
+    /**
+     * @param DOMNode|null $target
+     * @return DOMNode|null
+     */
+    protected function replaceNode(DOMNode $source, $target)
     {
         if ($target === null) {
             $source->parentNode->removeChild($source);

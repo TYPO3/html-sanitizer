@@ -39,7 +39,7 @@ class TagTest extends TestCase
      * @test
      * @dataProvider ambiguityIsDetectedDataProvider
      */
-    public function ambiguityIsDetected(array $originalNames, array $additionalNames, int $code = 0): void
+    public function ambiguityIsDetected(array $originalNames, array $additionalNames, int $code = 0)
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionCode($code);

@@ -21,7 +21,7 @@ class EnvironmentTest extends TestCase
     /**
      * @test
      */
-    public function reportsAllErrors(): void
+    public function reportsAllErrors()
     {
         self::assertSame(E_ALL, error_reporting());
     }

@@ -12,6 +12,9 @@ This `typo3/html-sanitizer` package aims to be a standalone component that can b
 project or library. Albeit it is released within the TYPO3 namespace, it is agnostic to specifics of
 [TYPO3 CMS](https://github.com/typo3/typo3).
 
+> :warning: Version 1.5 of `typo3/html-sanitizer` is a transitional version
+> between v1 and v2 to support PHP 7.0 and PHP 7.1.
+
 + [`\TYPO3\HtmlSanitizer\Behavior`](src/Behavior.php) contains declarative settings for
   a particular process for sanitizing HTML.
 + [`\TYPO3\HtmlSanitizer\Visitor\VisitorInterface`](src/Visitor/VisitorInterface.php)

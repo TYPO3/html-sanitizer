@@ -50,7 +50,10 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         $this->behavior = $behavior;
     }
 
-    public function beforeTraverse(Context $context): void
+    /**
+     * @return void
+     */
+    public function beforeTraverse(Context $context)
     {
         $this->context = $context;
         // v2.1.0: adding `#comment` and `#cdata-section` nodes for backward compatibility, will be removed with v3.0.0
@@ -62,7 +65,10 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         }
     }
 
-    public function enterNode(DOMNode $domNode): ?DOMNode
+    /**
+     * @return DOMNode|null
+     */
+    public function enterNode(DOMNode $domNode)
     {
         if (!$domNode instanceof DOMCdataSection
             && !$domNode instanceof DOMComment
@@ -92,7 +98,11 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         return $domNode;
     }
 
-    protected function enterDomElement(?DOMNode $domNode, Behavior\NodeInterface $node): ?DOMNode
+    /**
+     * @param DOMNode|null $domNode
+     * @return DOMNode|null
+     */
+    protected function enterDomElement($domNode, Behavior\NodeInterface $node)
     {
         if (!$domNode instanceof DOMElement || !$node instanceof Behavior\Tag) {
             return $domNode;
@@ -106,7 +116,10 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         return $this->handleMandatoryAttributes($domNode, $node);
     }
 
-    public function leaveNode(DOMNode $domNode): ?DOMNode
+    /**
+     * @return DOMNode|null
+     */
+    public function leaveNode(DOMNode $domNode)
     {
         if (!$domNode instanceof DOMElement) {
             return $domNode;
@@ -127,7 +140,11 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         return $domNode;
     }
 
-    protected function processAttributes(?DOMNode $domNode, Behavior\Tag $tag): ?DOMNode
+    /**
+     * @param DOMNode|null $domNode
+     * @return DOMNode|null
+     */
+    protected function processAttributes($domNode, Behavior\Tag $tag)
     {
         if (!$domNode instanceof DOMElement) {
             return $domNode;
@@ -146,7 +163,11 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         return $domNode;
     }
 
-    protected function processChildren(?DOMNode $domNode, Behavior\Tag $tag): ?DOMNode
+    /**
+     * @param DOMNode|null $domNode
+     * @return DOMNode|null
+     */
+    protected function processChildren($domNode, Behavior\Tag $tag)
     {
         if (!$domNode instanceof DOMElement) {
             return $domNode;
@@ -171,9 +192,10 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
     }
 
     /**
+     * @return void
      * @throws Behavior\NodeException
      */
-    protected function processAttribute(DOMElement $domNode, Behavior\Tag $tag, DOMAttr $attribute): void
+    protected function processAttribute(DOMElement $domNode, Behavior\Tag $tag, DOMAttr $attribute)
     {
         $name = strtolower($attribute->name);
         $attr = $tag->getAttr($name);
@@ -187,7 +209,11 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         }
     }
 
-    protected function handleMandatoryAttributes(?DOMNode $domNode, Behavior\Tag $tag): ?DOMNode
+    /**
+     * @param DOMNode|null $domNode
+     * @return DOMNode|null
+     */
+    protected function handleMandatoryAttributes($domNode, Behavior\Tag $tag)
     {
         if (!$domNode instanceof DOMElement) {
             return $domNode;
@@ -205,7 +231,10 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         return $domNode;
     }
 
-    protected function handleInvalidNode(DOMNode $domNode): ?DOMNode
+    /**
+     * @return DOMNode|null
+     */
+    protected function handleInvalidNode(DOMNode $domNode)
     {
         if ($domNode instanceof DOMComment && $this->behavior->shallEncodeInvalidComment()) {
             return $this->convertToText($domNode);
@@ -234,9 +263,10 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
     }
 
     /**
+     * @return void
      * @throws Behavior\NodeException
      */
-    protected function handleInvalidAttr(DOMNode $domNode, string $name): void
+    protected function handleInvalidAttr(DOMNode $domNode, string $name)
     {
         if ($this->behavior->shallEncodeInvalidAttr()) {
             throw Behavior\NodeException::create()->withDomNode($this->convertToText($domNode));
@@ -291,7 +321,10 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
             && preg_match('#^[a-z][a-z0-9]*-.+#', $domNode->nodeName) > 0;
     }
 
-    protected function log(string $message, array $context = [], $level = null): void
+    /**
+     * @return void
+     */
+    protected function log(string $message, array $context = [], $level = null)
     {
         // @todo consider given minimum log-level
         if (!isset($context['initiator'])) {

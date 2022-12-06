@@ -19,12 +19,12 @@ class NodeHandler implements NodeInterface
     /**
      * Whether defaults shall be processed (e.g. verifying all attributes etc.)
      */
-    public const PROCESS_DEFAULTS = 1;
+    const PROCESS_DEFAULTS = 1;
 
     /**
      * Whether this handler shall be processed first (before processing defaults)
      */
-    public const HANDLE_FIRST = 2;
+    const HANDLE_FIRST = 2;
 
     /**
      * @var NodeInterface

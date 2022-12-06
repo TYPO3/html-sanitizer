@@ -27,11 +27,15 @@ interface RulesInterface extends MastermindsRulesInterface
     public function withBehavior(Behavior $behavior);
 
     /**
+     * @param InitiatorInterface|null $initiator
      * @return self
      */
-    public function withInitiator(?InitiatorInterface $initiator);
+    public function withInitiator($initiator);
 
-    public function traverse(DOMNode $domNode): void;
+    /**
+     * @return void
+     */
+    public function traverse(DOMNode $domNode);
 
     /**
      * @return resource

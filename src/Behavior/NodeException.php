@@ -29,30 +29,38 @@ class NodeException extends RuntimeException
      */
     protected $domNode;
 
-    public function withDomNode(?DOMNode $domNode): self
+    /**
+     * @param DOMNode|null $domNode
+     */
+    public function withDomNode($domNode): self
     {
         $this->domNode = $domNode;
         return $this;
     }
 
     /**
-     * @deprecated since v2.1.0, use withDomNode(?DOMNode $domNode) instead
+     * @param DOMNode|null $domNode
+     * @deprecated since v1.5.0, use withDomNode(?DOMNode $domNode) instead
      */
-    public function withNode(?DOMNode $domNode): self
+    public function withNode($domNode): self
     {
         $this->domNode = $domNode;
         return $this;
     }
 
-    public function getDomNode(): ?DOMNode
+    /**
+     * @return DOMNode|null
+     */
+    public function getDomNode()
     {
         return $this->domNode;
     }
 
     /**
-     * @deprecated since v2.1.0, use getDomNode() instead
+     * @return DOMNode|null
+     * @deprecated since v1.5.0, use getDomNode() instead
      */
-    public function getNode(): ?DOMNode
+    public function getNode()
     {
         return $this->domNode;
     }

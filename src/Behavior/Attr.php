@@ -22,13 +22,13 @@ class Attr
     /**
      * not having any behavioral capabilities
      */
-    public const BLUNT = 0;
+    const BLUNT = 0;
 
     /**
      * whether given name shall be considered as prefix, e.g.
      * `data-` or `aria-` for multiple similar and safe attribute names
      */
-    public const NAME_PREFIX = 1;
+    const NAME_PREFIX = 1;
 
     /**
      * whether the first match in `$values` shall be considered
@@ -37,19 +37,19 @@ class Attr
      *
      * @deprecated since version 2.0.13 (it is the default behavior now)
      */
-    public const MATCH_FIRST_VALUE = 2;
+    const MATCH_FIRST_VALUE = 2;
 
     /**
      * whether all `$values` shall be considered as indicator an
      * attribute value is valid - if this flag is not given, the
      * first match in `$values` is taken
      */
-    public const MATCH_ALL_VALUES = 4;
+    const MATCH_ALL_VALUES = 4;
 
     /**
      * whether the current attribute is mandatory for the tag
      */
-    public const MANDATORY = 8;
+    const MANDATORY = 8;
 
     /**
      * either specific attribute name (`class`) or a prefix
