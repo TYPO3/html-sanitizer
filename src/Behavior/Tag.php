@@ -42,6 +42,12 @@ class Tag implements NodeInterface
     public const ALLOW_CHILDREN = 8;
 
     /**
+     * whether this tag is allowed to be serialized as raw text (e.g. for `<script>` elements)
+     * see https://html.spec.whatwg.org/multipage/syntax.html#raw-text-elements
+     */
+    public const ALLOW_INSECURE_RAW_TEXT = 16;
+
+    /**
      * @var string
      */
     protected $name;
@@ -110,6 +116,11 @@ class Tag implements NodeInterface
     public function shallAllowChildren(): bool
     {
         return ($this->flags & self::ALLOW_CHILDREN) === self::ALLOW_CHILDREN;
+    }
+
+    public function shallAllowInsecureRawText(): bool
+    {
+        return ($this->flags & self::ALLOW_INSECURE_RAW_TEXT) === self::ALLOW_INSECURE_RAW_TEXT;
     }
 
     public function getAttr(string $name): ?Attr

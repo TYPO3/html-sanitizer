@@ -14,7 +14,10 @@ declare(strict_types=1);
 
 namespace TYPO3\HtmlSanitizer\Serializer;
 
+use DOMCharacterData;
+use DOMElement;
 use DOMNode;
+use Masterminds\HTML5\Elements;
 use Masterminds\HTML5\Serializer\OutputRules;
 use Masterminds\HTML5\Serializer\Traverser;
 use TYPO3\HtmlSanitizer\Behavior;
@@ -106,5 +109,84 @@ class Rules extends OutputRules implements RulesInterface
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    public function element($domNode): void
+    {
+        if (!$domNode instanceof DOMElement) {
+            return;
+        }
+        // process non-raw-text elements and `<svg>` or `<math>` elements as usual
+        if (!$this->isRawText($domNode)
+            || in_array($this->resolveNodeName($domNode), ['svg', 'math'], true)
+        ) {
+            parent::element($domNode);
+            return;
+        }
+
+        $this->openTag($domNode);
+        if ($this->shallAllowInsecureRawText($domNode)) {
+            // the potentially insecure case, not encoding node data
+            foreach ($domNode->childNodes as $child) {
+                if ($child instanceof DOMCharacterData) {
+                    $this->wr($child->data);
+                } elseif ($child instanceof DOMElement) {
+                    $this->element($child);
+                }
+            }
+        } elseif ($domNode->hasChildNodes()) {
+            // enforce encoding for those raw text elements (different to original implementation)
+            $this->traverser->children($domNode->childNodes);
+        }
+        if (!$this->isVoid($domNode)) {
+            $this->closeTag($domNode);
+        }
+    }
+
+    public function text($domNode): void
+    {
+        if (!$domNode instanceof DOMNode) {
+            return;
+        }
+        // @todo if allowed as text raw element
+        $parentDomNode = $domNode->parentNode ?? null;
+        if (!$this->isRawText($parentDomNode) || !$this->shallAllowInsecureRawText($parentDomNode)) {
+            $this->wr($this->enc($domNode->data));
+            return;
+        }
+        // the potentially insecure case, not encoding node data
+        $this->wr($domNode->data);
+    }
+
+    /**
+     * If the element has a declared namespace in the HTML, MathML or
+     * SVG namespaces, we use the localName instead of the tagName.
+     */
+    protected function resolveNodeName(DOMElement $domNode): string
+    {
+        return $this->traverser->isLocalElement($domNode) ? $domNode->localName : $domNode->tagName;
+    }
+
+    protected function shallAllowInsecureRawText(?DOMNode $domNode): bool
+    {
+        if (!$domNode instanceof DOMNode || !$this->behavior instanceof Behavior) {
+            return false;
+        }
+        $tag = $this->behavior->getTag($domNode->nodeName);
+        return $tag instanceof Behavior\Tag && $tag->shallAllowInsecureRawText();
+    }
+
+    protected function isRawText(?DOMNode $domNode): bool
+    {
+        return $domNode instanceof DOMNode
+            && !empty($domNode->tagName)
+            && Elements::isA($domNode->localName, Elements::TEXT_RAW);
+    }
+
+    protected function isVoid(?DOMNode $domNode): bool
+    {
+        return $domNode instanceof DOMNode
+            && !empty($domNode->tagName)
+            && Elements::isA($domNode->localName, Elements::VOID_TAG);
     }
 }
