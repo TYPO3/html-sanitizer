@@ -4,11 +4,11 @@
 
 The following matrix shows the versions that are currently maintained.
 
-| Version  | Supported          |
-|----------| ------------------ |
-| 2.x      | :white_check_mark: |
-| 1.5.x    | :white_check_mark  |
-| < 1.5.0  | :x:                |
+| Version | Supported          |
+|---------|--------------------|
+| 2.x     | :white_check_mark: |
+| 1.5.x   | :white_check_mark: |
+| < 1.5.0 | :x:                |
 
 ## Reporting a Vulnerability
 
