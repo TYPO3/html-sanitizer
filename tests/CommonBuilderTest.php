@@ -257,11 +257,35 @@ class CommonBuilderTest extends TestCase
             ],
             '#910' => [
                 '<![CDATA[ #cdata ]]>',
-                '<![CDATA[ #cdata ]]>',
+                '#cdata',
             ],
             '#911' => [
                 '#text',
                 '#text',
+            ],
+            '#921' => [
+                '<![CDATA[<any><span data-value="value"></any>*/]]>',
+                '&lt;any&gt;&lt;span data-value="value"&gt;&lt;/any&gt;*/',
+            ],
+            '#930' => [
+                '<br><any>value</any></br>',
+                '<br>&lt;any&gt;value&lt;/any&gt;<br>',
+            ],
+            '#931' => [
+                '<hr><any>value</any></hr>',
+                '<hr>&lt;any&gt;value&lt;/any&gt;',
+            ],
+            '#932' => [
+                '<wbr><any>value</any></wbr>',
+                '<wbr>&lt;any&gt;value&lt;/any&gt;',
+            ],
+            '#933' => [
+                '<source><any>value</any></source>',
+                '<source>&lt;any&gt;value&lt;/any&gt;',
+            ],
+            '#934' => [
+                '<img src="/typo3.org/logo.svg"><any>value</any></img>',
+                '<img src="/typo3.org/logo.svg">&lt;any&gt;value&lt;/any&gt;',
             ],
         ];
     }
