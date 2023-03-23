@@ -73,7 +73,7 @@ class Sanitizer
     protected $context;
 
     /**
-     * @param Behavior|VisitorInterface[] $items
+     * @param Behavior|VisitorInterface ...$items
      *
      * @todo use `__construct(Behavior $behavior, VisitorInterface ...$visitors)`
      * (which would have been a breaking change with a PHP fatal error)
