@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace TYPO3\HtmlSanitizer;
 
 use LogicException;
+use TYPO3\HtmlSanitizer\Behavior\CdataSection;
+use TYPO3\HtmlSanitizer\Behavior\Comment;
 use TYPO3\HtmlSanitizer\Behavior\NodeInterface;
 use TYPO3\HtmlSanitizer\Behavior\Tag;
 
@@ -74,11 +76,16 @@ class Behavior
      * Node names as array index, e.g. `['strong' => new Tag('strong', '#comment' => new Comment()]`
      * @var array<string, ?NodeInterface>
      */
-    protected $nodes = [
+    protected $nodes = [];
+
+    public function __construct()
+    {
         // v2.1.0: adding `#comment` and `#cdata-section` hints for backward compatibility, will be removed with v3.0.0
-        '#comment' => null,
-        '#cdata-section' => null,
-    ];
+        $this->nodes = array_merge($this->nodes, [
+            '#comment' => new Comment(),
+            '#cdata-section' => new CdataSection(),
+        ]);
+    }
 
     public function withFlags(int $flags): self
     {
@@ -125,7 +132,6 @@ class Behavior
         if (!is_array($indexedNodes)) {
             return $this;
         }
-        $this->assertNodeUniqueness($indexedNodes);
         $target = clone $this;
         $target->nodes = array_merge($target->nodes, $indexedNodes);
         return $target;
@@ -136,9 +142,8 @@ class Behavior
         $names = array_map([$this, 'getNodeName'], $nodes);
         $filteredNodes = array_filter(
             $this->nodes,
-            static function (?NodeInterface $node, string $name) use ($nodes, $names) {
-                return $node === null && !in_array($name, $names, true)
-                    || $node !== null && !in_array($node, $nodes, true);
+            static function (NodeInterface $node, string $name) use ($nodes, $names) {
+                return !in_array($name, $names, true) && !in_array($node, $nodes, true);
             },
             ARRAY_FILTER_USE_BOTH
         );
@@ -243,23 +248,6 @@ class Behavior
                     implode(', ', $ambiguousNames)
                 ),
                 1625591503
-            );
-        }
-    }
-
-    /**
-     * @param array<string, NodeInterface> $nodes
-     */
-    protected function assertNodeUniqueness(array $nodes): void
-    {
-        $existingNodeNames = array_intersect_key(array_filter($this->nodes), $nodes);
-        if ($existingNodeNames !== []) {
-            throw new LogicException(
-                sprintf(
-                    'Cannot redeclare node names %s. Remove duplicates first',
-                    implode(', ', array_keys($existingNodeNames))
-                ),
-                1625391217
             );
         }
     }

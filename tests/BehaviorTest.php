@@ -24,7 +24,6 @@ class BehaviorTest extends TestCase
     public function ambiguityIsDetectedDataProvider(): array
     {
         return [
-            [ ['same'], ['same'], 1625391217 ],
             [ ['same', 'same'], [], 1625591503 ],
             [ ['same', 'same'], ['same'], 1625591503 ],
             [ [], ['same', 'same'], 1625591503 ],

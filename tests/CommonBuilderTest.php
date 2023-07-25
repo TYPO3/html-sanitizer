@@ -256,12 +256,20 @@ class CommonBuilderTest extends TestCase
                 '<!-- #comment -->',
             ],
             '#910' => [
-                '<![CDATA[ #cdata ]]>',
-                '#cdata',
+                '<!-- <"comment"> -->',
+                '<!-- &lt;&quot;comment&quot;&gt; -->',
             ],
             '#911' => [
+                '<!-- &lt;&quot;comment&quot;&gt; -->',
+                '<!-- &lt;&quot;comment&quot;&gt; -->',
+            ],
+            '#915' => [
                 '#text',
                 '#text',
+            ],
+            '#920' => [
+                '<![CDATA[ #cdata ]]>',
+                '#cdata',
             ],
             '#921' => [
                 '<![CDATA[<any><span data-value="value"></any>*/]]>',
@@ -286,6 +294,14 @@ class CommonBuilderTest extends TestCase
             '#934' => [
                 '<img src="/typo3.org/logo.svg"><any>value</any></img>',
                 '<img src="/typo3.org/logo.svg">&lt;any&gt;value&lt;/any&gt;',
+            ],
+            '#935' => [
+                '<p class="</p><script>alert(1)">value</p>',
+                '<p class="&lt;/p&gt;&lt;script&gt;alert(1)">value</p>',
+            ],
+            '#936' => [
+                '<p class="{&quot;json&quot;:true}">value</p>',
+                '<p class="{&quot;json&quot;:true}">value</p>',
             ],
         ];
     }

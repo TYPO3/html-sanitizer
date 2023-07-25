@@ -86,6 +86,9 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
             if (!$node->shallHandleFirst()) {
                 $domNode = $node->getHandler()->handle($node->getNode(), $domNode, $this->context, $this->behavior);
             }
+        } elseif ($node instanceof Behavior\HandlerInterface) {
+            $domNode = $node->handle($node, $domNode, $this->context, $this->behavior);
+            $domNode = $domNode instanceof DOMElement ? $this->enterDomElement($domNode, $node) : $domNode;
         } elseif ($domNode instanceof DOMElement) {
             $domNode = $this->enterDomElement($domNode, $node);
         }
