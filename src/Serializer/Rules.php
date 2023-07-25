@@ -187,10 +187,6 @@ class Rules extends OutputRules implements RulesInterface
                 // we rather want to treat it as pure text, that is *always* to be encoded.
                 true
             );
-            // htmlspecialchars does escaping, but it doesn't match the requirements of
-            // HTML5 section 8.3 to ecape non breaking spaces
-            // https://www.w3.org/TR/2013/CR-html5-20130806/syntax.html#escapingString
-            $value = implode('&nbsp;', mb_split("\xc2\xa0", $value));
             return $value;
         }
         return parent::enc($text, $attribute);
