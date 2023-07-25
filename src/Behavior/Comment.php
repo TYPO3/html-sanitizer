@@ -14,13 +14,36 @@ declare(strict_types=1);
 
 namespace TYPO3\HtmlSanitizer\Behavior;
 
+use DOMComment;
+use DOMNode;
+use TYPO3\HtmlSanitizer\Behavior;
+use TYPO3\HtmlSanitizer\Context;
+
 /**
  * Model of comment node.
  */
-class Comment implements NodeInterface
+class Comment implements NodeInterface, HandlerInterface
 {
+    /**
+     * @var bool
+     */
+    protected $secure = true;
+
+    public function __construct(bool $secure = true)
+    {
+        $this->secure = $secure;
+    }
+
     public function getName(): string
     {
         return '#comment';
+    }
+
+    public function handle(NodeInterface $node, $domNode, Context $context, Behavior $behavior = null)
+    {
+        if (!$this->secure || $domNode === null) {
+            return $domNode;
+        }
+        return new DOMComment(htmlspecialchars($domNode->textContent, ENT_QUOTES, 'UTF-8', false));
     }
 }

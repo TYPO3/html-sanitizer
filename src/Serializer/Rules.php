@@ -46,6 +46,11 @@ class Rules extends OutputRules implements RulesInterface
     protected $initiator;
 
     /**
+     * @var bool
+     */
+    protected $encodeAttributes;
+
+    /**
      * @param Behavior $behavior
      * @param resource$output
      * @param array $options
@@ -66,6 +71,7 @@ class Rules extends OutputRules implements RulesInterface
     public function __construct($output, $options = [])
     {
         $this->options = (array)$options;
+        $this->encodeAttributes = !empty($options['encode_attributes']);
         parent::__construct($output, $this->options);
     }
 
@@ -162,6 +168,32 @@ class Rules extends OutputRules implements RulesInterface
         }
         // the potentially insecure case, not encoding node data
         $this->wr($domNode->data);
+    }
+
+    protected function enc($text, $attribute = false): string
+    {
+        if ($attribute && $this->encodeAttributes && !$this->encode) {
+            // In contrast to parent::enc() (when $this->encode is true),
+            // we are using htmlspecialchars() instead of htmlentities() as
+            // colons and slashes do not need to be aggressively escaped.
+            $value = htmlspecialchars(
+                $text,
+                ENT_HTML5 | ENT_SUBSTITUTE | ENT_QUOTES,
+                'UTF-8',
+                // $double_encode: true
+                // (name is misleading, it actually means: disable-automagic/always-encode)
+                // Our input is always entity decoded by the parser and we do not
+                // want to consider our input to possibly contain valid entities
+                // we rather want to treat it as pure text, that is *always* to be encoded.
+                true
+            );
+            // htmlspecialchars does escaping, but it doesn't match the requirements of
+            // HTML5 section 8.3 to ecape non breaking spaces
+            // https://www.w3.org/TR/2013/CR-html5-20130806/syntax.html#escapingString
+            $value = implode('&nbsp;', mb_split("\xc2\xa0", $value));
+            return $value;
+        }
+        return parent::enc($text, $attribute);
     }
 
     /**

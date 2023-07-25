@@ -231,23 +231,41 @@ class ScenarioTest extends TestCase
         return [
             'not allowed' => [
                 false,
+                null,
                 Behavior::BLUNT,
                 '<div><!-- before -->test<!-- after --></div>',
                 '<div>test</div>'
             ],
-            'allowed' => [
+            'allowed, insecure' => [
+                true,
+                false,
+                Behavior::BLUNT,
+                '<div><!-- before -->test<!-- after --></div>',
+                '<div><!-- before -->test<!-- after --></div>'
+            ],
+            'allowed, secure' => [
+                true,
                 true,
                 Behavior::BLUNT,
                 '<div><!-- before -->test<!-- after --></div>',
                 '<div><!-- before -->test<!-- after --></div>'
             ],
-            'not allowed, encoded' => [
+            'not allowed, encode invalid' => [
                 false,
+                null,
                 Behavior::ENCODE_INVALID_COMMENT,
                 '<div><!-- before -->test<!-- after --></div>',
                 '<div>&lt;!-- before --&gt;test&lt;!-- after --&gt;</div>',
             ],
-            'allowed, encoded' => [
+            'allowed, insecure, encode invalid' => [
+                true,
+                false,
+                Behavior::ENCODE_INVALID_COMMENT,
+                '<div><!-- before -->test<!-- after --></div>',
+                '<div><!-- before -->test<!-- after --></div>'
+            ],
+            'allowed, secure, encode invalid' => [
+                true,
                 true,
                 Behavior::ENCODE_INVALID_COMMENT,
                 '<div><!-- before -->test<!-- after --></div>',
@@ -260,13 +278,13 @@ class ScenarioTest extends TestCase
      * @test
      * @dataProvider commentsAreHandledDataProvider
      */
-    public function commentsAreHandled(bool $allowed, int $flags, string $payload, string $expectation)
+    public function commentsAreHandled(bool $allowed, bool $secure = null, int $flags, string $payload, string $expectation)
     {
         $behavior = (new Behavior())
             ->withFlags($flags)
             ->withName('scenario-test')
             ->withTags(new Behavior\Tag('div', Behavior\Tag::ALLOW_CHILDREN));
-        $comment = new Behavior\Comment();
+        $comment = new Behavior\Comment($secure ?? true);
         $behavior = $allowed ? $behavior->withNodes($comment) : $behavior->withoutNodes($comment);
         $sanitizer = new Sanitizer(
             $behavior,
@@ -280,27 +298,45 @@ class ScenarioTest extends TestCase
         return [
             'not allowed' => [
                 false,
+                null,
                 Behavior::BLUNT,
-                '<div><![CDATA[ before ]]>test<![CDATA[ after ]]></div>',
-                '<div>test</div>'
+                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
+                '<div>.test.</div>'
             ],
-            'allowed' => [
+            'allowed, insecure' => [
+                true,
+                false,
+                Behavior::BLUNT,
+                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
+                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>'
+            ],
+            'allowed, secure' => [
+                true,
                 true,
                 Behavior::BLUNT,
-                '<div><![CDATA[ before ]]>test<![CDATA[ after ]]></div>',
-                '<div><![CDATA[ before ]]>test<![CDATA[ after ]]></div>'
+                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
+                '<div>before.test.after</div>'
             ],
-            'not allowed, encoded' => [
+            'not allowed, encode invalid' => [
+                false,
+                null,
+                Behavior::ENCODE_INVALID_CDATA_SECTION,
+                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
+                '<div>&lt;![CDATA[ before ]]&gt;.test.&lt;![CDATA[ after ]]&gt;</div>',
+            ],
+            'allowed, insecure, encode invalid' => [
+                true,
                 false,
                 Behavior::ENCODE_INVALID_CDATA_SECTION,
-                '<div><![CDATA[ before ]]>test<![CDATA[ after ]]></div>',
-                '<div>&lt;![CDATA[ before ]]&gt;test&lt;![CDATA[ after ]]&gt;</div>',
+                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
+                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>'
             ],
-            'allowed, encoded' => [
+            'allowed, secure, encode invalid' => [
+                true,
                 true,
                 Behavior::ENCODE_INVALID_CDATA_SECTION,
-                '<div><![CDATA[ before ]]>test<![CDATA[ after ]]></div>',
-                '<div><![CDATA[ before ]]>test<![CDATA[ after ]]></div>'
+                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
+                '<div>before.test.after</div>'
             ],
         ];
     }
@@ -309,13 +345,13 @@ class ScenarioTest extends TestCase
      * @test
      * @dataProvider cdataSectionsAreHandledDataProvider
      */
-    public function cdataSectionsAreHandled(bool $allowed, int $flags, string $payload, string $expectation)
+    public function cdataSectionsAreHandled(bool $allowed, bool $secure = null, int $flags, string $payload, string $expectation)
     {
         $behavior = (new Behavior())
             ->withFlags($flags)
             ->withName('scenario-test')
             ->withTags(new Behavior\Tag('div', Behavior\Tag::ALLOW_CHILDREN));
-        $cdataSection = new Behavior\CdataSection();
+        $cdataSection = new Behavior\CdataSection($secure ?? true);
         $behavior = $allowed ? $behavior->withNodes($cdataSection) : $behavior->withoutNodes($cdataSection);
         $sanitizer = new Sanitizer(
             $behavior,
@@ -473,6 +509,138 @@ class ScenarioTest extends TestCase
                     (new Behavior\Attr('src'))->withValues(
                         ...(new UriAttrValueBuilder())->allowSchemes('http', 'https')->getValues()
                     )
+                )
+            );
+
+        $sanitizer = new Sanitizer(
+            $behavior,
+            new CommonVisitor($behavior)
+        );
+        self::assertSame($expectation, $sanitizer->sanitize($payload));
+    }
+
+    public static function attributesAreEncodedDataProvider(): \Generator
+    {
+        yield 'preserve entities' => [
+	        '<a title="Insert &amp;"></a>',
+	        '<a title="Insert &amp;"></a>',
+        ];
+        yield 'encode single quotes' => [
+	        '<a title="\'"></a>',
+	        '<a title="&apos;"></a>',
+        ];
+        yield 'encode single quotes from entity' => [
+	        '<a title="&#039;"></a>',
+	        '<a title="&apos;"></a>',
+        ];
+        yield 'encode double quotes' => [
+	        "<a title='" . '"' . "'></a>",
+	        '<a title="&quot;"></a>',
+        ];
+        yield 'preserve double quote encoding' => [
+	        '<a title="&quot;"></a>',
+	        '<a title="&quot;"></a>',
+        ];
+        yield 'preserve double encoded entities' => [
+	        '<a title="Insert &amp;amp; to write an &amp;"></a>',
+	        '<a title="Insert &amp;amp; to write an &amp;"></a>',
+        ];
+        yield 'preserve URLs without "agressive" entity encoding' => [
+	        '<a title="https://example.com/"></a>',
+	        '<a title="https://example.com/"></a>',
+        ];
+        yield 'encode tag specifiers' => [
+            '<a id="</noscript><script>alert(1)</script>"></a>',
+            '<a id="&lt;/noscript&gt;&lt;script&gt;alert(1)&lt;/script&gt;"></a>',
+        ];
+        // Invalid input seems to be removed during parsing step (where?)
+        // therefore ENT_SUBSTITUTE can not operate during serialization
+        // @todo: check masterminds/html5-php whether that behavior is
+        // intended
+        //yield 'substitute invalid unicode in attributes' => [
+        //    "<a title='Hello \x80, Good morning'></a>",
+        //    "<a title='Hello \xEF\xBF\xBD, Good morning'></a>",
+        //];
+        yield 'escape non breaking space' => [
+            "<a title='Hello\xc2\xa0World'></a>",
+            '<a title="Hello&nbsp;World"></a>',
+        ];
+        yield 'encodes json values' => [
+            "<div data-value='{\"Hello\":[{\"w\":\"o\",\"r\":\"ld\"}]}'></a>",
+            '<div data-value="{&quot;Hello&quot;:[{&quot;w&quot;:&quot;o&quot;,&quot;r&quot;:&quot;ld&quot;}]}"></div>'
+        ];
+        yield 'encodes json values containing html' => [
+            "<div data-value='{\"Hello\":\"&lt;span&gt;World&lt;\/span&gt;\"}'></div>",
+            '<div data-value="{&quot;Hello&quot;:&quot;&lt;span&gt;World&lt;\/span&gt;&quot;}"></div>'
+        ];
+
+    }
+
+    /**
+     * @test
+     * @dataProvider attributesAreEncodedDataProvider
+     */
+    public function attributesAreEncoded(string $payload, string $expectation)
+    {
+        $behavior = (new Behavior())
+            ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withName('scenario-test')
+            ->withTags(
+                (new Behavior\Tag('a', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(
+                    new Behavior\Attr('id'),
+                    new Behavior\Attr('title')
+                ),
+                (new Behavior\Tag('div', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(
+                    new Behavior\Attr('data-value')
+                )
+            );
+
+        $sanitizer = new Sanitizer(
+            $behavior,
+            new CommonVisitor($behavior)
+        );
+        self::assertSame($expectation, $sanitizer->sanitize($payload));
+    }
+
+    public static function specialTagsAreHandledDataProvider(): \Generator
+    {
+        yield 'noscript attribute' => [
+            '<noscript><p id="</noscript><script>alert(1)</script>"></p>',
+            '<noscript><p id="&lt;/noscript&gt;&lt;script&gt;alert(1)&lt;/script&gt;"></p></noscript>',
+        ];
+        yield 'noscript namespaced attribute' => [
+            '<noscript><p test:id="</noscript><script>alert(1)</script>"></p>',
+            '<noscript><p test:id="&lt;/noscript&gt;&lt;script&gt;alert(1)&lt;/script&gt;"></p></noscript>',
+        ];
+        yield 'noscript comment' => [
+            '<noscript><!--</noscript><script>alert(2)</script>--></noscript>',
+            '<noscript><!--&lt;/noscript&gt;&lt;script&gt;alert(2)&lt;/script&gt;--></noscript>',
+        ];
+        yield 'noscript raw text' => [
+            '<noscript><style></noscript><script>alert(3)</script>',
+            '<noscript><style>&lt;/noscript&gt;&lt;script&gt;alert(3)&lt;/script&gt;</style></noscript>',
+        ];
+        yield 'noscript event attribute' => [
+            '<noscript><p onmouseover="alert(4)">value</p></noscript>',
+            '<noscript><p>value</p></noscript>',
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider specialTagsAreHandledDataProvider
+     */
+    public function specialTagsAreHandled(string $payload, string $expectation)
+    {
+        $behavior = (new Behavior())
+            ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withName('scenario-test')
+            ->withTags(
+                (new Behavior\Tag('style', Behavior\Tag::ALLOW_CHILDREN)),
+                (new Behavior\Tag('noscript', Behavior\Tag::ALLOW_CHILDREN)),
+                (new Behavior\Tag('p', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(
+                    new Behavior\Attr('id'),
+                    new Behavior\Attr('test:id')
                 )
             );
 
