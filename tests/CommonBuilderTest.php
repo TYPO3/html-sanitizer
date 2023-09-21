@@ -263,6 +263,14 @@ class CommonBuilderTest extends TestCase
                 '<!-- &lt;&quot;comment&quot;&gt; -->',
                 '<!-- &lt;&quot;comment&quot;&gt; -->',
             ],
+            '#912' => [
+                '<!---><p>',
+                '<!---&gt;&lt;p&gt;-->',
+            ],
+            '#913' => [
+                '<!---!><p>',
+                '<!---!&gt;&lt;p&gt;-->',
+            ],
             '#915' => [
                 '#text',
                 '#text',
@@ -302,6 +310,10 @@ class CommonBuilderTest extends TestCase
             '#936' => [
                 '<p class="{&quot;json&quot;:true}">value</p>',
                 '<p class="{&quot;json&quot;:true}">value</p>',
+            ],
+            '#941' => [
+                '<?xml >s<img src=x onerror=alert(1)> ?>',
+                '&lt;?xml &gt;s&lt;img src=x onerror=alert(1)&gt; ?&gt;',
             ],
         ];
     }

@@ -63,6 +63,11 @@ class Behavior
     const ENCODE_INVALID_CDATA_SECTION = 32;
 
     /**
+     * in case an unexpected processing instruction (e.g. `<?xml>`) was found, encode the whole node as HTML
+     */
+    const ENCODE_INVALID_PROCESSING_INSTRUCTION = 64;
+
+    /**
      * @var int
      */
     protected $flags = 0;
@@ -228,6 +233,11 @@ class Behavior
     public function shallEncodeInvalidCdataSection(): bool
     {
         return ($this->flags & self::ENCODE_INVALID_CDATA_SECTION) === self::ENCODE_INVALID_CDATA_SECTION;
+    }
+
+    public function shallEncodeInvalidProcessingInstruction(): bool
+    {
+        return ($this->flags & self::ENCODE_INVALID_PROCESSING_INSTRUCTION) === self::ENCODE_INVALID_PROCESSING_INSTRUCTION;
     }
 
     public function shallRemoveUnexpectedChildren(): bool

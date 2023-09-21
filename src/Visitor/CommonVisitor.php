@@ -19,6 +19,7 @@ use DOMCdataSection;
 use DOMComment;
 use DOMElement;
 use DOMNode;
+use DOMProcessingInstruction;
 use DOMText;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -70,6 +71,10 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
      */
     public function enterNode(DOMNode $domNode)
     {
+        if ($domNode instanceof DOMProcessingInstruction) {
+            return $this->handleInvalidNode($domNode);
+        }
+
         if (!$domNode instanceof DOMCdataSection
             && !$domNode instanceof DOMComment
             && !$domNode instanceof DOMElement
@@ -248,6 +253,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         if (
             ($domNode instanceof DOMComment && $this->behavior->shallEncodeInvalidComment())
             || ($domNode instanceof DOMCdataSection && $this->behavior->shallEncodeInvalidCdataSection())
+            || ($domNode instanceof DOMProcessingInstruction && $this->behavior->shallEncodeInvalidProcessingInstruction())
         ) {
             $this->log('Found unexpected node {nodeName}', [
                 'behavior' => $this->behavior->getName(),
