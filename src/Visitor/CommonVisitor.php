@@ -181,6 +181,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         ) {
             $this->log('Found unexpected children for {nodeName}', [
                 'behavior' => $this->behavior->getName(),
+                'nodeType' => $domNode->nodeType,
                 'nodeName' => $domNode->nodeName,
             ]);
             // reverse processing of children,
@@ -205,6 +206,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         if ($attr === null || !$attr->matchesValue($attribute->value)) {
             $this->log('Found invalid attribute {nodeName}.{attrName}', [
                 'behavior' => $this->behavior->getName(),
+                'nodeType' => $domNode->nodeType,
                 'nodeName' => $domNode->nodeName,
                 'attrName' => $attribute->nodeName,
             ]);
@@ -225,6 +227,7 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
             if ($attr->isMandatory() && !$domNode->hasAttribute($attr->getName())) {
                 $this->log('Missing mandatory attribute {nodeName}.{attrName}', [
                     'behavior' => $this->behavior->getName(),
+                    'nodeType' => $domNode->nodeType,
                     'nodeName' => $domNode->nodeName,
                     'attrName' => $attr->getName(),
                 ]);
@@ -239,10 +242,15 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
      */
     protected function handleInvalidNode(DOMNode $domNode)
     {
-        if ($domNode instanceof DOMComment && $this->behavior->shallEncodeInvalidComment()) {
-            return $this->convertToText($domNode);
-        }
-        if ($domNode instanceof DOMCdataSection && $this->behavior->shallEncodeInvalidCdataSection()) {
+        if (
+            ($domNode instanceof DOMComment && $this->behavior->shallEncodeInvalidComment())
+            || ($domNode instanceof DOMCdataSection && $this->behavior->shallEncodeInvalidCdataSection())
+        ) {
+            $this->log('Found unexpected node {nodeName}', [
+                'behavior' => $this->behavior->getName(),
+                'nodeType' => $domNode->nodeType,
+                'nodeName' => $domNode->nodeName,
+            ]);
             return $this->convertToText($domNode);
         }
         if ($domNode instanceof DOMElement) {
@@ -250,18 +258,25 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
             if ($this->behavior->shallAllowCustomElements() && $this->isCustomElement($domNode)) {
                 $this->log('Allowed custom element {nodeName}', [
                     'behavior' => $this->behavior->getName(),
+                    'nodeType' => $domNode->nodeType,
                     'nodeName' => $domNode->nodeName,
                 ]);
                 return $domNode;
             }
             $this->log('Found unexpected tag {nodeName}', [
                 'behavior' => $this->behavior->getName(),
+                'nodeType' => $domNode->nodeType,
                 'nodeName' => $domNode->nodeName,
             ]);
             if ($this->behavior->shallEncodeInvalidTag()) {
                 return $this->convertToText($domNode);
             }
         }
+        $this->log('Removed unexpected node {nodeName}', [
+            'behavior' => $this->behavior->getName(),
+            'nodeType' => $domNode->nodeType,
+            'nodeName' => $domNode->nodeName,
+        ]);
         return null;
     }
 
