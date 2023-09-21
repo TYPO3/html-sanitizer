@@ -561,10 +561,12 @@ class ScenarioTest extends TestCase
         //    "<a title='Hello \x80, Good morning'></a>",
         //    "<a title='Hello \xEF\xBF\xBD, Good morning'></a>",
         //];
-        yield 'escape non breaking space' => [
-            "<a title='Hello\xc2\xa0World'></a>",
-            '<a title="Hello&nbsp;World"></a>',
-        ];
+        // Disabled replacement of unicode non breaking spaces
+        // see https://github.com/TYPO3/html-sanitizer/commit/a35f220b2336e3f040f91d3de23d19964833643f
+        //yield 'escape non breaking space' => [
+        //    "<a title='Hello\xc2\xa0World'></a>",
+        //    '<a title="Hello&nbsp;World"></a>',
+        //];
         yield 'encodes json values' => [
             "<div data-value='{\"Hello\":[{\"w\":\"o\",\"r\":\"ld\"}]}'></a>",
             '<div data-value="{&quot;Hello&quot;:[{&quot;w&quot;:&quot;o&quot;,&quot;r&quot;:&quot;ld&quot;}]}"></div>'
