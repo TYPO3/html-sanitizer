@@ -184,8 +184,11 @@ class Sanitizer
         if ($target === null) {
             $source->parentNode->removeChild($source);
         } elseif ($source !== $target) {
-            if ($source->ownerDocument !== $target->ownerDocument) {
-                $source->ownerDocument->importNode($target);
+            if ($source->ownerDocument !== $target->ownerDocument
+                && $source->ownerDocument !== null
+                && $target->ownerDocument !== null
+            ) {
+                $target = $source->ownerDocument->importNode($target, true);
             }
             $source->parentNode->replaceChild($target, $source);
         }
