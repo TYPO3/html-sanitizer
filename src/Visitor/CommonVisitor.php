@@ -127,8 +127,8 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
         if (!$domNode instanceof DOMElement) {
             return $domNode;
         }
-        $tag = $this->behavior->getTag($domNode->nodeName);
-        if ($tag === null) {
+        $node = $this->behavior->getNode($domNode->nodeName);
+        if ($node === null) {
             // pass custom elements, in case it has been declared
             if ($this->behavior->shallAllowCustomElements() && $this->isCustomElement($domNode)) {
                 return $domNode;
@@ -137,7 +137,10 @@ class CommonVisitor extends AbstractVisitor implements LoggerAwareInterface
             return null;
         }
         // completely remove node, in case it is expected to exist with children only
-        if (!$this->hasNonEmptyChildren($domNode) && $tag->shallPurgeWithoutChildren()) {
+        if ($node instanceof Behavior\Tag
+            && $node->shallPurgeWithoutChildren()
+            && !$this->hasNonEmptyChildren($domNode)
+        ) {
             return null;
         }
         return $domNode;
