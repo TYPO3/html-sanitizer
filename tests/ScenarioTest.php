@@ -226,6 +226,42 @@ class ScenarioTest extends TestCase
         self::assertSame($expectation, $sanitizer->sanitize($payload));
     }
 
+    /**
+     * @test
+     */
+    public function tagHandlingIsDelegated(): void
+    {
+        $behavior = (new Behavior())
+            ->withFlags(Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withName('scenario-test')
+            ->withTags(new Behavior\Tag('div', Behavior\Tag::ALLOW_CHILDREN))
+            ->withNodes(
+                new Behavior\NodeHandler(
+                    new Behavior\Tag('my-placeholder'),
+                    new Behavior\Handler\ClosureHandler(
+                        static function (NodeInterface $node, ?DOMNode $domNode): ?\DOMNode {
+                            if ($domNode === null) {
+                                return null;
+                            }
+                            $newDocument = new \DOMDocument();
+                            $text = $newDocument->createTextNode($domNode->textContent);
+                            $span = $newDocument->createElement('div');
+                            $span->setAttribute('class', 'delegated');
+                            $span->appendChild($text);
+                            return $span;
+                        }
+                    )
+                )
+            );
+        $sanitizer = new Sanitizer(
+            $behavior,
+            new CommonVisitor($behavior)
+        );
+        $payload = '<div><my-placeholder><span class="inner">value</span></my-placeholder></div>';
+        $expectation = '<div><div class="delegated">value</div></div>';
+        self::assertSame($expectation, $sanitizer->sanitize($payload));
+    }
+
     public static function commentsAreHandledDataProvider(): array
     {
         return [
