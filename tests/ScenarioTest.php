@@ -229,7 +229,7 @@ class ScenarioTest extends TestCase
     /**
      * @test
      */
-    public function tagHandlingIsDelegated(): void
+    public function tagHandlingIsDelegated()
     {
         $behavior = (new Behavior())
             ->withFlags(Behavior::REMOVE_UNEXPECTED_CHILDREN)
@@ -239,7 +239,7 @@ class ScenarioTest extends TestCase
                 new Behavior\NodeHandler(
                     new Behavior\Tag('my-placeholder'),
                     new Behavior\Handler\ClosureHandler(
-                        static function (NodeInterface $node, ?DOMNode $domNode): ?\DOMNode {
+                        static function (NodeInterface $node, DOMNode $domNode = null) {
                             if ($domNode === null) {
                                 return null;
                             }
