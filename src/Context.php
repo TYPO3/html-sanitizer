@@ -32,7 +32,7 @@ class Context
      */
     public $initiator;
 
-    public function __construct(HTML5 $parser, InitiatorInterface $initiator = null)
+    public function __construct(HTML5 $parser, ?InitiatorInterface $initiator = null)
     {
         $this->parser = $parser;
         $this->initiator = $initiator;

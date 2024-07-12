@@ -92,7 +92,7 @@ class Sanitizer
         $this->parser = $this->createParser();
     }
 
-    public function sanitize(string $html, InitiatorInterface $initiator = null): string
+    public function sanitize(string $html, ?InitiatorInterface $initiator = null): string
     {
         $root = $this->parse($html);
         // @todo drop deprecated property
@@ -109,7 +109,7 @@ class Sanitizer
         return $this->parser->parseFragment($html);
     }
 
-    protected function handle(DOMNode $domNode, InitiatorInterface $initiator = null): DOMNode
+    protected function handle(DOMNode $domNode, ?InitiatorInterface $initiator = null): DOMNode
     {
         $this->context = new Context($this->parser, $initiator);
         $this->beforeTraverse();
@@ -195,7 +195,7 @@ class Sanitizer
         return $target;
     }
 
-    protected function createRules(InitiatorInterface $initiator = null): Rules
+    protected function createRules(?InitiatorInterface $initiator = null): Rules
     {
         $stream = fopen('php://temp', 'wb');
         return (new Rules($stream, self::mastermindsDefaultOptions))

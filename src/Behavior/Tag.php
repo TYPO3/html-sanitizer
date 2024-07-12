@@ -62,7 +62,7 @@ class Tag implements NodeInterface
      */
     protected $attrs = [];
 
-    public function __construct(string $name, int $flags = null)
+    public function __construct(string $name, ?int $flags = null)
     {
         $this->name = $name;
         // using `null` as default - potentially allows switching

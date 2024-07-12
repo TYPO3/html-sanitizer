@@ -20,5 +20,5 @@ use TYPO3\HtmlSanitizer\Context;
 
 interface HandlerInterface
 {
-    public function handle(NodeInterface $node, ?DOMNode $domNode, Context $context, Behavior $behavior = null): ?DOMNode;
+    public function handle(NodeInterface $node, ?DOMNode $domNode, Context $context, ?Behavior $behavior = null): ?DOMNode;
 }

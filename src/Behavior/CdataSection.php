@@ -39,7 +39,7 @@ class CdataSection implements NodeInterface, HandlerInterface
         return '#cdata-section';
     }
 
-    public function handle(NodeInterface $node, ?DOMNode $domNode, Context $context, Behavior $behavior = null): ?DOMNode
+    public function handle(NodeInterface $node, ?DOMNode $domNode, Context $context, ?Behavior $behavior = null): ?DOMNode
     {
         if (!$this->secure || $domNode === null) {
             return $domNode;
