@@ -17,7 +17,7 @@ namespace TYPO3\HtmlSanitizer;
 use DOMDocumentFragment;
 use DOMNode;
 use DOMNodeList;
-use Masterminds\HTML5;
+use TYPO3\HtmlSanitizer\Parser\Html5;
 use TYPO3\HtmlSanitizer\Serializer\Rules;
 use TYPO3\HtmlSanitizer\Serializer\RulesInterface;
 use TYPO3\HtmlSanitizer\Visitor\VisitorInterface;
@@ -196,8 +196,8 @@ class Sanitizer
         return fclose($rules->getStream());
     }
 
-    protected function createParser(): HTML5
+    protected function createParser(): Html5
     {
-        return new HTML5(self::mastermindsDefaultOptions);
+        return new Html5(self::mastermindsDefaultOptions);
     }
 }
