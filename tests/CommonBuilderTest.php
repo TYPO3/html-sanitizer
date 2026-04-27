@@ -313,6 +313,11 @@ class CommonBuilderTest extends TestCase
         yield '#941' => [
             '<?xml >s<img src=x onerror=alert(1)> ?>',
             '&lt;?xml &gt;s&lt;img src=x onerror=alert(1)&gt; ?&gt;',
+
+        ];
+        yield '#950' => [
+            '<div xmlns:x="&quot;&gt;&lt;img src=x onerror=alert(document.domain)&gt;">text</div>',
+            '<div xmlns:x="&quot;&gt;&lt;img src=x onerror=alert(document.domain)&gt;">text</div>',
         ];
     }
 
