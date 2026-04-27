@@ -616,6 +616,10 @@ class ScenarioTest extends TestCase
 
     public static function specialTagsAreHandledDataProvider(): iterable
     {
+        yield 'noscript valid' => [
+            '<noscript><p id="info">This site requires JavaScript.</p></noscript>',
+            '<noscript><p id="info">This site requires JavaScript.</p></noscript>',
+        ];
         yield 'noscript attribute' => [
             '<noscript><p id="</noscript><script>alert(1)</script>"></p>',
             '<noscript><p id="&lt;/noscript&gt;&lt;script&gt;alert(1)&lt;/script&gt;"></p></noscript>',
@@ -655,6 +659,66 @@ class ScenarioTest extends TestCase
                     new Behavior\Attr('test:id')
                 )
             );
+
+        $sanitizer = new Sanitizer(
+            $behavior,
+            new CommonVisitor($behavior)
+        );
+        self::assertSame($expectation, $sanitizer->sanitize($payload));
+    }
+
+    public static function insecureRawTextIsSanitizedDataProvider(): \Generator
+    {
+        $noscript = new Behavior\Tag('noscript', Behavior\Tag::ALLOW_CHILDREN);
+        $styleDefault = new Behavior\Tag('style', Behavior\Tag::ALLOW_CHILDREN);
+        $styleInsecureRawText = new Behavior\Tag('style', Behavior\Tag::ALLOW_CHILDREN | Behavior\Tag::ALLOW_INSECURE_RAW_TEXT);
+        $iframeDefault = new Behavior\Tag('iframe', Behavior\Tag::ALLOW_CHILDREN);
+        $iframeInsecureRawText = new Behavior\Tag('iframe', Behavior\Tag::ALLOW_CHILDREN | Behavior\Tag::ALLOW_INSECURE_RAW_TEXT);
+
+        yield 'style whitespace closing tag is recognized (img is removed - default)' => [
+            [$styleDefault],
+            "<style>div::after{content:'<'}</style\t><img src=x onerror=alert(1)>",
+            '<style>div::after{content:\'&lt;\'}</style>',
+        ];
+        yield 'style whitespace closing tag is recognised (img is removed - insecure raw text allowed)' => [
+            [$styleInsecureRawText],
+            "<style>div::after{content:'<'}</style\t><img src=x onerror=alert(1)>",
+            '<style>div::after{content:\'<\'}</style>',
+        ];
+
+        yield 'iframe & style detect raw-text part (img is removed - insecure raw text allowed)' => [
+            [$iframeInsecureRawText, $styleInsecureRawText],
+            '<iframe><style></iframe><img src="x" onerror="alert(1)"></style></iframe>',
+            '<iframe><style></iframe>',
+        ];
+        yield 'iframe & style detect raw-text part (img is removed - default)' => [
+            [$iframeDefault, $styleDefault],
+            '<iframe><style></iframe><img src="x" onerror="alert(1)"></style></iframe>',
+            '<iframe>&lt;style&gt;</iframe>',
+        ];
+
+        yield 'noscript nesting another raw-text element is denied (content is encoded - default)' => [
+            [$noscript, $styleDefault],
+            '<noscript><style></noscript><img src=x onerror=alert(2)></style></noscript>',
+            '<noscript><style>&lt;/noscript&gt;&lt;img src=x onerror=alert(2)&gt;</style></noscript>',
+        ];
+        yield 'noscript nesting another raw-text element is denied (content is encoded - insecure raw text allowed)' => [
+            [$noscript, $styleInsecureRawText],
+            '<noscript><style></noscript><img src=x onerror=alert(2)></style></noscript>',
+            '<noscript><style>&lt;/noscript&gt;&lt;img src=x onerror=alert(2)&gt;</style></noscript>',
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider insecureRawTextIsSanitizedDataProvider
+     */
+    public function insecureRawTextIsSanitized(array $tags, string $payload, string $expectation): void
+    {
+        $behavior = (new Behavior())
+            ->withFlags(Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withName('scenario-test')
+            ->withTags(...$tags);
 
         $sanitizer = new Sanitizer(
             $behavior,

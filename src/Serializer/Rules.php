@@ -154,9 +154,8 @@ class Rules extends OutputRules implements RulesInterface
         if (!$domNode instanceof DOMNode) {
             return;
         }
-        // @todo if allowed as text raw element
         $parentDomNode = $domNode->parentNode ?? null;
-        if (!$this->isRawText($parentDomNode) || !$this->shallAllowInsecureRawText($parentDomNode)) {
+        if (!$this->shallAllowInsecureRawText($parentDomNode)) {
             $this->wr($this->enc($domNode->data));
             return;
         }
@@ -200,6 +199,10 @@ class Rules extends OutputRules implements RulesInterface
         if ($domNode === null || !$this->behavior instanceof Behavior || !$this->isRawText($domNode)) {
             return false;
         }
+        // allowing raw-text in elements nested in `<noscript>` is denied per default
+        if ($this->hasAncestorWithName($domNode, 'noscript')) {
+            return false;
+        }
         $tag = $this->behavior->getTag($domNode->nodeName);
         return $tag instanceof Behavior\Tag && $tag->shallAllowInsecureRawText();
     }
@@ -216,5 +219,20 @@ class Rules extends OutputRules implements RulesInterface
         return $domNode !== null
             && !empty($domNode->tagName)
             && Elements::isA($domNode->localName, Elements::VOID_TAG);
+    }
+
+    protected function hasAncestorWithName(?DOMNode $domNode, string $ancestorName): bool
+    {
+        if (!$domNode instanceof DOMNode) {
+            return false;
+        }
+        $ancestor = $domNode->parentNode;
+        while ($ancestor instanceof DOMNode) {
+            if ($ancestor->localName === $ancestorName) {
+                return true;
+            }
+            $ancestor = $ancestor->parentNode;
+        }
+        return false;
     }
 }
