@@ -221,6 +221,23 @@ class Rules extends OutputRules implements RulesInterface
             && Elements::isA($domNode->localName, Elements::VOID_TAG);
     }
 
+    /**
+     * Write the namespace attributes.
+     *
+     * @param \DOMNode $ele The element being written.
+     */
+    #[\Override]
+    protected function namespaceAttrs($ele)
+    {
+        $xpath = new \DOMXPath($ele->ownerDocument);
+
+        foreach ($xpath->query('namespace::*[not(.=../../namespace::*)]', $ele) as $nsNode) {
+            if (!in_array($nsNode->nodeValue, $this->implicitNamespaces)) {
+                $this->wr(' ')->wr($nsNode->nodeName)->wr('="')->wr($this->enc($nsNode->nodeValue, true))->wr('"');
+            }
+        }
+    }
+
     protected function hasAncestorWithName(?DOMNode $domNode, string $ancestorName): bool
     {
         if (!$domNode instanceof DOMNode) {
