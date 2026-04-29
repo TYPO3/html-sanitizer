@@ -105,7 +105,7 @@ class ScenarioTest extends TestCase
     public function tagFlagsAreProcessed(int $flags, string $payload, string $expectation): void
     {
         $behavior = (new Behavior())
-            ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withFlags(Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('scenario-test')
             ->withTags(
                 (new Behavior\Tag('i')), // just used as DOM child element
@@ -595,7 +595,7 @@ class ScenarioTest extends TestCase
     public function attributesAreEncoded(string $payload, string $expectation): void
     {
         $behavior = (new Behavior())
-            ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withFlags(Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('scenario-test')
             ->withTags(
                 (new Behavior\Tag('a', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(
@@ -645,7 +645,7 @@ class ScenarioTest extends TestCase
     public function specialTagsAreHandled(string $payload, string $expectation): void
     {
         $behavior = (new Behavior())
-            ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withFlags(Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('scenario-test')
             ->withTags(
                 (new Behavior\Tag('style', Behavior\Tag::ALLOW_CHILDREN)),
