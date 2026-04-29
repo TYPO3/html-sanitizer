@@ -7,8 +7,7 @@ The following matrix shows the versions that are currently maintained.
 | Version | Supported          |
 |---------|--------------------|
 | 2.x     | :white_check_mark: |
-| 1.5.x   | :white_check_mark: |
-| < 1.5.0 | :x:                |
+| < 2.x   | :x:                |
 
 ## Reporting a Vulnerability
 
