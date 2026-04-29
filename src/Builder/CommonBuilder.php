@@ -40,12 +40,6 @@ class CommonBuilder implements BuilderInterface
      */
     protected $srcAttr;
 
-    /**
-     * @var Behavior\Attr
-     * @deprecated not used anymore
-     */
-    protected $srcsetAttr;
-
     public function __construct()
     {
         $bluntUriAttrValueBuilder = new UriAttrValueBuilder();
@@ -57,13 +51,6 @@ class CommonBuilder implements BuilderInterface
             ->addValues(...($uriAttrValueBuilders['href'] ?? $bluntUriAttrValueBuilder)->getValues());
         $this->srcAttr = (new Behavior\Attr('src'))
             ->addValues(...($uriAttrValueBuilders['src'] ?? $bluntUriAttrValueBuilder)->getValues());
-
-        // @deprecated not used anymore
-        $srcsetAttrValueBuilder = (new UriAttrValueBuilder())
-            ->allowLocal(true)
-            ->allowSchemes('http', 'https');
-        $this->srcsetAttr = (new Behavior\Attr('src'))
-            ->addValues(...$srcsetAttrValueBuilder->getValues());
     }
 
     public function build(): Sanitizer
