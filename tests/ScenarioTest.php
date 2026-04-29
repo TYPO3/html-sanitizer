@@ -26,22 +26,6 @@ use TYPO3\HtmlSanitizer\Visitor\CommonVisitor;
 
 class ScenarioTest extends TestCase
 {
-    /**
-     * @test
-     */
-    public function missingBehaviorTriggersDeprecationError(): void
-    {
-        $this->markTestSkipped('see https://github.com/TYPO3/html-sanitizer/issues/99');
-
-        $this->expectDeprecation();
-        $this->expectDeprecationMessage(
-            'Add `Behavior` when creating new `Sanitizer` instances, e.g. `new Sanitizer($behavior, $visitor)`'
-        );
-        $behavior = new Behavior();
-        $visitor = new CommonVisitor($behavior);
-        new Sanitizer($visitor);
-    }
-
     public static function allTagsAreRemovedOnMissingDeclarationDataProvider(): array
     {
         return [
