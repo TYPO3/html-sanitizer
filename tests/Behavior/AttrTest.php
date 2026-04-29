@@ -78,17 +78,15 @@ class AttrTest extends TestCase
         self::assertNotSame($attr, $attr->withValues($valueA, $valueD));
     }
 
-    public static function matchesNameDataProvider(): array
+    public static function matchesNameDataProvider(): iterable
     {
-        return [
-            [ Attr::BLUNT, 'name', 'name', true ],
-            [ Attr::BLUNT, 'name', 'other', false ],
-            [ Attr::BLUNT, 'name', 'name-other', false ],
-            [ Attr::NAME_PREFIX, 'name-', 'name-', true ],
-            [ Attr::NAME_PREFIX, 'name-', 'name-other', true ],
-            [ Attr::NAME_PREFIX, 'name-', 'name', false ],
-            [ Attr::NAME_PREFIX, 'name-', 'other', false ],
-        ];
+        yield [ Attr::BLUNT, 'name', 'name', true ];
+        yield [ Attr::BLUNT, 'name', 'other', false ];
+        yield [ Attr::BLUNT, 'name', 'name-other', false ];
+        yield [ Attr::NAME_PREFIX, 'name-', 'name-', true ];
+        yield [ Attr::NAME_PREFIX, 'name-', 'name-other', true ];
+        yield [ Attr::NAME_PREFIX, 'name-', 'name', false ];
+        yield [ Attr::NAME_PREFIX, 'name-', 'other', false ];
     }
 
     /**
@@ -105,30 +103,28 @@ class AttrTest extends TestCase
         self::assertSame($expectation, $attr->matchesName($matchName));
     }
 
-    public static function matchesValueDataProvider(): array
+    public static function matchesValueDataProvider(): iterable
     {
         $equalsA = new DatasetAttrValue('a');
         $equalsB = new DatasetAttrValue('b');
         $equalsAorB = new DatasetAttrValue('a', 'b');
 
-        return [
-            [ Attr::MATCH_ALL_VALUES, [$equalsA], 'a', true ],
-            [ Attr::MATCH_ALL_VALUES, [$equalsA], 'b', false ],
-            [ Attr::MATCH_ALL_VALUES, [$equalsAorB], 'a', true ],
-            [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsAorB], 'a', true ],
-            [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsB], 'a', false ], // both `$equalsA` and `$equalsB` must match
-            [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsB], 'b', false ], // both `$equalsA` and `$equalsB` must match
-            [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsB], 'c', false ],
-            [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsB, $equalsAorB], 'c', false ],
-            [ Attr::BLUNT, [$equalsA], 'a', true ],
-            [ Attr::BLUNT, [$equalsA], 'b', false ],
-            [ Attr::BLUNT, [$equalsAorB], 'a', true ],
-            [ Attr::BLUNT, [$equalsA, $equalsAorB], 'a', true ],
-            [ Attr::BLUNT, [$equalsA, $equalsB], 'a', true ],
-            [ Attr::BLUNT, [$equalsA, $equalsB], 'b', true ],
-            [ Attr::BLUNT, [$equalsA, $equalsB], 'c', false ],
-            [ Attr::BLUNT, [$equalsA, $equalsB, $equalsAorB], 'c', false ],
-        ];
+        yield [ Attr::MATCH_ALL_VALUES, [$equalsA], 'a', true ];
+        yield [ Attr::MATCH_ALL_VALUES, [$equalsA], 'b', false ];
+        yield [ Attr::MATCH_ALL_VALUES, [$equalsAorB], 'a', true ];
+        yield [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsAorB], 'a', true ];
+        yield [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsB], 'a', false ]; // both `$equalsA` and `$equalsB` must match
+        yield [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsB], 'b', false ]; // both `$equalsA` and `$equalsB` must match
+        yield [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsB], 'c', false ];
+        yield [ Attr::MATCH_ALL_VALUES, [$equalsA, $equalsB, $equalsAorB], 'c', false ];
+        yield [ Attr::BLUNT, [$equalsA], 'a', true ];
+        yield [ Attr::BLUNT, [$equalsA], 'b', false ];
+        yield [ Attr::BLUNT, [$equalsAorB], 'a', true ];
+        yield [ Attr::BLUNT, [$equalsA, $equalsAorB], 'a', true ];
+        yield [ Attr::BLUNT, [$equalsA, $equalsB], 'a', true ];
+        yield [ Attr::BLUNT, [$equalsA, $equalsB], 'b', true ];
+        yield [ Attr::BLUNT, [$equalsA, $equalsB], 'c', false ];
+        yield [ Attr::BLUNT, [$equalsA, $equalsB, $equalsAorB], 'c', false ];
     }
 
     /**
