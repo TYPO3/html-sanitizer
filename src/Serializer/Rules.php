@@ -197,7 +197,7 @@ class Rules extends OutputRules implements RulesInterface
 
     protected function shallAllowInsecureRawText(?DOMNode $domNode): bool
     {
-        if (!$domNode instanceof DOMNode || !$this->behavior instanceof Behavior) {
+        if ($domNode === null || !$this->behavior instanceof Behavior || !$this->isRawText($domNode)) {
             return false;
         }
         $tag = $this->behavior->getTag($domNode->nodeName);
@@ -206,14 +206,14 @@ class Rules extends OutputRules implements RulesInterface
 
     protected function isRawText(?DOMNode $domNode): bool
     {
-        return $domNode instanceof DOMNode
+        return $domNode !== null
             && !empty($domNode->tagName)
             && Elements::isA($domNode->localName, Elements::TEXT_RAW);
     }
 
     protected function isVoid(?DOMNode $domNode): bool
     {
-        return $domNode instanceof DOMNode
+        return $domNode !== null
             && !empty($domNode->tagName)
             && Elements::isA($domNode->localName, Elements::VOID_TAG);
     }
