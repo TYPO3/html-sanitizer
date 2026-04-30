@@ -26,13 +26,11 @@ use TYPO3\HtmlSanitizer\Visitor\CommonVisitor;
 
 class ScenarioTest extends TestCase
 {
-    public static function allTagsAreRemovedOnMissingDeclarationDataProvider(): array
+    public static function allTagsAreRemovedOnMissingDeclarationDataProvider(): iterable
     {
-        return [
-            ['<div class="content">value</div><span class="content">value</span>', ''],
-            ['<!--any--><div class="content">value</div>', '<!--any-->'],
-            ['<!--any--!><div class="content">value</div>', '<!--any-->'],
-        ];
+        yield ['<div class="content">value</div><span class="content">value</span>', ''];
+        yield ['<!--any--><div class="content">value</div>', '<!--any-->'];
+        yield ['<!--any--!><div class="content">value</div>', '<!--any-->'];
     }
 
     /**
@@ -49,56 +47,54 @@ class ScenarioTest extends TestCase
         self::assertSame($expectation, $sanitizer->sanitize($payload));
     }
 
-    public static function tagFlagsAreProcessedDataProvider(): array
+    public static function tagFlagsAreProcessedDataProvider(): iterable
     {
-        return [
-            [
-                Behavior\Tag::ALLOW_CHILDREN | Behavior\Tag::PURGE_WITHOUT_CHILDREN,
-                implode("\n", [
-                    '<div></div><div data-test="test"></div>',
-                    '<div>test</div><div data-test="test">test</div>',
-                    '<div><!-- --></div><div data-test="test"><!-- --></div>',
-                    '<div><!-- test --></div><div data-test="test"><!-- test --></div>',
-                    '<div><i></i></div><div data-test="test"><i></i></div>',
-                ]),
-                implode("\n", [
-                    '',
-                    '<div>test</div><div data-test="test">test</div>',
-                    '<div><!-- --></div><div data-test="test"><!-- --></div>',
-                    '<div><!-- test --></div><div data-test="test"><!-- test --></div>',
-                    '<div><i></i></div><div data-test="test"><i></i></div>',
-                ]),
-            ],
-            [
-                Behavior\Tag::ALLOW_CHILDREN | Behavior\Tag::PURGE_WITHOUT_CHILDREN,
-                implode("\n", [
-                    '<script></script><script data-test="test"></script>',
-                    '<script>test</script><script data-test="test">test</script>',
-                    '<script><!-- --></script><script data-test="test"><!-- --></script>',
-                    '<script><!-- test --></script><script data-test="test"><!-- test --></script>',
-                ]),
-                implode("\n", [
-                    '',
-                    '<script>test</script><script data-test="test">test</script>',
-                    '<script>&lt;!-- --&gt;</script><script data-test="test">&lt;!-- --&gt;</script>',
-                    '<script>&lt;!-- test --&gt;</script><script data-test="test">&lt;!-- test --&gt;</script>',
-                ]),
-            ],
-            [
-                Behavior\Tag::ALLOW_CHILDREN | Behavior\Tag::PURGE_WITHOUT_CHILDREN | Behavior\Tag::ALLOW_INSECURE_RAW_TEXT,
-                implode("\n", [
-                    '<script></script><script data-test="test"></script>',
-                    '<script>test</script><script data-test="test">test</script>',
-                    '<script><!-- --></script><script data-test="test"><!-- --></script>',
-                    '<script><!-- test --></script><script data-test="test"><!-- test --></script>',
-                ]),
-                implode("\n", [
-                    '',
-                    '<script>test</script><script data-test="test">test</script>',
-                    '<script><!-- --></script><script data-test="test"><!-- --></script>',
-                    '<script><!-- test --></script><script data-test="test"><!-- test --></script>',
-                ]),
-            ],
+        yield [
+            Behavior\Tag::ALLOW_CHILDREN | Behavior\Tag::PURGE_WITHOUT_CHILDREN,
+            implode("\n", [
+                '<div></div><div data-test="test"></div>',
+                '<div>test</div><div data-test="test">test</div>',
+                '<div><!-- --></div><div data-test="test"><!-- --></div>',
+                '<div><!-- test --></div><div data-test="test"><!-- test --></div>',
+                '<div><i></i></div><div data-test="test"><i></i></div>',
+            ]),
+            implode("\n", [
+                '',
+                '<div>test</div><div data-test="test">test</div>',
+                '<div><!-- --></div><div data-test="test"><!-- --></div>',
+                '<div><!-- test --></div><div data-test="test"><!-- test --></div>',
+                '<div><i></i></div><div data-test="test"><i></i></div>',
+            ]),
+        ];
+        yield [
+            Behavior\Tag::ALLOW_CHILDREN | Behavior\Tag::PURGE_WITHOUT_CHILDREN,
+            implode("\n", [
+                '<script></script><script data-test="test"></script>',
+                '<script>test</script><script data-test="test">test</script>',
+                '<script><!-- --></script><script data-test="test"><!-- --></script>',
+                '<script><!-- test --></script><script data-test="test"><!-- test --></script>',
+            ]),
+            implode("\n", [
+                '',
+                '<script>test</script><script data-test="test">test</script>',
+                '<script>&lt;!-- --&gt;</script><script data-test="test">&lt;!-- --&gt;</script>',
+                '<script>&lt;!-- test --&gt;</script><script data-test="test">&lt;!-- test --&gt;</script>',
+            ]),
+        ];
+        yield [
+            Behavior\Tag::ALLOW_CHILDREN | Behavior\Tag::PURGE_WITHOUT_CHILDREN | Behavior\Tag::ALLOW_INSECURE_RAW_TEXT,
+            implode("\n", [
+                '<script></script><script data-test="test"></script>',
+                '<script>test</script><script data-test="test">test</script>',
+                '<script><!-- --></script><script data-test="test"><!-- --></script>',
+                '<script><!-- test --></script><script data-test="test"><!-- test --></script>',
+            ]),
+            implode("\n", [
+                '',
+                '<script>test</script><script data-test="test">test</script>',
+                '<script><!-- --></script><script data-test="test"><!-- --></script>',
+                '<script><!-- test --></script><script data-test="test"><!-- test --></script>',
+            ]),
         ];
     }
 
@@ -109,7 +105,7 @@ class ScenarioTest extends TestCase
     public function tagFlagsAreProcessed(int $flags, string $payload, string $expectation): void
     {
         $behavior = (new Behavior())
-            ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withFlags(Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('scenario-test')
             ->withTags(
                 (new Behavior\Tag('i')), // just used as DOM child element
@@ -124,7 +120,7 @@ class ScenarioTest extends TestCase
         self::assertSame($expectation, $sanitizer->sanitize($payload));
     }
 
-    public static function tagIsHandledDataProcessor(): array
+    public static function tagIsHandledDataProcessor(): iterable
     {
         $node = new Behavior\Tag('div');
         $asTextHandler = new Behavior\Handler\AsTextHandler();
@@ -137,59 +133,57 @@ class ScenarioTest extends TestCase
             }
         );
 
-        return [
-            [
-                new Behavior\NodeHandler(
-                    $node,
-                    $asTextHandler
-                ),
-                '<div invalid-attr="value"><i>unexpected</i></div>',
-                '&lt;div invalid-attr="value"&gt;&lt;i&gt;unexpected&lt;/i&gt;&lt;/div&gt;',
-            ],
-            [
-                new Behavior\NodeHandler(
-                    $node,
-                    $asTextHandler,
-                    Behavior\NodeHandler::PROCESS_DEFAULTS
-                ),
-                '<div invalid-attr="value"><i>unexpected</i></div>',
-                '&lt;div&gt;&lt;/div&gt;',
-            ],
-            [
-                new Behavior\NodeHandler(
-                    $node,
-                    $asTextHandler,
-                    Behavior\NodeHandler::PROCESS_DEFAULTS | Behavior\NodeHandler::HANDLE_FIRST
-                ),
-                '<div invalid-attr="value"><i>unexpected</i></div>',
-                '&lt;div invalid-attr="value"&gt;&lt;i&gt;unexpected&lt;/i&gt;&lt;/div&gt;',
-            ],
-            [
-                new Behavior\NodeHandler(
-                    $node,
-                    $closureHandler
-                ),
-                '<div invalid-attr="value"><i>unexpected</i></div>',
-                'Handled &lt;div&gt;',
-            ],
-            [
-                new Behavior\NodeHandler(
-                    $node,
-                    $closureHandler,
-                    Behavior\NodeHandler::PROCESS_DEFAULTS
-                ),
-                '<div invalid-attr="value"><i>unexpected</i></div>',
-                'Handled &lt;div&gt;',
-            ],
-            [
-                new Behavior\NodeHandler(
-                    $node,
-                    $closureHandler,
-                    Behavior\NodeHandler::PROCESS_DEFAULTS | Behavior\NodeHandler::HANDLE_FIRST
-                ),
-                '<div invalid-attr="value"><i>unexpected</i></div>',
-                'Handled &lt;div&gt;',
-            ],
+        yield [
+            new Behavior\NodeHandler(
+                $node,
+                $asTextHandler
+            ),
+            '<div invalid-attr="value"><i>unexpected</i></div>',
+            '&lt;div invalid-attr="value"&gt;&lt;i&gt;unexpected&lt;/i&gt;&lt;/div&gt;',
+        ];
+        yield [
+            new Behavior\NodeHandler(
+                $node,
+                $asTextHandler,
+                Behavior\NodeHandler::PROCESS_DEFAULTS
+            ),
+            '<div invalid-attr="value"><i>unexpected</i></div>',
+            '&lt;div&gt;&lt;/div&gt;',
+        ];
+        yield [
+            new Behavior\NodeHandler(
+                $node,
+                $asTextHandler,
+                Behavior\NodeHandler::PROCESS_DEFAULTS | Behavior\NodeHandler::HANDLE_FIRST
+            ),
+            '<div invalid-attr="value"><i>unexpected</i></div>',
+            '&lt;div invalid-attr="value"&gt;&lt;i&gt;unexpected&lt;/i&gt;&lt;/div&gt;',
+        ];
+        yield [
+            new Behavior\NodeHandler(
+                $node,
+                $closureHandler
+            ),
+            '<div invalid-attr="value"><i>unexpected</i></div>',
+            'Handled &lt;div&gt;',
+        ];
+        yield [
+            new Behavior\NodeHandler(
+                $node,
+                $closureHandler,
+                Behavior\NodeHandler::PROCESS_DEFAULTS
+            ),
+            '<div invalid-attr="value"><i>unexpected</i></div>',
+            'Handled &lt;div&gt;',
+        ];
+        yield [
+            new Behavior\NodeHandler(
+                $node,
+                $closureHandler,
+                Behavior\NodeHandler::PROCESS_DEFAULTS | Behavior\NodeHandler::HANDLE_FIRST
+            ),
+            '<div invalid-attr="value"><i>unexpected</i></div>',
+            'Handled &lt;div&gt;',
         ];
     }
 
@@ -246,51 +240,49 @@ class ScenarioTest extends TestCase
         self::assertSame($expectation, $sanitizer->sanitize($payload));
     }
 
-    public static function commentsAreHandledDataProvider(): array
+    public static function commentsAreHandledDataProvider(): iterable
     {
-        return [
-            'not allowed' => [
-                false,
-                null,
-                Behavior::BLUNT,
-                '<div><!-- before -->test<!-- after --></div>',
-                '<div>test</div>'
-            ],
-            'allowed, insecure' => [
-                true,
-                false,
-                Behavior::BLUNT,
-                '<div><!-- before -->test<!-- after --></div>',
-                '<div><!-- before -->test<!-- after --></div>'
-            ],
-            'allowed, secure' => [
-                true,
-                true,
-                Behavior::BLUNT,
-                '<div><!-- before -->test<!-- after --></div>',
-                '<div><!-- before -->test<!-- after --></div>'
-            ],
-            'not allowed, encode invalid' => [
-                false,
-                null,
-                Behavior::ENCODE_INVALID_COMMENT,
-                '<div><!-- before -->test<!-- after --></div>',
-                '<div>&lt;!-- before --&gt;test&lt;!-- after --&gt;</div>',
-            ],
-            'allowed, insecure, encode invalid' => [
-                true,
-                false,
-                Behavior::ENCODE_INVALID_COMMENT,
-                '<div><!-- before -->test<!-- after --></div>',
-                '<div><!-- before -->test<!-- after --></div>'
-            ],
-            'allowed, secure, encode invalid' => [
-                true,
-                true,
-                Behavior::ENCODE_INVALID_COMMENT,
-                '<div><!-- before -->test<!-- after --></div>',
-                '<div><!-- before -->test<!-- after --></div>'
-            ],
+        yield 'not allowed' => [
+            false,
+            null,
+            Behavior::BLUNT,
+            '<div><!-- before -->test<!-- after --></div>',
+            '<div>test</div>'
+        ];
+        yield 'allowed, insecure' => [
+            true,
+            false,
+            Behavior::BLUNT,
+            '<div><!-- before -->test<!-- after --></div>',
+            '<div><!-- before -->test<!-- after --></div>'
+        ];
+        yield 'allowed, secure' => [
+            true,
+            true,
+            Behavior::BLUNT,
+            '<div><!-- before -->test<!-- after --></div>',
+            '<div><!-- before -->test<!-- after --></div>'
+        ];
+        yield 'not allowed, encode invalid' => [
+            false,
+            null,
+            Behavior::ENCODE_INVALID_COMMENT,
+            '<div><!-- before -->test<!-- after --></div>',
+            '<div>&lt;!-- before --&gt;test&lt;!-- after --&gt;</div>',
+        ];
+        yield 'allowed, insecure, encode invalid' => [
+            true,
+            false,
+            Behavior::ENCODE_INVALID_COMMENT,
+            '<div><!-- before -->test<!-- after --></div>',
+            '<div><!-- before -->test<!-- after --></div>'
+        ];
+        yield 'allowed, secure, encode invalid' => [
+            true,
+            true,
+            Behavior::ENCODE_INVALID_COMMENT,
+            '<div><!-- before -->test<!-- after --></div>',
+            '<div><!-- before -->test<!-- after --></div>'
         ];
     }
 
@@ -313,51 +305,49 @@ class ScenarioTest extends TestCase
         self::assertSame($expectation, $sanitizer->sanitize($payload));
     }
 
-    public static function cdataSectionsAreHandledDataProvider(): array
+    public static function cdataSectionsAreHandledDataProvider(): iterable
     {
-        return [
-            'not allowed' => [
-                false,
-                null,
-                Behavior::BLUNT,
-                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
-                '<div>.test.</div>'
-            ],
-            'allowed, insecure' => [
-                true,
-                false,
-                Behavior::BLUNT,
-                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
-                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>'
-            ],
-            'allowed, secure' => [
-                true,
-                true,
-                Behavior::BLUNT,
-                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
-                '<div>before.test.after</div>'
-            ],
-            'not allowed, encode invalid' => [
-                false,
-                null,
-                Behavior::ENCODE_INVALID_CDATA_SECTION,
-                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
-                '<div>&lt;![CDATA[ before ]]&gt;.test.&lt;![CDATA[ after ]]&gt;</div>',
-            ],
-            'allowed, insecure, encode invalid' => [
-                true,
-                false,
-                Behavior::ENCODE_INVALID_CDATA_SECTION,
-                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
-                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>'
-            ],
-            'allowed, secure, encode invalid' => [
-                true,
-                true,
-                Behavior::ENCODE_INVALID_CDATA_SECTION,
-                '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
-                '<div>before.test.after</div>'
-            ],
+        yield 'not allowed' => [
+            false,
+            null,
+            Behavior::BLUNT,
+            '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
+            '<div>.test.</div>'
+        ];
+        yield 'allowed, insecure' => [
+            true,
+            false,
+            Behavior::BLUNT,
+            '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
+            '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>'
+        ];
+        yield 'allowed, secure' => [
+            true,
+            true,
+            Behavior::BLUNT,
+            '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
+            '<div>before.test.after</div>'
+        ];
+        yield 'not allowed, encode invalid' => [
+            false,
+            null,
+            Behavior::ENCODE_INVALID_CDATA_SECTION,
+            '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
+            '<div>&lt;![CDATA[ before ]]&gt;.test.&lt;![CDATA[ after ]]&gt;</div>',
+        ];
+        yield 'allowed, insecure, encode invalid' => [
+            true,
+            false,
+            Behavior::ENCODE_INVALID_CDATA_SECTION,
+            '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
+            '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>'
+        ];
+        yield 'allowed, secure, encode invalid' => [
+            true,
+            true,
+            Behavior::ENCODE_INVALID_CDATA_SECTION,
+            '<div><![CDATA[ before ]]>.test.<![CDATA[ after ]]></div>',
+            '<div>before.test.after</div>'
         ];
     }
 
@@ -380,7 +370,7 @@ class ScenarioTest extends TestCase
         self::assertSame($expectation, $sanitizer->sanitize($payload));
     }
 
-    public static function rawTextElementsAreHandledDataProvider(): \Generator
+    public static function rawTextElementsAreHandledDataProvider(): iterable
     {
         foreach (Elements::$html5 as $name => $flags) {
             if (($flags & Elements::TEXT_RAW) !== Elements::TEXT_RAW) {
@@ -539,7 +529,7 @@ class ScenarioTest extends TestCase
         self::assertSame($expectation, $sanitizer->sanitize($payload));
     }
 
-    public static function attributesAreEncodedDataProvider(): \Generator
+    public static function attributesAreEncodedDataProvider(): iterable
     {
         yield 'preserve entities' => [
 	        '<a title="Insert &amp;"></a>',
@@ -605,7 +595,7 @@ class ScenarioTest extends TestCase
     public function attributesAreEncoded(string $payload, string $expectation): void
     {
         $behavior = (new Behavior())
-            ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withFlags(Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('scenario-test')
             ->withTags(
                 (new Behavior\Tag('a', Behavior\Tag::ALLOW_CHILDREN))->addAttrs(
@@ -624,7 +614,7 @@ class ScenarioTest extends TestCase
         self::assertSame($expectation, $sanitizer->sanitize($payload));
     }
 
-    public static function specialTagsAreHandledDataProvider(): \Generator
+    public static function specialTagsAreHandledDataProvider(): iterable
     {
         yield 'noscript attribute' => [
             '<noscript><p id="</noscript><script>alert(1)</script>"></p>',
@@ -655,7 +645,7 @@ class ScenarioTest extends TestCase
     public function specialTagsAreHandled(string $payload, string $expectation): void
     {
         $behavior = (new Behavior())
-            ->withFlags(Behavior::ENCODE_INVALID_TAG | Behavior::REMOVE_UNEXPECTED_CHILDREN)
+            ->withFlags(Behavior::REMOVE_UNEXPECTED_CHILDREN)
             ->withName('scenario-test')
             ->withTags(
                 (new Behavior\Tag('style', Behavior\Tag::ALLOW_CHILDREN)),

@@ -21,14 +21,12 @@ use TYPO3\HtmlSanitizer\Behavior\Tag;
 
 class BehaviorTest extends TestCase
 {
-    public function ambiguityIsDetectedDataProvider(): array
+    public static function ambiguityIsDetectedDataProvider(): iterable
     {
-        return [
-            [ ['same', 'same'], [], 1625591503 ],
-            [ ['same', 'same'], ['same'], 1625591503 ],
-            [ [], ['same', 'same'], 1625591503 ],
-            [ ['same'], ['same', 'same'], 1625591503 ],
-        ];
+        yield [ ['same', 'same'], [], 1625591503 ];
+        yield [ ['same', 'same'], ['same'], 1625591503 ];
+        yield [ [], ['same', 'same'], 1625591503 ];
+        yield [ ['same'], ['same', 'same'], 1625591503 ];
     }
 
     /**

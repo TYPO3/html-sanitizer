@@ -21,15 +21,13 @@ use TYPO3\HtmlSanitizer\Behavior\Tag;
 
 class TagTest extends TestCase
 {
-    public function ambiguityIsDetectedDataProvider(): array
+    public static function ambiguityIsDetectedDataProvider(): iterable
     {
-        return [
-            [ ['same'], ['same'], 1625394715 ],
-            [ ['same', 'same'], [], 1625590355 ],
-            [ ['same', 'same'], ['same'], 1625590355 ],
-            [ [], ['same', 'same'], 1625590355 ],
-            [ ['same'], ['same', 'same'], 1625590355 ],
-        ];
+        yield [ ['same'], ['same'], 1625394715 ];
+        yield [ ['same', 'same'], [], 1625590355 ];
+        yield [ ['same', 'same'], ['same'], 1625590355 ];
+        yield [ [], ['same', 'same'], 1625590355 ];
+        yield [ ['same'], ['same', 'same'], 1625590355 ];
     }
 
     /**
